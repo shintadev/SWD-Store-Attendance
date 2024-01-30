@@ -6,3 +6,4 @@ env/
 spec/
 /src/views/
 /src/public/
+secret/

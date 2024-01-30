@@ -6,13 +6,14 @@ export default {
   Base: '/api',
   Employees: {
     Base: '/emp',
-    Get: '/i/',
+    Get: '/i/:id',
     Add: '/add',
     Update: '/update',
     Delete: '/delete/:id',
     Face: '/scan',
   },
 } as const;
+
 
 
 

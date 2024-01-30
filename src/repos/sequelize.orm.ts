@@ -25,13 +25,11 @@ const sequelize = new Sequelize(
         require: true,
       },
     },
-    // sync: {
-    //   force: true,
-    //   alter: true,
-    // },
+    sync: {
+      alter: true,
+    },
   }
 );
-// console.log('🚀 ~ sequelize:', sequelize);
 
 // **** Models **** //
 
@@ -80,16 +78,16 @@ const Employee = sequelize.define<EmployeeModel>(
   }
 );
 
-async function alterTable() {
-  try {
-    await sequelize.sync({ alter: true });
-    console.log('Table created');
-  } catch (error) {
-    console.log('🚀 ~ createAndUseTable ~ error:', error);
-  }
-}
+// async function alterTable() {
+//   try {
+//     await sequelize.sync({ alter: true });
+//     console.log('Table created');
+//   } catch (error) {
+//     console.log('🚀 ~ createAndUseTable ~ error:', error);
+//   }
+// }
 
-alterTable();
+// alterTable();
 
 // **** Export default **** //
 

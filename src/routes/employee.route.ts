@@ -5,7 +5,7 @@ import Paths from '../constants/Paths';
 import Employee, { IEmployee } from '@src/models/Employee';
 import imageService from '../services/image.service';
 import { asyncHandler } from '../util/misc';
-// import fileService from '@src/services/file.service';
+import fileService from '@src/services/file.service';
 import employeeService from '@src/services/employee.service';
 import multer from 'multer';
 
@@ -116,11 +116,11 @@ const employeeResolvers = {
           data: { error },
         });
       }
-      // const imgBuffer = img.buffer.toString('base64');
+      const imgBuffer = img.buffer;
 
-      // const publicId = await fileService.uploadToCloud(imgBuffer);
+      const publicId = await fileService.uploadToCloud(imgBuffer);
 
-      const employee: IEmployee = Employee.new(name, '123', faceId);
+      const employee: IEmployee = Employee.new(name, publicId, faceId);
       console.log('🚀 ~ add: ~ employee:', employee);
 
       const result = await employeeService.addOne(employee);

@@ -30,10 +30,12 @@ export function generateId(fullName: string): string {
   const name = fullName.split(' ');
   let id = name[name.length - 1];
   for (let i = 0; i < name.length - 1; i++) {
-    id = name[i].charAt(0);
+    id = id + name[i].charAt(0);
   }
 
-  return id + nanoid(10 - id.length);
+  const result = id + nanoid(10 - id.length);
+
+  return result;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,5 +1,5 @@
 import EnvVars from '@src/constants/EnvVars';
-import { v2 as Cloudinary } from 'cloudinary';
+import { v2 as Cloudinary, UploadApiResponse } from 'cloudinary';
 
 class FileService {
   private config;
@@ -20,22 +20,28 @@ class FileService {
     Cloudinary.config(this.config);
   }
 
-  public async uploadToCloud(image: string): Promise<string> {
+  public async uploadToCloud(image: Buffer): Promise<string> {
     // Use the uploaded file's name as the asset's public ID and
     // allow overwriting the asset with new versions
-    const options = {
-      use_filename: true,
-      unique_filename: true,
-      overwrite: true,
-    };
+    // const options = {
+    //   use_filename: true,
+    //   unique_filename: true,
+    //   overwrite: true,
+    // };
 
     try {
-      // Upload the image
-      const result = await Cloudinary.uploader.upload(image, options); //Not working
+      const result = await new Promise<UploadApiResponse>((resolve, reject) => {
+        Cloudinary.uploader
+          .upload_stream((error, result) => {
+            if (result) return resolve(result);
+            else reject(error);
+          })
+          .end(image);
+      });
 
       return result.public_id;
     } catch (error) {
-      console.log('🚀 ~ FileService ~ uploadToCloud ~ error:');
+      console.log('🚀 ~ FileService ~ uploadToCloud ~ error:', error);
 
       throw error;
     }
