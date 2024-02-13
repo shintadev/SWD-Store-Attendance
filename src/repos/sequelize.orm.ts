@@ -14,22 +14,20 @@ const DB_NAME = EnvVars.DB.PostGre.DATABASE;
 export interface EmployeeModel extends Model<IEmployee>, IEmployee {}
 
 // **** Connection **** //
-// const config = {
+const uri = 'postgres://' + DB_USER + ':' + DB_PASSWORD + '@' + DB_HOST + '/' + DB_NAME;
 
-// }
-const sequelize = new Sequelize(
-  'postgres://' + DB_USER + ':' + DB_PASSWORD + '@' + DB_HOST + '/' + DB_NAME,
-  {
-    dialectOptions: {
-      ssl: {
-        require: true,
-      },
+const config = {
+  dialectOptions: {
+    ssl: {
+      require: true,
     },
-    sync: {
-      alter: true,
-    },
-  }
-);
+  },
+  sync: {
+    alter: true,
+  },
+};
+
+const sequelize = new Sequelize(uri, config);
 
 // **** Models **** //
 
@@ -39,42 +37,28 @@ const Employee = sequelize.define<EmployeeModel>(
     id: {
       type: DataTypes.STRING(10),
       primaryKey: true,
-      get: function () {
-        return this.getDataValue('id');
-      },
     },
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      get: function () {
-        return this.getDataValue('name');
-      },
     },
     status: {
       type: DataTypes.STRING(10),
       allowNull: false,
-      get: function () {
-        return this.getDataValue('status');
-      },
     },
     publicId: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      get: function () {
-        return this.getDataValue('publicId');
-      },
     },
     rekognitionId: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      get: function () {
-        return this.getDataValue('rekognitionId');
-      },
     },
   },
   {
     // tableName: 'employee',
     freezeTableName: true,
+    // paranoid: true,
   }
 );
 

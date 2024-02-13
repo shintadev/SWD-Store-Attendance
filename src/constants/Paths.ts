@@ -5,14 +5,17 @@
 export default {
   Base: '/api',
   Employees: {
-    Base: '/emp',
-    Get: '/i/:id',
-    Add: '/add',
-    Update: '/update',
-    Delete: '/delete/:id',
-    Face: '/scan',
+    Base: '/employees',
+    CRUD: '/',
+    Attendance: '/attendance',
   },
 } as const;
+
+
+
+
+
+
 
 
 

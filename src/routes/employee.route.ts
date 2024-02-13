@@ -8,6 +8,7 @@ import { asyncHandler } from '../util/misc';
 import fileService from '@src/services/file.service';
 import employeeService from '@src/services/employee.service';
 import multer from 'multer';
+import { RouteError } from '@src/other/classes';
 
 // ** Add Router ** //
 
@@ -23,7 +24,6 @@ export interface FaceRequest {
 export interface EmployeeRequest {
   id: string;
   name: string;
-  faceId: string;
 }
 
 // **** Resolvers **** //
@@ -33,10 +33,13 @@ const employeeResolvers = {
    * Get one employee.
    */
   getOne: async (req: IReq<EmployeeRequest>, res: IRes) => {
-    const id = req.params.id;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const { id } = req.body;
     const employee = await employeeService.getOne(id);
-    return res.status(HttpStatusCodes.OK).json({ employee });
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Request handled',
+      data: employee,
+    });
   },
 
   /**
@@ -45,11 +48,7 @@ const employeeResolvers = {
   detect: async (req: IReq<FaceRequest>, res: IRes) => {
     const img = req.file;
     if (!img) {
-      const error = new Error('Please upload a file');
-      return res.status(HttpStatusCodes.BAD_REQUEST).json({
-        message: 'Updated Error',
-        data: { error },
-      });
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please upload a file');
     }
     const imgBuffer = img.buffer.toString('base64');
 
@@ -57,7 +56,8 @@ const employeeResolvers = {
     const faces = await imageService.indexFace(imgBuffer);
 
     // Prepare response with face details
-    if (typeof faces.FaceRecords === 'undefined') throw new Error();
+    if (typeof faces.FaceRecords === 'undefined')
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Can not detect any face');
     const faceRecord = faces.FaceRecords[0];
     const faceDetail = faceRecord.Face;
 
@@ -73,27 +73,24 @@ const employeeResolvers = {
   /**
    * Search face by image.
    */
-  search: async (req: IReq<FaceRequest>, res: IRes) => {
+  attendance: async (req: IReq<FaceRequest>, res: IRes) => {
     const img = req.file;
     if (!img) {
-      const error = new Error('Please upload a file');
-      return res.status(HttpStatusCodes.BAD_REQUEST).json({
-        message: 'Updated Error',
-        data: { error },
-      });
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please upload a file');
     }
     const imgBuffer = img.buffer.toString('base64');
-    console.log('object');
+
     // Search faces in Rekognition collection
     const faces = await imageService.searchFace(imgBuffer);
-    console.log('hello');
+
     // Prepare response with face details
-    if (typeof faces.FaceMatches === 'undefined') throw new Error();
+    if (typeof faces.FaceMatches === 'undefined')
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Can not detect any face');
     const faceMatch = faces.FaceMatches[0];
     const faceDetail = faceMatch.Face;
 
     return res.status(HttpStatusCodes.OK).json({
-      message: 'Face detected',
+      message: 'Face match',
       data: {
         FaceId: faceDetail?.FaceId,
         Confidence: faceMatch.Similarity,
@@ -106,37 +103,41 @@ const employeeResolvers = {
    * Add one employee.
    */
   add: async (req: IReq<EmployeeRequest>, res: IRes) => {
+    const { name } = req.body;
+    const img = req.file;
+    if (!img) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please upload a file');
+    }
+    const imgBuffer = img.buffer;
     try {
-      const { name, faceId } = req.body;
-      const img = req.file;
-      if (!img) {
-        const error = new Error('Please upload a file');
-        return res.status(HttpStatusCodes.OK).json({
-          message: 'File Error',
-          data: { error },
-        });
-      }
-      const imgBuffer = img.buffer;
+      // Index faces using Rekognition
+      const faces = await imageService.indexFace(imgBuffer.toString('base64'));
+
+      // Prepare response with face details
+      if (typeof faces.FaceRecords === 'undefined') throw new Error('Can not detect any face');
+      const faceRecord = faces.FaceRecords[0];
+      if (typeof faceRecord.Face === 'undefined') throw new Error('Can not detect any face');
+      const faceId = faces.FaceRecords[0].Face?.FaceId;
+      if (typeof faceId === 'undefined') throw new Error('Can not detect any face');
 
       const publicId = await fileService.uploadToCloud(imgBuffer);
-
       const employee: IEmployee = Employee.new(name, publicId, faceId);
-      console.log('🚀 ~ add: ~ employee:', employee);
 
       const result = await employeeService.addOne(employee);
-      console.log('🚀 ~ add: ~ result:', result);
 
       return res.status(HttpStatusCodes.CREATED).json({
-        message: 'Created successfully',
-        data: { result },
+        message: 'Create successfully',
+        data: { id: result.id },
       });
     } catch (error) {
-      console.log('🚀 ~ add ~ error:');
-
-      return res.status(HttpStatusCodes.BAD_REQUEST).json({
-        message: 'Add Error',
-        data: {},
-      });
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
     }
   },
 
@@ -146,8 +147,9 @@ const employeeResolvers = {
   update: async (req: IReq<EmployeeRequest>, res: IRes) => {
     const { id, name } = req.body;
     await employeeService.updateOne(id, name);
+
     return res.status(HttpStatusCodes.OK).json({
-      message: 'Updated successfully',
+      message: 'Update successfully',
       data: {},
     });
   },
@@ -156,55 +158,28 @@ const employeeResolvers = {
    * Delete one employee.
    */
   delete_: async (req: IReq<EmployeeRequest>, res: IRes) => {
-    try {
-      const id = req.params.id;
-      await employeeService._delete(id);
-      return res.status(HttpStatusCodes.OK).json({
-        message: 'Deleted successfully',
-        data: {},
-      });
-    } catch (error) {
-      console.log('🚀 ~ delete_: ~ error:', error);
+    const { id } = req.body;
+    await employeeService._delete(id);
 
-      return res.status(HttpStatusCodes.BAD_REQUEST).json({
-        message: 'Add Error',
-        data: {},
-      });
-    }
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Deleted successfully',
+      data: {},
+    });
   },
 };
 
 // **** Routes **** //
 
-// Get one employee
-employeeRouter.get(Paths.Employees.Get, asyncHandler(employeeResolvers.getOne));
+employeeRouter
+  .route(Paths.Employees.CRUD)
+  .get(asyncHandler(employeeResolvers.getOne)) // Get one employee
+  .post(upload.single('file'), employeeResolvers.add) // Add one employee
+  .put(asyncHandler(employeeResolvers.update)) // Update one employee
+  .delete(asyncHandler(employeeResolvers.delete_)); // Delete one employee
 
-// Search face by image
-employeeRouter.get(
-  Paths.Employees.Face,
-  upload.single('file'),
-  asyncHandler(employeeResolvers.search)
-);
-
-// Detect face in image
-employeeRouter.post(
-  Paths.Employees.Face,
-  upload.single('file'),
-  asyncHandler(employeeResolvers.detect)
-);
-
-// Add one employee
-employeeRouter.post(
-  Paths.Employees.Add,
-  upload.single('file'),
-  asyncHandler(employeeResolvers.add)
-);
-
-// Update one employee
-employeeRouter.put(Paths.Employees.Update, asyncHandler(employeeResolvers.update));
-
-// Delete one employee
-employeeRouter.delete(Paths.Employees.Delete, asyncHandler(employeeResolvers.delete_));
+employeeRouter
+  .route(Paths.Employees.Attendance)
+  .post(upload.single('file'), asyncHandler(employeeResolvers.attendance)); // Search face by image
 
 // **** Export default **** //
 

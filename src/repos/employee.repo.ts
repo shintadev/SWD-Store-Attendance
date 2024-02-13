@@ -1,5 +1,5 @@
 import { IEmployee } from '../models/Employee';
-import SequelizeORM from './sequelize.orm';
+import SequelizeORM, { EmployeeModel } from './sequelize.orm';
 
 // **** Variables **** //
 
@@ -8,33 +8,22 @@ const orm = SequelizeORM;
 // **** Functions **** //
 
 /**
- * Get one employee.
+ * Convert type EmployeeModel to type IEmployee.
  */
-async function getOne(id: string): Promise<IEmployee | null> {
-  const result = await orm.Employee.findOne({
-    where: {
-      id: id,
-      status: 'Active',
-    },
-  }).then(function (employee) {
-    if (employee != null) {
-      const id = employee.get('id');
-      const name = employee.get('name');
-      const status = employee.get('status');
-      const publicId = employee.get('publicId');
-      const rekognitionId = employee.get('rekognitionId');
-      const employeeData: IEmployee = { id, name, status, publicId, rekognitionId };
-      return employeeData;
-    }
-    return null;
-  });
+function toIEmployee(model: EmployeeModel) {
+  const id = model.id;
+  const name = model.name;
+  const status = model.status;
+  const publicId = model.publicId;
+  const rekognitionId = model.rekognitionId;
+  const result: IEmployee = { id, name, status, publicId, rekognitionId };
   return result;
 }
 
 /**
- * Get publicId.
+ * Get one employee.
  */
-async function getPublicId(id: string): Promise<string> {
+async function getById(id: string): Promise<IEmployee> {
   const result = await orm.Employee.findOne({
     where: {
       id: id,
@@ -42,10 +31,8 @@ async function getPublicId(id: string): Promise<string> {
     },
   }).then(function (employee) {
     if (employee != null) {
-      const publicId = employee.get('publicId');
-      return publicId;
-    }
-    throw new Error();
+      return toIEmployee(employee);
+    } else throw new Error();
   });
   return result;
 }
@@ -57,22 +44,19 @@ async function persists(id: string): Promise<boolean> {
   const employee = await orm.Employee.findAll({
     where: { id: id },
   });
-  return employee != null;
+  if (employee) return true;
+  else return false;
 }
 
 /**
  * Add one employee.
  */
-async function add(employee: IEmployee): Promise<IEmployee | null> {
-  try {
-    const emplyeModel = await orm.Employee.create(employee).then(function (employee) {
-      return employee;
-    });
-    return getOne(emplyeModel.id);
-  } catch (error) {
-    console.log('🚀 repo ~ add ~ error:');
-    throw error;
-  }
+async function add(employee: IEmployee): Promise<IEmployee> {
+  const employeeModel = await orm.Employee.create(employee).then(function (employee) {
+    return employee;
+  });
+  const result = await getById(employeeModel.id);
+  return result;
 }
 
 /**
@@ -110,9 +94,8 @@ async function delete_(id: string): Promise<void> {
 // **** Export default **** //
 
 export default {
-  getOne,
+  getById,
   persists,
-  getPublicId,
   add,
   update,
   delete: delete_,

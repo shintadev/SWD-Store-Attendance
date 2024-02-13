@@ -20,9 +20,9 @@ class ImageService {
     console.log('🚀 ~ ImageService ~ constructor ~ collectionId:', this.collectionId);
   }
 
-  public async indexFace(image: string): Promise<IndexFacesCommandOutput> {
+  public async indexFace(image: string, collectionId?: string): Promise<IndexFacesCommandOutput> {
     const params = {
-      CollectionId: this.collectionId,
+      CollectionId: collectionId ?? this.collectionId,
       Image: {
         Bytes: Buffer.from(image, 'base64'), // Encode image data as base64
       },
