@@ -31,7 +31,16 @@ class ImageService {
 
     try {
       const command = new IndexFacesCommand(params);
-      return await this.client.send(command);
+      const faces = await this.client.send(command);
+
+      // Prepare response
+      const FaceRecords = faces.FaceRecords ?? undefined;
+      if (!FaceRecords)
+        throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Can not detect any face');
+      const face = FaceRecords[0].Face ?? undefined;
+      if (!face) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
+
+      return face;
     } catch (error) {
       console.log('🚀 ~ ImageService ~ detectFace ~ error:', error);
 
