@@ -1,7 +1,7 @@
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 import { IEmployee } from '@src/models/Employee';
 import { RouteError } from '@src/other/classes';
-import EmployeeRepo from '@src/repos/employee.repo';
+import employeeRepo from '@src/repos/employee.repo';
 
 // **** Variables **** //
 
@@ -15,12 +15,12 @@ class EmployeeService {
    * Get one employee.
    */
   public async getOne(id: string): Promise<IEmployee> {
-    const persists = await EmployeeRepo.persists(id);
+    const persists = await employeeRepo.persists(id);
     if (!persists) {
       throw new RouteError(HttpStatusCodes.NOT_FOUND, EMPLOYEE_NOT_FOUND_ERROR);
     }
     try {
-      const result = await EmployeeRepo.getById(id);
+      const result = await employeeRepo.getById(id);
       return result;
     } catch (error) {
       console.log('🚀 ~ EmployeeService ~ getOne ~ error:', error);
@@ -34,7 +34,7 @@ class EmployeeService {
    */
   public async addOne(employee: IEmployee): Promise<IEmployee> {
     try {
-      const result = await EmployeeRepo.add(employee);
+      const result = await employeeRepo.add(employee);
       return result;
     } catch (error) {
       console.log('🚀 ~ EmployeeService ~ addOne ~ error:', error);
@@ -46,13 +46,13 @@ class EmployeeService {
   /**
    * Update an employee.
    */
-  public async updateOne(id: string, name: string): Promise<void> {
-    const persists = await EmployeeRepo.persists(id);
+  public async updateOne(id: string, name: string) {
+    const persists = await employeeRepo.persists(id);
     if (!persists) {
       throw new RouteError(HttpStatusCodes.NOT_FOUND, EMPLOYEE_NOT_FOUND_ERROR);
     }
     try {
-      const result = await EmployeeRepo.update(id, name);
+      const result = await employeeRepo.update(id, name);
       return result;
     } catch (error) {
       console.log('🚀 ~ EmployeeService ~ updateOne ~ error:', error);
@@ -64,14 +64,13 @@ class EmployeeService {
   /**
    * Delete an employee by their id.
    */
-  public async _delete(id: string): Promise<void> {
-    const persists = await EmployeeRepo.persists(id);
+  public async _delete(id: string) {
+    const persists = await employeeRepo.persists(id);
     if (!persists) {
       throw new RouteError(HttpStatusCodes.NOT_FOUND, EMPLOYEE_NOT_FOUND_ERROR);
     }
     try {
-      const result = await EmployeeRepo.delete(id);
-      return result;
+      await employeeRepo.delete(id);
     } catch (error) {
       console.log('🚀 ~ EmployeeService ~ _delete ~ error:', error);
 

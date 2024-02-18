@@ -26,14 +26,18 @@ export function tick(milliseconds: number): Promise<void> {
 /**
  * Generate new random Id
  */
-export function generateId(fullName: string): string {
-  const name = fullName.split(' ');
-  let id = name[name.length - 1];
-  for (let i = 0; i < name.length - 1; i++) {
-    id = id + name[i].charAt(0);
+export function generateId(seed: string | Date): string {
+  let result;
+  if (typeof seed === 'string') {
+    const name = seed.split(' ');
+    let id = name[name.length - 1];
+    for (let i = 0; i < name.length - 1; i++) {
+      id = id + name[i].charAt(0);
+    }
+    result = id + nanoid(10 - id.length);
+  } else {
+    result = seed.getDate() + seed.getMonth() + seed.getFullYear() + nanoid(4);
   }
-
-  const result = id + nanoid(10 - id.length);
 
   return result;
 }

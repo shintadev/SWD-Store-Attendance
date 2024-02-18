@@ -2,11 +2,11 @@ import EnvVars from '@src/constants/EnvVars';
 import {
   RekognitionClient,
   IndexFacesCommand,
-  IndexFacesCommandOutput,
   QualityFilter,
   SearchFacesByImageCommand,
-  SearchFacesByImageCommandOutput,
 } from '@aws-sdk/client-rekognition';
+import { RouteError } from '@src/other/classes';
+import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 
 class ImageService {
   private client;
@@ -17,10 +17,9 @@ class ImageService {
       region: EnvVars.Rekognition.REGION,
     });
     this.collectionId = EnvVars.Rekognition.COLLECTION_ID;
-    console.log('🚀 ~ ImageService ~ constructor ~ collectionId:', this.collectionId);
   }
 
-  public async indexFace(image: string, collectionId?: string): Promise<IndexFacesCommandOutput> {
+  public async indexFace(image: string, collectionId?: string) {
     const params = {
       CollectionId: collectionId ?? this.collectionId,
       Image: {
@@ -40,7 +39,7 @@ class ImageService {
     }
   }
 
-  public async searchFace(image: string): Promise<SearchFacesByImageCommandOutput> {
+  public async searchFace(image: string) {
     const params = {
       CollectionId: this.collectionId,
       Image: {
@@ -53,9 +52,18 @@ class ImageService {
 
     try {
       const command = new SearchFacesByImageCommand(params);
-      return await this.client.send(command);
+      const faces = await this.client.send(command);
+
+      // Prepare response
+      const faceMatch = faces.FaceMatches ?? undefined;
+      if (!faceMatch) throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Can not detect any face');
+      const face = faceMatch[0].Face ?? undefined;
+      if (!face) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
+
+      const result = { ...face, similarity: faceMatch[0].Similarity };
+      return result;
     } catch (error) {
-      console.log('🚀 ~ ImageService ~ compareFace ~ error:', error);
+      console.log('🚀 ~ ImageService ~ searchFace ~ error:', error);
 
       throw error;
     }

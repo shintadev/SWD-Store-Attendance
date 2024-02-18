@@ -15,8 +15,6 @@ class FileService {
       secure: true,
     };
 
-    console.log('🚀 ~ FileService ~ constructor ~ config:', this.config);
-
     Cloudinary.config(this.config);
   }
 

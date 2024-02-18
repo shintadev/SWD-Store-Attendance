@@ -77,11 +77,11 @@ app.use(express.static(staticDir));
 
 // Nav to employees page by default
 app.get('/', (_: Request, res: Response) => {
-  return res.redirect(Paths.Employees.Face);
+  return res.redirect(Paths.Employees.CRUD);
 });
 
 // Redirect to login if not logged in.
-app.get(Paths.Employees.Face, (_: Request, res: Response) => {
+app.get(Paths.Employees.CRUD, (_: Request, res: Response) => {
   return res.sendFile('employees.html', { root: viewsDir });
 });
 
