@@ -1,9 +1,5 @@
-import { IAttendance } from '@src/models/Attendance';
-import SequelizeORM from './sequelize.orm';
-
-// **** Variables **** //
-
-const orm = SequelizeORM;
+import { Attendance, IAttendance } from '@src/models/Attendance';
+import { sequelize } from './sequelize.orm';
 
 class AttendanceRepo {
   // **** Functions **** //
@@ -12,7 +8,7 @@ class AttendanceRepo {
    * Get employee's attendance list.
    */
   public async getByEmployeeId(employeeId: string) {
-    const result = await orm.Attendance.findAll({
+    const result = await Attendance.findAll({
       where: {
         employeeId: employeeId,
       },
@@ -28,7 +24,7 @@ class AttendanceRepo {
    * Get employee's shift attendance.
    */
   public async getByEmployeeAndShift(employeeId: string, shiftId: string) {
-    const result = await orm.Attendance.findOne({
+    const result = await Attendance.findOne({
       where: {
         employeeId: employeeId,
         shiftId: shiftId,
@@ -45,30 +41,49 @@ class AttendanceRepo {
    * Create new attendance.
    */
   public async create(attendance: IAttendance) {
-    const result = await orm.Attendance.create(attendance).then(function (shift) {
-      return shift;
-    });
-    return result;
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await Attendance.create(attendance, { transaction: transaction }).then(
+        function (shift) {
+          return shift;
+        }
+      );
+      transaction.commit();
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
   }
 
   /**
    * Update attendance.
    */
   public async update(attendance: IAttendance) {
-    const result = await orm.Attendance.update(
-      {
-        checkOutTime: attendance.checkOutTime,
-      },
-      {
-        where: {
-          shiftId: attendance.shiftId,
-          employeeId: attendance.employeeId,
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await Attendance.update(
+        {
+          checkOutTime: attendance.checkOutTime,
         },
-      }
-    ).then(function (shift) {
-      return shift;
-    });
-    return result;
+        {
+          where: {
+            shiftId: attendance.shiftId,
+            employeeId: attendance.employeeId,
+          },
+          transaction: transaction,
+        }
+      ).then(function (shift) {
+        return shift;
+      });
+      transaction.commit();
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
   }
 }
 

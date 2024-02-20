@@ -1,10 +1,6 @@
-import { IShift } from '@src/models/Shift';
-import SequelizeORM from './sequelize.orm';
+import { IShift, Shift } from '@src/models/Shift';
 import { WhereOptions } from 'sequelize';
-
-// **** Variables **** //
-
-const orm = SequelizeORM;
+import { sequelize } from './sequelize.orm';
 
 // **** Types **** //
 
@@ -13,6 +9,8 @@ interface updateParams {
   endTime?: Date;
 }
 
+// **** Class **** //
+
 class ShiftRepo {
   // **** Functions **** //
 
@@ -20,7 +18,7 @@ class ShiftRepo {
    * Get one shift.
    */
   public async getById(id: string) {
-    const result = await orm.Shift.findOne({
+    const result = await Shift.findOne({
       where: {
         id: id,
       },
@@ -36,7 +34,7 @@ class ShiftRepo {
    * Get shift list.
    */
   public async getShifts(condition: WhereOptions) {
-    const result = await orm.Shift.findAll({
+    const result = await Shift.findAll({
       where: condition,
     }).then(function (shift) {
       if (shift) {
@@ -50,7 +48,7 @@ class ShiftRepo {
    * See if a shift with the given id exists.
    */
   public async persists(id: string): Promise<boolean> {
-    const shift = await orm.Shift.findAll({
+    const shift = await Shift.findOne({
       where: { id: id },
     });
     if (shift) return true;
@@ -61,16 +59,22 @@ class ShiftRepo {
    * Create new shift.
    */
   public async create(shift: IShift) {
-    const result = await orm.Shift.create(shift).then(function (shift) {
-      return shift;
-    });
-    return result;
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await Shift.create(shift, { transaction: transaction });
+      transaction.commit();
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
   }
 
   /**
    * Update a shift.
    */
-  public async update(id: string, start?: Date, end?: Date): Promise<void> {
+  public async update(id: string, start?: Date, end?: Date) {
     const updateValues: updateParams = {};
 
     if (start) {
@@ -81,25 +85,44 @@ class ShiftRepo {
       updateValues.endTime = end;
     }
 
-    // Only execute the update if there are values to update
-    if (Object.keys(updateValues).length > 0) {
-      await orm.Shift.update(updateValues, {
-        where: {
-          id: id,
-        }, // Use shorthand for where clause
-      });
+    const transaction = await sequelize.transaction();
+    try {
+      // Only execute the update if there are values to update
+      if (Object.keys(updateValues).length > 0) {
+        const result = await Shift.update(updateValues, {
+          where: {
+            id: id,
+          }, // Use shorthand for where clause
+          transaction: transaction,
+        });
+        transaction.commit();
+
+        return result;
+      }
+    } catch (error) {
+      transaction.rollback();
+      throw error;
     }
   }
 
   /**
    * Delete one shift.
    */
-  public async delete(id: string): Promise<void> {
-    await orm.Shift.destroy({
-      where: {
-        id: id,
-      },
-    });
+  public async delete(id: string) {
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await Shift.destroy({
+        where: {
+          id: id,
+        },
+        transaction: transaction,
+      });
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
   }
 }
 

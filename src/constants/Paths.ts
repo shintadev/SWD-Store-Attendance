@@ -7,16 +7,20 @@ export default {
   Employees: {
     Base: '/employees',
     CRUD: '/',
+    List: '/list',
   },
   Shift: {
     Base: '/schedule',
     CRUD: '/',
+    Assign: '/assign',
   },
   Attendance: {
     Base: '/attendance',
     CRUD: '/',
   },
 } as const;
+
+
 
 
 

@@ -22,7 +22,7 @@ interface AttendanceRequest {
 // **** Resolvers **** //
 
 const attendanceResolvers = {
-  checkIn: async (req: IReq<AttendanceRequest>, res: IRes) => {
+  takeAttendance: async (req: IReq<AttendanceRequest>, res: IRes) => {
     const img = req.file;
     if (!img) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please upload a file');
@@ -37,29 +37,7 @@ const attendanceResolvers = {
     const shiftId = (await shiftService.getCurrentShift()).id;
 
     // Create check-in record
-    const result = await attendanceService.createCheckIn(shiftId, face.FaceId);
-
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: result,
-    });
-  },
-
-  checkOut: async (req: IReq<AttendanceRequest>, res: IRes) => {
-    const img = req.file;
-    if (!img) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please upload a file');
-    }
-    const imgBuffer = img.buffer.toString('base64');
-
-    // Search faces in Rekognition collection
-    const face = await imageService.searchFace(imgBuffer);
-    if (!face.FaceId) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
-
-    // Get the current shift
-    const shiftId = (await shiftService.getCurrentShift()).id;
-
-    const result = await attendanceService.setCheckOut(shiftId, face.FaceId);
+    const result = await attendanceService.takeAttendance(shiftId, face.FaceId);
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
@@ -72,8 +50,7 @@ const attendanceResolvers = {
 
 attendanceRouter
   .route(Paths.Attendance.CRUD)
-  .post(asyncHandler(attendanceResolvers.checkIn))
-  .put(asyncHandler(attendanceResolvers.checkOut));
+  .post(asyncHandler(attendanceResolvers.takeAttendance));
 
 // **** Export default **** //
 

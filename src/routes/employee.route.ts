@@ -24,6 +24,14 @@ export interface FaceRequest {
 export interface EmployeeRequest {
   id?: string;
   name?: string;
+  DOB?: Date;
+  phone?: string;
+  address?: string;
+}
+
+export interface EmployeesRequest {
+  page?: number;
+  pageSize?: number;
 }
 
 // **** Resolvers **** //
@@ -46,12 +54,28 @@ const employeeResolvers = {
   },
 
   /**
+   * Get one employee.
+   */
+  getList: async (req: IReq<EmployeesRequest>, res: IRes) => {
+    const { page, pageSize } = req.body;
+    if (!page) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
+    const employee = await employeeService.getList(page, pageSize);
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Request handled',
+      data: employee,
+    });
+  },
+
+  /**
    * Add one employee.
    */
   add: async (req: IReq<EmployeeRequest>, res: IRes) => {
-    const { name } = req.body;
+    const { name, DOB, phone, address } = req.body;
     const img = req.file;
-    if (!name) {
+    if (!name || !DOB || !phone || !address) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
     if (!img) {
@@ -65,7 +89,7 @@ const employeeResolvers = {
 
       const publicId = await fileService.uploadToCloud(imgBuffer);
 
-      const employee: IEmployee = Employee.new(name, publicId, face.FaceId);
+      const employee: IEmployee = Employee.new(name, DOB, phone, address, publicId, face.FaceId);
 
       const result = await employeeService.addOne(employee);
 
@@ -109,7 +133,7 @@ const employeeResolvers = {
     if (!id) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
-    const result = await employeeService._delete(id);
+    const result = await employeeService.deleteOne(id);
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Deleted successfully',
@@ -126,6 +150,10 @@ employeeRouter
   .post(upload.single('file'), employeeResolvers.add) // Add one employee
   .put(asyncHandler(employeeResolvers.update)) // Update one employee
   .delete(asyncHandler(employeeResolvers.delete_)); // Delete one employee
+
+employeeRouter
+  .route(Paths.Employees.List)
+  .get(asyncHandler(employeeResolvers.getList)); //Get list employees
 
 // **** Export default **** //
 

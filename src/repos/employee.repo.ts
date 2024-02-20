@@ -1,23 +1,22 @@
-import { IEmployee } from '../models/Employee';
-import SequelizeORM, { EmployeeModel } from './sequelize.orm';
-
-// **** Variables **** //
-
-const orm = SequelizeORM;
+import { Employee, IEmployee } from '../models/Employee';
+import { sequelize } from './sequelize.orm';
 
 class EmployeeRepo {
   // **** Functions **** //
 
   /**
-   * Convert type EmployeeModel to type IEmployee.
+   * Get list employee.
    */
-  public toIEmployee(model: EmployeeModel): IEmployee {
-    const id = model.id;
-    const name = model.name;
-    const status = model.status;
-    const publicId = model.publicId;
-    const rekognitionId = model.rekognitionId;
-    const result: IEmployee = { id, name, status, publicId, rekognitionId };
+  public async getList(page: number, pageSize: number): Promise<IEmployee[]> {
+    const offset = (page - 1) * pageSize;
+    const result = await Employee.findAll({
+      where: {
+        // status: 'Active',
+      },
+      offset: offset,
+      limit: pageSize,
+    });
+    if (!result) throw new Error('Error while getting record');
     return result;
   }
 
@@ -25,16 +24,13 @@ class EmployeeRepo {
    * Get one employee.
    */
   public async getById(id: string): Promise<IEmployee> {
-    const result = await orm.Employee.findOne({
+    const result = await Employee.findOne({
       where: {
         id: id,
         status: 'Active',
       },
-    }).then(function (employee) {
-      if (employee) {
-        return EmployeeRepo.prototype.toIEmployee(employee);
-      } else throw new Error('Error while getting record');
     });
+    if (!result) throw new Error('Error while getting record');
     return result;
   }
 
@@ -42,16 +38,13 @@ class EmployeeRepo {
    * Get one employee by faceId.
    */
   public async getByFaceId(faceId: string): Promise<IEmployee> {
-    const result = await orm.Employee.findOne({
+    const result = await Employee.findOne({
       where: {
         rekognitionId: faceId,
         status: 'Active',
       },
-    }).then(function (employee) {
-      if (employee) {
-        return EmployeeRepo.prototype.toIEmployee(employee);
-      } else throw new Error('Error while getting record');
     });
+    if (!result) throw new Error('Error while getting record');
     return result;
   }
 
@@ -59,7 +52,7 @@ class EmployeeRepo {
    * See if an employee with the given id exists.
    */
   public async persists(id: string): Promise<boolean> {
-    const employee = await orm.Employee.findAll({
+    const employee = await Employee.findOne({
       where: { id: id },
     });
     if (employee) return true;
@@ -70,43 +63,72 @@ class EmployeeRepo {
    * Add one employee.
    */
   public async add(employee: IEmployee): Promise<IEmployee> {
-    const employeeModel = await orm.Employee.create(employee).then(function (employee) {
-      return employee;
-    });
-    const result = await this.getById(employeeModel.id);
-    return result;
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await Employee.create(employee, { transaction: transaction }).then(function (
+        employee
+      ) {
+        return employee;
+      });
+      transaction.commit();
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
   }
 
   /**
    * Update an employee.
    */
   public async update(id: string, name: string) {
-    return await orm.Employee.update(
-      {
-        name: name,
-      },
-      {
-        where: {
-          id: id,
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await Employee.update(
+        {
+          name: name,
         },
-      }
-    );
+        {
+          where: {
+            id: id,
+          },
+          transaction: transaction,
+        }
+      );
+      transaction.commit();
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
   }
 
   /**
    * Delete one employee.
    */
   public async delete(id: string) {
-    return await orm.Employee.update(
-      {
-        status: 'Inactive',
-      },
-      {
-        where: {
-          id: id,
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await Employee.update(
+        {
+          status: 'Inactive',
         },
-      }
-    );
+        {
+          where: {
+            id: id,
+          },
+          transaction: transaction,
+        }
+      );
+      transaction.commit();
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
   }
 }
 
