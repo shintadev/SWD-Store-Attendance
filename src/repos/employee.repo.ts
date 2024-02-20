@@ -7,16 +7,22 @@ class EmployeeRepo {
   /**
    * Get list employee.
    */
-  public async getList(page: number, pageSize: number): Promise<IEmployee[]> {
+  public async getList(page: number, pageSize: number) {
     const offset = (page - 1) * pageSize;
-    const result = await Employee.findAll({
+    const employees = await Employee.findAll({
       where: {
         // status: 'Active',
       },
       offset: offset,
       limit: pageSize,
     });
-    if (!result) throw new Error('Error while getting record');
+    if (!employees) throw new Error('Error while getting record');
+
+    const total = await Employee.count();
+    const totalPages = Math.ceil(total / pageSize);
+
+    const result = { employees, total, totalPages };
+
     return result;
   }
 

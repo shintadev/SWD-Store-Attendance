@@ -17,7 +17,7 @@ class EmployeeService {
   public async getOne(id: string): Promise<IEmployee> {
     try {
       const result = await employeeRepo.getById(id);
-      
+
       return result;
     } catch (error) {
       console.log('🚀 ~ EmployeeService ~ getOne ~ error:', error);
@@ -29,7 +29,7 @@ class EmployeeService {
   /**
    * Get list employees.
    */
-  public async getList(page: number, pageSize?: number): Promise<IEmployee[]> {
+  public async getList(page: number, pageSize?: number) {
     try {
       const result = await employeeRepo.getList(page, pageSize ?? 10);
 

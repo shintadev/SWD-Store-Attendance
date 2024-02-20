@@ -57,15 +57,16 @@ const employeeResolvers = {
    * Get one employee.
    */
   getList: async (req: IReq<EmployeesRequest>, res: IRes) => {
-    const { page, pageSize } = req.body;
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
     if (!page) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
-    const employee = await employeeService.getList(page, pageSize);
+    const result = await employeeService.getList(page, pageSize);
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
-      data: employee,
+      data: result,
     });
   },
 

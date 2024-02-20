@@ -1,0 +1,405 @@
+basePath: "/api"
+paths:
+  /employees:
+    get:
+      tags:
+        - Get employee
+      description: Get an employee
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+      responses:
+        200:
+          description: Employee details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  DOB:
+                    type: string
+                    format: date
+                  phone:
+                    type: string
+                  address:
+                    type: string
+    post:
+      description: Create new employee
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  required: true
+                DOB:
+                  type: string
+                  format: date
+                  required: true
+                phone:
+                  type: string
+                  required: true
+                address:
+                  type: string
+                  required: true
+      responses:
+        201:
+          description: Employee created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  DOB:
+                    type: string
+                    format: date
+                  phone:
+                    type: string
+                  address:
+                    type: string
+    put:
+      description: Update an employee
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+                name:
+                  type: string
+                DOB:
+                  type: string
+                  format: date
+                phone:
+                  type: string
+                address:
+                  type: string
+      responses:
+        200:
+          description: Employee updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  DOB:
+                    type: string
+                    format: date
+                  phone:
+                    type: string
+                  address:
+                    type: string
+    delete:
+      description: Delete an employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+      responses:
+        204:
+          description: Employee deleted
+  /employees/list:
+    get:
+      tags:
+        - Get employees list
+      description: Get a list of employees with pagination
+      produces:
+        - application/json
+      parameters:
+        - in: "query"
+          name: "page"
+          type: integer
+          default: 1
+          description: Page number (optional)
+        - in: "query"
+          name: "pageSize"
+          type: integer
+          default: 10
+          description: Page size (optional)
+      responses:
+        200:
+          description: List of employees
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Employee"
+                  total:
+                    type: integer
+                    description: Total number of employees
+                  totalPages:
+                    type: integer
+                    description: Total number of pages
+  /shift:
+    # CRUD operations for shifts
+    get:
+      summary: Get shifts by week
+      description: Retrieves shifts for a given week (defaults to current week)
+      tags:
+        - Shifts
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                day:
+                  type: string
+                  format: date
+                  description: (Optional) Specific date to retrieve shifts for. Defaults to today.
+      responses:
+        200:
+          description: List of shifts for the specified week
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Response message
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Shift"
+    post:
+      summary: Create a new shift
+      description: Creates a new shift with specified start and end times
+      tags:
+        - Shifts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: date-time
+                  description: Start time of the shift
+                end:
+                  type: string
+                  format: date-time
+                  description: End time of the shift
+      responses:
+        200:
+          description: Newly created shift details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Response message
+                  data:
+                    $ref: "#/components/schemas/Shift"
+    put:
+      summary: Update an existing shift
+      description: Updates an existing shift with new start and/or end times
+      tags:
+        - Shifts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: ID of the shift to update
+                start:
+                  type: string
+                  format: date-time
+                  description: (Optional) New start time of the shift
+                end:
+                  type: string
+                  format: date-time
+                  description: (Optional) New end time of the shift
+      responses:
+        200:
+          description: Updated shift details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Response message
+                  data:
+                    $ref: "#/components/schemas/Shift"
+    delete:
+      summary: Delete an existing shift
+      description: Deletes a shift by its ID
+      tags:
+        - Shifts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: ID of the shift to delete
+      responses:
+        200:
+          description: Deletion confirmation message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Response message
+  /shift/assign:
+    # Assign/deallocate employees to/from shifts
+    get:
+      # ... (existing documentation for GET)
+    post:
+      summary: Assign employee to a shift
+      description: Assigns an employee to a specific shift
+      tags:
+        - Shifts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employeeId:
+                  type: string
+                  description: ID of the employee to assign
+                shiftId:
+                  type: string
+                  description: ID of the shift to assign the employee to
+      responses:
+        200:
+          description: Confirmation message of successful assignment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Response message
+                  data:
+                    type: object
+                    properties:
+                      # ... (Shift properties)
+                      employeeOfShift:
+                        $ref: "#/components/schemas/Employee"
+    put:
+      summary: Deallocate employee from a shift
+      description: Removes an employee from an assigned shift
+      tags:
+        - Shifts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employeeId:
+                  type: string
+                  description: ID of the employee to deassign
+                shiftId:
+                  type: string
+                  description: ID of the shift to deassign the employee from
+      responses:
+        200:
+          description: Confirmation message of successful deallocation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Response message
+  /attendance:
+    post:
+      summary: Take attendance using facial recognition
+      description: Uploads an image and attempts to recognize a face for attendance marking in the current shift
+      tags:
+        - Attendance
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                img:
+                  type: file
+                  description: Image file containing the face to be recognized
+      responses:
+        200:
+          description: Attendance record details or error message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Response message
+                  data:
+                    oneOf:
+                      - $ref: "#/components/schemas/Attendance"
+                      - type: object
+                        properties:
+                          error:
+                            type: string
+                            description: Error message (e.g., face not found)
