@@ -35,8 +35,11 @@ class EmployeeRepo {
         id: id,
         status: 'Active',
       },
+    }).then(function (employee) {
+      if (employee) {
+        return employee;
+      } else throw new Error('Error while getting record');
     });
-    if (!result) throw new Error('Error while getting record');
     return result;
   }
 
@@ -49,8 +52,11 @@ class EmployeeRepo {
         rekognitionId: faceId,
         status: 'Active',
       },
+    }).then(function (employee) {
+      if (employee) {
+        return employee;
+      } else throw new Error('Error while getting record');
     });
-    if (!result) throw new Error('Error while getting record');
     return result;
   }
 
@@ -71,11 +77,7 @@ class EmployeeRepo {
   public async add(employee: IEmployee): Promise<IEmployee> {
     const transaction = await sequelize.transaction();
     try {
-      const result = await Employee.create(employee, { transaction: transaction }).then(function (
-        employee
-      ) {
-        return employee;
-      });
+      const result = await Employee.create(employee, { transaction: transaction });
       transaction.commit();
 
       return result;

@@ -19,6 +19,8 @@ class ImageService {
     this.collectionId = EnvVars.Rekognition.COLLECTION_ID;
   }
 
+  // **** Functions **** //
+
   public async indexFace(image: string, collectionId?: string) {
     const params = {
       CollectionId: collectionId ?? this.collectionId,

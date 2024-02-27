@@ -36,6 +36,10 @@ export const Attendance = sequelize.define<AttendanceModel>('attendance', {
         }
       },
     },
+    references: {
+      model: Shift,
+      key: 'id',
+    },
   },
   employeeId: {
     type: DataTypes.STRING,
@@ -47,6 +51,10 @@ export const Attendance = sequelize.define<AttendanceModel>('attendance', {
           throw new Error('Invalid EmployeeId');
         }
       },
+    },
+    references: {
+      model: Employee,
+      key: 'id',
     },
   },
 });

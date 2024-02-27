@@ -18,19 +18,15 @@ export default {
     Base: '/attendance',
     CRUD: '/',
   },
+  User: {
+    Base: 'users',
+    CRUD: '/',
+  },
+  Auth: {
+    Base: '/auth',
+    Login: '/login',
+    Logout: '/logout',
+    RefreshToken: '/refresh-token',
+  },
 } as const;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -129,7 +129,7 @@ const employeeResolvers = {
   /**
    * Delete one employee.
    */
-  delete_: async (req: IReq<EmployeeRequest>, res: IRes) => {
+  delete: async (req: IReq<EmployeeRequest>, res: IRes) => {
     const { id } = req.body;
     if (!id) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
@@ -150,7 +150,7 @@ employeeRouter
   .get(asyncHandler(employeeResolvers.getOne)) // Get one employee
   .post(upload.single('file'), employeeResolvers.add) // Add one employee
   .put(asyncHandler(employeeResolvers.update)) // Update one employee
-  .delete(asyncHandler(employeeResolvers.delete_)); // Delete one employee
+  .delete(asyncHandler(employeeResolvers.delete)); // Delete one employee
 
 employeeRouter
   .route(Paths.Employees.List)
