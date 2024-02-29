@@ -1,6 +1,8 @@
 import { Employee, IEmployee } from '../models/Employee';
 import { sequelize } from './sequelize.orm';
 
+// **** Class **** //
+
 class EmployeeRepo {
   // **** Functions **** //
 

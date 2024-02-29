@@ -8,6 +8,8 @@ import employeeRepo from '@src/repos/employee.repo';
 const EMPLOYEE_NOT_FOUND_ERROR = 'Employee not found';
 const EMPLOYEE_REQUEST_ERROR = 'Request can not be handle';
 
+// **** Class **** //
+
 class EmployeeService {
   // **** Functions **** //
 

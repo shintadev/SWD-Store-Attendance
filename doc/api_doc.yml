@@ -301,7 +301,7 @@ paths:
                     type: string
                     description: Response message
   /shift/assign:
-    # Assign/deallocate employees to/from shifts
+    # Assign/de-allocate employees to/from shifts
     get:
       # ... (existing documentation for GET)
     post:
@@ -339,27 +339,27 @@ paths:
                       # ... (Shift properties)
                       employeeOfShift:
                         $ref: "#/components/schemas/Employee"
-    put:
-      summary: Deallocate employee from a shift
-      description: Removes an employee from an assigned shift
-      tags:
-        - Shifts
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                employeeId:
-                  type: string
-                  description: ID of the employee to deassign
-                shiftId:
-                  type: string
-                  description: ID of the shift to deassign the employee from
+  put:
+    summary: De-allocate employee from a shift
+    description: Removes an employee from an assigned shift
+    tags:
+      - Shifts
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              employeeId:
+                type: string
+                description: ID of the employee to de-assign
+              shiftId:
+                type: string
+                description: ID of the shift to de-assign the employee from
       responses:
         200:
-          description: Confirmation message of successful deallocation
+          description: Confirmation message of successful de-allocation
           content:
             application/json:
               schema:
@@ -403,3 +403,40 @@ paths:
                           error:
                             type: string
                             description: Error message (e.g., face not found)
+  /user:
+    post:
+      summary: Get user by id
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: ID of the user
+      responses:
+        200:
+          description: Attendance record details or error message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Response message
+                  data:
+                    oneOf:
+                      - $ref: "#/components/schemas/Attendance"
+                      - type: object
+                        properties:
+                          error:
+                            type: string
+                            description: Error message (e.g., face not found)
+  /auth/login:
+  /auth/logout:
+  /auth/refresh-token:

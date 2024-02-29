@@ -134,14 +134,15 @@ const shiftResolvers = {
 
 shiftRouter
   .route(Paths.Shift.CRUD)
-  .get(asyncHandler(shiftResolvers.getByWeek))
+  .get(asyncHandler(shiftResolvers.getById))
   .post(asyncHandler(shiftResolvers.create))
   .put(asyncHandler(shiftResolvers.update))
   .delete(asyncHandler(shiftResolvers.delete));
 
+shiftRouter.route(Paths.Shift.Schedule).get(asyncHandler(shiftResolvers.getByWeek));
+
 shiftRouter
   .route(Paths.Shift.Assign)
-  .get(asyncHandler(shiftResolvers.getById))
   .post(asyncHandler(shiftResolvers.assign))
   .put(asyncHandler(shiftResolvers.deallocate));
 

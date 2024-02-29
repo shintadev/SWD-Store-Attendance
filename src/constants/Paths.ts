@@ -10,8 +10,9 @@ export default {
     List: '/list',
   },
   Shift: {
-    Base: '/schedule',
+    Base: '/shift',
     CRUD: '/',
+    Schedule: '/schedule',
     Assign: '/assign',
   },
   Attendance: {
@@ -29,4 +30,6 @@ export default {
     RefreshToken: '/refresh-token',
   },
 } as const;
+
+
 

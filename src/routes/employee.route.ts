@@ -1,6 +1,6 @@
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 import { IReq, IRes } from './types/express/misc';
-import { Router } from 'express';
+import { Router, json } from 'express';
 import Paths from '../constants/Paths';
 import Employee, { IEmployee } from '@src/models/Employee';
 import imageService from '../services/image.service';
@@ -144,6 +144,8 @@ const employeeResolvers = {
 };
 
 // **** Routes **** //
+
+employeeRouter.use(json({ limit: '10mb' }));
 
 employeeRouter
   .route(Paths.Employees.CRUD)

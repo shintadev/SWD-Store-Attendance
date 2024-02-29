@@ -16,6 +16,7 @@ const userRouter = Router();
 interface UserRequest {
   id?: string;
   password?: string;
+  role?: string;
 }
 
 // **** Resolvers **** //
@@ -48,6 +49,34 @@ const userResolvers = {
       data: result,
     });
   },
+
+  update: async (req: IReq<UserRequest>, res: IRes) => {
+    const { id, password, role } = req.body;
+    if (!id) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
+
+    const result = await userService.updateOne(id, password, role);
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Request handled',
+      data: result ?? 'Nothing to update.',
+    });
+  },
+
+  delete: async (req: IReq<UserRequest>, res: IRes) => {
+    const { id } = req.body;
+    if (!id) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
+
+    const result = await userService.deleteOne(id);
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Request handled',
+      data: result,
+    });
+  },
 };
 
 // **** Routes **** //
@@ -55,7 +84,9 @@ const userResolvers = {
 userRouter
   .route(Paths.User.CRUD)
   .get(asyncHandler(userResolvers.getById))
-  .post(asyncHandler(userResolvers.create));
+  .post(asyncHandler(userResolvers.create))
+  .put(asyncHandler(userResolvers.update))
+  .delete(asyncHandler(userResolvers.delete));
 
 // **** Export default **** //
 

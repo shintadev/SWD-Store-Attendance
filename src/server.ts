@@ -77,12 +77,20 @@ app.use(express.static(staticDir));
 
 // Nav to employees page by default
 app.get('/', (_: Request, res: Response) => {
-  return res.redirect(Paths.Employees.CRUD);
+  return res.redirect(Paths.Employees.Base);
 });
 
 // Redirect to login if not logged in.
-app.get(Paths.Employees.CRUD, (_: Request, res: Response) => {
+app.get(Paths.Employees.Base, (_: Request, res: Response) => {
   return res.sendFile('employees.html', { root: viewsDir });
+});
+
+app.get(Paths.Attendance.Base, (_: Request, res: Response) => {
+  return res.sendFile('attendance.html', { root: viewsDir });
+});
+
+app.get(Paths.Shift.Base, (_: Request, res: Response) => {
+  return res.sendFile('shift.html', { root: viewsDir });
 });
 
 

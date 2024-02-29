@@ -8,6 +8,8 @@ import {
 import { RouteError } from '@src/other/classes';
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 
+// **** Class **** //
+
 class ImageService {
   private client;
   private collectionId;

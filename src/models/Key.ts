@@ -55,7 +55,7 @@ export const Key = sequelize.define<KeyModel>('Key', {
 
 // User 1:1 Key
 User.hasOne(Key, {
-  onDelete: 'RESTRICT',
+  onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
 Key.belongsTo(User, {

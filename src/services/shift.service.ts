@@ -12,6 +12,8 @@ import employeeService from './employee.service';
 const SHIFT_NOT_FOUND_ERROR = 'Shift not found';
 const SHIFT_REQUEST_ERROR = 'Request can not be handle';
 
+// **** Class **** //
+
 class ShiftService {
   // **** Functions **** //
 

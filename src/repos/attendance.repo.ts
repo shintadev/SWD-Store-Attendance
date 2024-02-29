@@ -1,6 +1,8 @@
 import { Attendance, IAttendance } from '@src/models/Attendance';
 import { sequelize } from './sequelize.orm';
 
+// **** Class **** //
+
 class AttendanceRepo {
   // **** Functions **** //
 

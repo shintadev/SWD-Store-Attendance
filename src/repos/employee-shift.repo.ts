@@ -1,7 +1,11 @@
 import { EmployeeShift, IEmployeeShift } from '@src/models/EmployeeShift';
 import { sequelize } from './sequelize.orm';
 
+// **** Class **** //
+
 class EmployeeShiftRepo {
+  // **** Functions **** //
+
   /**
    * Get employee of a shift.
    */

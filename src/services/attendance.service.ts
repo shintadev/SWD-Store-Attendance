@@ -9,6 +9,8 @@ import moment from 'moment';
 
 const ATTENDANCE_REQUEST_ERROR = 'Request can not be handle';
 
+// **** Class **** //
+
 class AttendanceService {
   // **** Functions **** //
 

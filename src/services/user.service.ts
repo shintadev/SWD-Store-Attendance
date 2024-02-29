@@ -44,6 +44,36 @@ class UserService {
       throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
     }
   }
+
+  /**
+   * Update one user
+   */
+  public async updateOne(id: string, password?: string, role?: string) {
+    try {
+      const result = await userRepo.update(id, password, role);
+
+      return result;
+    } catch (error) {
+      console.log("🚀 ~ UserService ~ updateOne ~ error:", error)
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * Delete one user
+   */
+  public async deleteOne(id: string) {
+    try {
+      const result = await userRepo.delete(id);
+
+      return result;
+    } catch (error) {
+      console.log("🚀 ~ UserService ~ deleteOne ~ error:", error)
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
+    }
+  }
 }
 
 export default new UserService();

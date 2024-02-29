@@ -1,6 +1,8 @@
 import EnvVars from '@src/constants/EnvVars';
 import { v2 as Cloudinary, UploadApiResponse } from 'cloudinary';
 
+// **** Class **** //
+
 class FileService {
   private config;
   private cloudName = EnvVars.Cloudinary.NAME;

@@ -1,6 +1,6 @@
 {
   "name": "SWD-Store-Attendance",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "scripts": {
     "build": "npx ts-node build.ts",
     "lint": "npx eslint --ext .ts src/",

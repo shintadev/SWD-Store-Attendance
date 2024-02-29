@@ -1,6 +1,13 @@
 import { IUser, User } from '@src/models/User';
 import { sequelize } from './sequelize.orm';
 
+// **** Types **** //
+
+interface updateParams {
+  password?: string;
+  role?: string;
+}
+
 // **** Class **** //
 
 class UserRepo {
@@ -25,6 +32,65 @@ class UserRepo {
     const transaction = await sequelize.transaction();
     try {
       const result = await User.create(user, { transaction: transaction });
+      transaction.commit();
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
+  }
+
+  /**
+   * Update.
+   */
+  public async update(id: string, password?:string, role?:string) {
+    const updateValues: updateParams = {};
+
+    if (password) {
+      updateValues.password = password;
+    }
+
+    if (role) {
+      updateValues.role = role;
+    }
+
+    const transaction = await sequelize.transaction();
+    try {
+      if (Object.keys(updateValues).length > 0) {
+        const result = await User.update(
+          updateValues,
+          {
+            where: {
+              id: id,
+            },
+            transaction: transaction,
+          }
+        );
+        transaction.commit();
+
+        return result;
+      }
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
+  }
+
+  /**
+   * delete
+   */
+  public async delete(id:string) {
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await User.destroy(
+        {
+          where: {
+            id: id,
+          },
+          transaction: transaction,
+        }
+      );
       transaction.commit();
 
       return result;

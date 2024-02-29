@@ -3,12 +3,16 @@ import { DataTypes, Model } from 'sequelize';
 import { Employee } from './Employee';
 import { nanoid } from 'nanoid';
 
+// **** Variables **** //
+
+const userRole = ['admin', 'manager'];
+
 // **** Types **** //
 
 export interface IUser {
   id: string;
   password: string;
-  role: 'admin' | 'employee';
+  role: string;
 }
 
 export interface UserModel extends Model<IUser>, IUser {}
@@ -48,8 +52,7 @@ export const User = sequelize.define<UserModel>('User', {
     allowNull: false,
     validate: {
       valid(value: string) {
-        const array = ['admin', 'employee'];
-        if (!value || array.includes(value)) {
+        if (!value || userRole.includes(value)) {
           throw new Error('Invalid Role');
         }
       },
