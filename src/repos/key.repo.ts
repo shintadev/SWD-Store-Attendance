@@ -33,6 +33,30 @@ class KeyRepo {
       throw error;
     }
   }
+
+  /**
+   * update
+   */
+  public async update(key: IKey) {
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await Key.update(
+        key, 
+        {
+          where:{
+            id:key.id,
+          }, 
+          transaction: transaction,
+        },
+      );
+      transaction.commit();
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
+  }
 }
 
 // **** Export default **** //

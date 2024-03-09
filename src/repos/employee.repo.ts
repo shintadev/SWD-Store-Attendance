@@ -11,19 +11,21 @@ class EmployeeRepo {
    */
   public async getList(page: number, pageSize: number) {
     const offset = (page - 1) * pageSize;
-    const employees = await Employee.findAll({
+    const result = await Employee.findAll({
       where: {
         // status: 'Active',
       },
       offset: offset,
       limit: pageSize,
+    }).then(function (employees) {
+      if (employees) {
+        const result: IEmployee[] = [];
+        employees.forEach((employee) => {
+          result.push(employee.dataValues);
+        });
+        return result;
+      } else throw new Error('Error while getting record');
     });
-    if (!employees) throw new Error('Error while getting record');
-
-    const total = await Employee.count();
-    const totalPages = Math.ceil(total / pageSize);
-
-    const result = { employees, total, totalPages };
 
     return result;
   }

@@ -25,6 +25,17 @@ const config = {
 
 export const sequelize = new Sequelize(uri, config);
 
+// Connect to the database
+sequelize.authenticate()
+  .then(() => {
+    console.log('Connected to the database');
+  })
+  .catch((error) => {
+    console.error('Unable to connect to the database:', error);
+  });
+
+// sequelize.sync();
+
 // async function alterTable() {
 //   try {
 //     await sequelize.sync({ alter: true });
@@ -35,3 +46,15 @@ export const sequelize = new Sequelize(uri, config);
 // }
 
 // alterTable();
+
+// async function clearTable() {
+//   try {
+//     await sequelize.sync({ force: true }).then(() => {
+//       console.log('All tables truncated successfully.');
+//     });
+//   } catch (error) {
+//     console.log('🚀 ~ createAndUseTable ~ error:', error);
+//   }
+// }
+
+// clearTable();

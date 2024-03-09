@@ -42,7 +42,10 @@ export const EmployeeShift = sequelize.define<EmployeeShiftModel>(
       },
     },
   },
-  { timestamps: false }
+  {
+    timestamps: false,
+    freezeTableName: true,
+  }
 );
 
 // **** Relationship **** //

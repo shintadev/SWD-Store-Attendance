@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shift</title>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+  <style>
+    .schedule-container {
+      width: 1600px;
+      /* Increased max-width for a wider form */
+      margin: 2rem auto;
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .title-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 1rem;
+    }
+
+    .title-container h1 {
+      flex: auto;
+      margin: 0;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid;
+      font-family: monospace;
+      font-size: larger;
+    }
+
+    table {
+      table-layout: fixed;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    td {
+      width: 1/7;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 5px 10px;
+      margin-right: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="home-bar">
+      <div class="logo"><a href="/admin">Store Attendance</a></div>
+      <nav>
+        <button class="header-button" onclick="navigateTo('/employees')">Employee</button>
+        <button class="header-button" onclick="navigateTo('/shift')">Schedule</button>
+        <button class="header-button" onclick="navigateTo('/users')">User</button>
+        <button class="header-button logout-button" onclick="logout()">Log out</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="schedule-container">
+    <div class="title-container">
+      <h1>Schedule</h1>
+      <button id="add-shift-btn">Add➕</button>
+    </div>
+    <div class="table-container">
+      <table id="schedule-table">
+        <thead>
+          <tr>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+            <th>Saturday</th>
+            <th>Sunday</th>
+          </tr>
+        </thead>
+        <tbody id="item-list"></tbody>
+      </table>
+    </div>
+  </div>
+</body>
+<script src="scripts/script.js"></script>
+<script>
+  // DOM elements
+  const itemList = document.getElementById('item-list');
+  const addShiftBtn = document.getElementById('add-shift-btn');
+  const dateChoice = document.getElementById('')
+
+  async function renderItems() {
+    const response = await fetch('api/shift/schedule', {
+      method: 'GET'
+    });
+    const result = await response.json();
+
+    const data = result.data;
+
+    // Clear previous items
+    itemList.innerHTML = '';
+    for (let n = 0; n < findMaxColumnLength(data); n++) {
+      const tr = document.createElement('tr');
+      data.forEach(day => {
+        const cell = document.createElement('td');
+        cell.innerHTML = day[n] ? day[n].startTime.getHours() + ' : ' + day[n].startTime.getMinutes()
+          + ' - ' + day[n].endTime.getHours() + ' : ' + day[n].endTime.getMinutes()
+          + '<br><button>Edit🔄️</button><button>Delete❎</button>' : '';
+
+        tr.appendChild(cell)
+      })
+      itemList.appendChild(tr);
+    }
+  }
+
+  function findMaxColumnLength(matrix) {
+    if (!matrix || matrix.length === 0 || matrix[0].length === 0) {
+      return -1; // Invalid matrix
+    }
+
+    let maxColumnLength = 0;
+
+    for (let col = 0; col < matrix[0].length; col++) {
+      let columnLength = 0;
+
+      for (let row = 0; row < matrix.length; row++) {
+        if (matrix[row][col] !== undefined) {
+          // Assuming undefined values should not be considered in the length
+          columnLength++;
+        }
+      }
+
+      maxColumnLength = Math.max(maxColumnLength, columnLength);
+    }
+
+    return maxColumnLength;
+  }
+
+  // Event listeners for pagination buttons
+  addShiftBtn.addEventListener('click', () => {
+    window.location.href = '/shift/form';
+  })
+
+  // Initial render
+  renderItems();
+</script>
+
+</html>

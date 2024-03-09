@@ -14,6 +14,30 @@ class UserRepo {
   // **** Functions **** //
 
   /**
+   * Get list users.
+   */
+  public async getList(page: number, pageSize: number) {
+    const offset = (page - 1) * pageSize;
+    const result = await User.findAll({
+      where: {
+        // status: 'Active',
+      },
+      offset: offset,
+      limit: pageSize,
+    }).then(function (Users) {
+      if (Users) {
+        const result: IUser[] = [];
+        Users.forEach((User) => {
+          result.push(User.dataValues);
+        });
+        return result;
+      } else throw new Error('Error while getting record');
+    });
+
+    return result;
+  }
+
+  /**
    * getById
    */
   public async getById(id: string) {
@@ -44,7 +68,7 @@ class UserRepo {
   /**
    * Update.
    */
-  public async update(id: string, password?:string, role?:string) {
+  public async update(id: string, password?: string, role?: string) {
     const updateValues: updateParams = {};
 
     if (password) {
@@ -58,15 +82,12 @@ class UserRepo {
     const transaction = await sequelize.transaction();
     try {
       if (Object.keys(updateValues).length > 0) {
-        const result = await User.update(
-          updateValues,
-          {
-            where: {
-              id: id,
-            },
-            transaction: transaction,
-          }
-        );
+        const result = await User.update(updateValues, {
+          where: {
+            id: id,
+          },
+          transaction: transaction,
+        });
         transaction.commit();
 
         return result;
@@ -80,17 +101,15 @@ class UserRepo {
   /**
    * delete
    */
-  public async delete(id:string) {
+  public async delete(id: string) {
     const transaction = await sequelize.transaction();
     try {
-      const result = await User.destroy(
-        {
-          where: {
-            id: id,
-          },
-          transaction: transaction,
-        }
-      );
+      const result = await User.destroy({
+        where: {
+          id: id,
+        },
+        transaction: transaction,
+      });
       transaction.commit();
 
       return result;

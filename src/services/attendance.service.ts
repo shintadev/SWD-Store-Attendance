@@ -1,9 +1,12 @@
+import { Attendance as MAttendance } from './../models/Attendance';
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 import Attendance, { AttendanceModel } from '@src/models/Attendance';
 import { RouteError } from '@src/other/classes';
 import attendanceRepo from '@src/repos/attendance.repo';
 import employeeRepo from '@src/repos/employee.repo';
 import moment from 'moment';
+import shiftService from './shift.service';
+import { EmployeeShift } from '@src/models/EmployeeShift';
 
 // **** Variables **** //
 
@@ -65,6 +68,33 @@ class AttendanceService {
       return await attendanceRepo.update(attendance);
     } catch (error) {
       console.log('🚀 ~ AttendanceService ~ setCheckOut ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * getAttendanceRate
+   */
+  public async getAttendanceRate() {
+    try {
+      const now = moment().toDate();
+      const dayShifts = await shiftService.getByWeek(now);
+      let attendanceCount = 0;
+      let expectAttendanceCount = 0;
+
+      for (const shifts of dayShifts) {
+        for (const shift of shifts) {
+          attendanceCount += await MAttendance.count({ where: { shiftId: shift.id } });
+          expectAttendanceCount += await EmployeeShift.count({ where: { shiftId: shift.id } });
+        }
+      }
+
+      const result = (attendanceCount / expectAttendanceCount) * 100;
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ AttendanceService ~ getAttendanceRate ~ error:', error);
 
       throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
     }

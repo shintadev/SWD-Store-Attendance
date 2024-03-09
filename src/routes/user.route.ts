@@ -6,6 +6,7 @@ import { RouteError } from '@src/other/classes';
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 import userService from '@src/services/user.service';
 import User from '@src/models/User';
+import multer from 'multer';
 
 // ** Add Router ** //
 
@@ -35,17 +36,31 @@ const userResolvers = {
     });
   },
 
-  create: async (req: IReq<UserRequest>, res: IRes) => {
-    const { id, password } = req.body;
-    if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
-    }
-    const user = User.new(id, password);
-
-    const result = await userService.createOne(user);
+  /**
+   * Get list users.
+   */
+  getList: async (req: IReq<UserRequest>, res: IRes) => {
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
+    const result = await userService.getList(page, pageSize);
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
+      data: result,
+    });
+  },
+
+  create: async (req: IReq<UserRequest>, res: IRes) => {
+    const { id, password, role } = req.body;
+    if (!id) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
+    const user = User.new(id, password, role);
+
+    const result = await userService.createOne(user);
+
+    return res.status(HttpStatusCodes.CREATED).json({
+      message: 'User created',
       data: result,
     });
   },
@@ -84,9 +99,13 @@ const userResolvers = {
 userRouter
   .route(Paths.User.CRUD)
   .get(asyncHandler(userResolvers.getById))
-  .post(asyncHandler(userResolvers.create))
+  .post(multer().none(), asyncHandler(userResolvers.create))
   .put(asyncHandler(userResolvers.update))
   .delete(asyncHandler(userResolvers.delete));
+
+  userRouter
+  .route(Paths.User.List)
+  .get(multer().none(),asyncHandler(userResolvers.getList)); //Get list users
 
 // **** Export default **** //
 

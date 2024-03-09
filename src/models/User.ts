@@ -19,7 +19,7 @@ export interface UserModel extends Model<IUser>, IUser {}
 
 // **** Models **** //
 
-export const User = sequelize.define<UserModel>('User', {
+export const User = sequelize.define<UserModel>('user', {
   id: {
     type: DataTypes.STRING,
     primaryKey: true,
@@ -30,10 +30,6 @@ export const User = sequelize.define<UserModel>('User', {
           throw new Error('Invalid EmployeeId');
         }
       },
-    },
-    references: {
-      model: Employee,
-      key: 'id',
     },
   },
   password: {
@@ -52,7 +48,7 @@ export const User = sequelize.define<UserModel>('User', {
     allowNull: false,
     validate: {
       valid(value: string) {
-        if (!value || userRole.includes(value)) {
+        if (!value || !userRole.includes(value)) {
           throw new Error('Invalid Role');
         }
       },
@@ -77,11 +73,11 @@ User.belongsTo(Employee, {
 /**
  * Create new Attendance.
  */
-function new_(id: string, password?: string): IUser {
+function new_(id: string, password?: string, role?: string): IUser {
   return {
     id: id,
     password: password ?? nanoid(8),
-    role: 'employee',
+    role: role ?? 'manager',
   };
 }
 

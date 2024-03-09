@@ -4,7 +4,7 @@
 
 export default {
   Base: '/api',
-  Employees: {
+  Employee: {
     Base: '/employees',
     CRUD: '/',
     List: '/list',
@@ -20,8 +20,9 @@ export default {
     CRUD: '/',
   },
   User: {
-    Base: 'users',
+    Base: '/users',
     CRUD: '/',
+    List: '/list',
   },
   Auth: {
     Base: '/auth',
@@ -29,7 +30,14 @@ export default {
     Logout: '/logout',
     RefreshToken: '/refresh-token',
   },
+  Admin: {
+    Base: '/admin',
+  },
 } as const;
+
+
+
+
 
 
 

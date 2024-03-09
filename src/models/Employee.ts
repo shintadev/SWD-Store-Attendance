@@ -57,7 +57,7 @@ export const Employee = sequelize.define<EmployeeModel>(
   },
   {
     // tableName: 'employee',
-    freezeTableName: true,
+    // freezeTableName: true,
     // paranoid: true,
   }
 );

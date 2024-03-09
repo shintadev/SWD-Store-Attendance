@@ -24,22 +24,38 @@ class AuthService {
   public async login(id: string, password: string) {
     try {
       const user = await verify(id, password);
-      const { publicKey, privateKey } = generateKeyPair();
-      const { accessToken, refreshToken } = createJWTTokenPair(
-        {
-          id: user.id,
-          role: user.role,
-        },
-        publicKey,
-        privateKey
-      );
+      let keyObject = (await keyService.getByUserId(user.id))?.dataValues;
+      if (!keyObject) {
+        const { publicKey, privateKey } = generateKeyPair();
+        const { accessToken, refreshToken } = createJWTTokenPair(
+          {
+            id: user.id,
+            role: user.role,
+          },
+          publicKey,
+          privateKey
+        );
 
-      const keyObject = Key.new(user.id, publicKey, privateKey, accessToken, refreshToken);
-      await keyService.createKeyToken(keyObject);
+        keyObject = Key.new(user.id, publicKey, privateKey, accessToken, refreshToken);
+        await keyService.createKeyToken(keyObject);
+      } else {
+        const { accessToken, refreshToken } = createJWTTokenPair(
+          {
+            id: user.id,
+            role: user.role,
+          },
+          keyObject.publicKey,
+          keyObject.privateKey
+        );
+        keyObject.accessToken = accessToken;
+        keyObject.refreshToken = refreshToken;
+
+        await keyService.updateKeyToken(keyObject);
+      }
 
       return {
         uid: user.id,
-        accessToken,
+        accessToken: keyObject.accessToken,
       };
     } catch (error) {
       console.log('🚀 ~ AuthService ~ login ~ error:', error);
@@ -55,6 +71,8 @@ class AuthService {
     try {
       const user = await userService.getById(uid);
       const foundKey = await keyService.getByUserId(uid);
+
+      if (!foundKey) throw new RouteError(HttpStatusCodes.UNAUTHORIZED, INVALID_TOKEN_ERROR);
 
       const publicKey = foundKey.publicKey;
       const privateKey = foundKey.privateKey;

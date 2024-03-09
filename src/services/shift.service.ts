@@ -60,6 +60,7 @@ class ShiftService {
    * Get all shift of a specific day
    */
   public async getByDay(date: Date) {
+    const result = [];
     const params: WhereOptions = {
       startTime: {
         [Op.gte]: moment(date).startOf('d'),
@@ -68,7 +69,28 @@ class ShiftService {
         [Op.lte]: moment(date).endOf('d'),
       },
     };
-    const result = await shiftRepo.getShifts(params);
+    const shifts = await shiftRepo.getShifts(params);
+
+    for (const shift of shifts) {
+      result.push(shift.dataValues);
+    }
+
+    return result;
+  }
+
+  /**
+   * getDayCount
+   */
+  public async getDayCount(date: Date) {
+    const params: WhereOptions = {
+      startTime: {
+        [Op.gte]: moment(date).startOf('d'),
+      },
+      endTime: {
+        [Op.lte]: moment(date).endOf('d'),
+      },
+    };
+    const result = (await shiftRepo.getShifts(params)).length;
 
     return result;
   }
@@ -77,13 +99,29 @@ class ShiftService {
    * Get all shift of a week by day
    */
   public async getByWeek(date: Date) {
-    const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const weekDays = [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday','Sunday'];
     const result = [];
 
     for (const day of weekDays) {
       const currentDay = moment(date).startOf('d').day(day).toDate();
       const dayShifts = await this.getByDay(currentDay);
       result.push(dayShifts);
+    }
+
+    return result;
+  }
+
+  /**
+   * getWeekCount
+   */
+  public async getWeekCount(date: Date) {
+    const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    let result = 0;
+
+    for (const day of weekDays) {
+      const currentDay = moment(date).startOf('d').day(day).toDate();
+      const dayShifts = await this.getDayCount(currentDay);
+      result += dayShifts;
     }
 
     return result;

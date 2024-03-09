@@ -22,8 +22,6 @@ class KeyService {
       return result;
     } catch (error) {
       console.log('🚀 ~ KeyService ~ getByUserId ~ error:', error);
-
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, KEY_REQUEST_ERROR);
     }
   }
 
@@ -37,6 +35,21 @@ class KeyService {
       return result;
     } catch (error) {
       console.log('🚀 ~ KeyService ~ createKeyToken ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, KEY_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * updateKeyToken
+   */
+  public async updateKeyToken(keyObject: IKey) {
+    try {
+      const result = await keyRepo.update(keyObject);
+
+      return result;
+    } catch (error) {
+      console.log("🚀 ~ KeyService ~ updateKeyToken ~ error:", error)
 
       throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, KEY_REQUEST_ERROR);
     }

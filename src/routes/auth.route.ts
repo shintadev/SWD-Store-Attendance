@@ -7,6 +7,7 @@ import EnvVars from '@src/constants/EnvVars';
 import Paths from '@src/constants/Paths';
 import { asyncHandler } from '@src/util/misc';
 import { isAuthenticated } from '../middlewares/auth.middleware';
+import multer from 'multer';
 
 // ** Add Router ** //
 
@@ -14,7 +15,7 @@ const authRouter = Router();
 
 // **** Types **** //
 
-interface AuthRequest {
+export interface AuthRequest {
   id?: string;
   password?: string;
 }
@@ -24,6 +25,7 @@ interface AuthRequest {
 const authResolvers = {
   login: async (req: IReq<AuthRequest>, res: IRes) => {
     const { id, password } = req.body;
+
     if (!id || !password) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
@@ -35,19 +37,20 @@ const authResolvers = {
     res.cookie('uid', result.uid, EnvVars.CookieProps.Options);
     res.cookie('token', result.accessToken, EnvVars.CookieProps.Options);
 
-    return res.status(HttpStatusCodes.OK).json({
+    res.status(HttpStatusCodes.OK).json({
       message: 'Login successfully',
       data: result,
     });
+    res.end();
   },
 
-  logout: (req: IReq<AuthRequest>, res: IRes) => {
+  logout: (_: IReq<AuthRequest>, res: IRes) => {
     res.clearCookie('uid');
     res.clearCookie('token');
     res.status(HttpStatusCodes.OK).json({
       message: 'Logout successful',
     });
-    res.end();
+    // res.end();
   },
 
   refreshToken: async (req: IReq<AuthRequest>, res: IRes) => {
@@ -60,12 +63,13 @@ const authResolvers = {
     res.status(HttpStatusCodes.OK).json({
       message: 'Refresh token successfully',
     });
+    res.end();
   },
 };
 
 // **** Routes **** //
 
-authRouter.route(Paths.Auth.Login).post(asyncHandler(authResolvers.login));
+authRouter.route(Paths.Auth.Login).post(multer().none(), asyncHandler(authResolvers.login));
 authRouter.route(Paths.Auth.Logout).post(asyncHandler(authResolvers.logout));
 authRouter
   .route(Paths.Auth.RefreshToken)

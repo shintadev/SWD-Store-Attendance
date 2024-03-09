@@ -1,5 +1,5 @@
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import { IEmployee } from '@src/models/Employee';
+import { Employee, IEmployee } from '@src/models/Employee';
 import { RouteError } from '@src/other/classes';
 import employeeRepo from '@src/repos/employee.repo';
 
@@ -31,10 +31,13 @@ class EmployeeService {
   /**
    * Get list employees.
    */
-  public async getList(page: number, pageSize?: number) {
+  public async getList(page: number, pageSize: number) {
     try {
-      const result = await employeeRepo.getList(page, pageSize ?? 10);
+      const employees = await employeeRepo.getList(page, pageSize);
+      const total = await Employee.count();
+      const totalPages = Math.ceil(total / pageSize);
 
+      const result = { employees, total, totalPages };
       return result;
     } catch (error) {
       console.log('🚀 ~ EmployeeService ~ getOne ~ error:', error);
@@ -90,6 +93,21 @@ class EmployeeService {
       return result;
     } catch (error) {
       console.log('🚀 ~ EmployeeService ~ _delete ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, EMPLOYEE_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * getTotalEmps
+   */
+  public getTotalEmps() {
+    try {
+      const result = Employee.count({ where: { status: 'Active' } });
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ EmployeeService ~ getTotalEmps ~ error:', error);
 
       throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, EMPLOYEE_REQUEST_ERROR);
     }

@@ -13,6 +13,9 @@ import { RouteError } from '@src/other/classes';
 // ** Add Router ** //
 
 const employeeRouter = Router();
+
+// **** Variables **** //
+
 const upload = multer();
 
 // **** Types **** //
@@ -40,28 +43,25 @@ const employeeResolvers = {
   /**
    * Get one employee.
    */
-  getOne: async (req: IReq<EmployeeRequest>, res: IRes) => {
+  getOne: (req: IReq<EmployeeRequest>, res: IRes) => {
     const { id } = req.body;
     if (!id) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
-    const employee = await employeeService.getOne(id);
+    // const employee = await employeeService.getOne(id);
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
-      data: employee,
+      data: id,
     });
   },
 
   /**
-   * Get one employee.
+   * Get list employees.
    */
   getList: async (req: IReq<EmployeesRequest>, res: IRes) => {
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 10;
-    if (!page) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
-    }
     const result = await employeeService.getList(page, pageSize);
 
     return res.status(HttpStatusCodes.OK).json({
@@ -75,6 +75,7 @@ const employeeResolvers = {
    */
   add: async (req: IReq<EmployeeRequest>, res: IRes) => {
     const { name, DOB, phone, address } = req.body;
+
     const img = req.file;
     if (!name || !DOB || !phone || !address) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
@@ -148,15 +149,15 @@ const employeeResolvers = {
 employeeRouter.use(json({ limit: '10mb' }));
 
 employeeRouter
-  .route(Paths.Employees.CRUD)
-  .get(asyncHandler(employeeResolvers.getOne)) // Get one employee
-  .post(upload.single('file'), employeeResolvers.add) // Add one employee
+  .route(Paths.Employee.CRUD)
+  .get(upload.none(), asyncHandler(employeeResolvers.getOne)) // Get one employee
+  .post(upload.single('file'), asyncHandler(employeeResolvers.add)) // Add one employee
   .put(asyncHandler(employeeResolvers.update)) // Update one employee
   .delete(asyncHandler(employeeResolvers.delete)); // Delete one employee
 
 employeeRouter
-  .route(Paths.Employees.List)
-  .get(asyncHandler(employeeResolvers.getList)); //Get list employees
+  .route(Paths.Employee.List)
+  .get(upload.none(),asyncHandler(employeeResolvers.getList)); //Get list employees
 
 // **** Export default **** //
 

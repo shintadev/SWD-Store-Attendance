@@ -16,7 +16,7 @@ export interface KeyModel extends Model<IKey>, IKey {}
 
 // **** Models **** //
 
-export const Key = sequelize.define<KeyModel>('Key', {
+export const Key = sequelize.define<KeyModel>('key', {
   id: {
     type: DataTypes.STRING,
     primaryKey: true,

@@ -4,7 +4,6 @@
 
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
-import path from 'path';
 import helmet from 'helmet';
 import express, { Request, Response, NextFunction } from 'express';
 import logger from 'jet-logger';
@@ -19,6 +18,7 @@ import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 
 import { NodeEnvs } from '@src/constants/misc';
 import { RouteError } from '@src/other/classes';
+import { setViews } from './util/view.util';
 
 
 // **** Variables **** //
@@ -67,31 +67,7 @@ app.use((
 
 // ** Front-End Content ** //
 
-// Set views directory (html)
-const viewsDir = path.join(__dirname, 'views');
-app.set('views', viewsDir);
-
-// Set static directory (js and css).
-const staticDir = path.join(__dirname, 'public');
-app.use(express.static(staticDir));
-
-// Nav to employees page by default
-app.get('/', (_: Request, res: Response) => {
-  return res.redirect(Paths.Employees.Base);
-});
-
-// Redirect to login if not logged in.
-app.get(Paths.Employees.Base, (_: Request, res: Response) => {
-  return res.sendFile('employees.html', { root: viewsDir });
-});
-
-app.get(Paths.Attendance.Base, (_: Request, res: Response) => {
-  return res.sendFile('attendance.html', { root: viewsDir });
-});
-
-app.get(Paths.Shift.Base, (_: Request, res: Response) => {
-  return res.sendFile('shift.html', { root: viewsDir });
-});
+setViews(app);
 
 
 // **** Export default **** //

@@ -1,5 +1,5 @@
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import { IUser } from '@src/models/User';
+import { IUser, User } from '@src/models/User';
 import { RouteError } from '@src/other/classes';
 import userRepo from '@src/repos/user.repo';
 import { getHash } from '@src/util/auth.util';
@@ -23,6 +23,24 @@ class UserService {
       return result.dataValues;
     } catch (error) {
       console.log('🚀 ~ UserService ~ getById ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * Get list users.
+   */
+  public async getList(page: number, pageSize: number) {
+    try {
+      const users = await userRepo.getList(page, pageSize);
+      const total = await User.count();
+      const totalPages = Math.ceil(total / pageSize);
+
+      const result = { users, total, totalPages };
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ userService ~ getOne ~ error:', error);
 
       throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
     }
@@ -54,7 +72,7 @@ class UserService {
 
       return result;
     } catch (error) {
-      console.log("🚀 ~ UserService ~ updateOne ~ error:", error)
+      console.log('🚀 ~ UserService ~ updateOne ~ error:', error);
 
       throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
     }
@@ -69,7 +87,22 @@ class UserService {
 
       return result;
     } catch (error) {
-      console.log("🚀 ~ UserService ~ deleteOne ~ error:", error)
+      console.log('🚀 ~ UserService ~ deleteOne ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * getTotalUsers
+   */
+  public getTotalUsers() {
+    try {
+      const result = User.count();
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ UserService ~ getTotalUsers ~ error:', error);
 
       throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
     }

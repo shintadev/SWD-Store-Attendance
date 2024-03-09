@@ -9,14 +9,16 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 // **** Functions **** //
 
-export const isAuthenticated = async (req: IReq, res: IRes, next: NextFunction) => {
+export const isAuthenticated = async (req: IReq, res: IRes, next?: NextFunction) => {
   const uid = req.signedCookies['uid'];
   const accessToken = req.signedCookies['token'];
+
   if (!uid || !accessToken) {
     throw new RouteError(HttpStatusCodes.UNAUTHORIZED, 'Need login first');
   }
 
   const foundKey = await keyService.getByUserId(uid);
+  if (!foundKey) throw new RouteError(HttpStatusCodes.UNAUTHORIZED, INVALID_TOKEN_ERROR);
   try {
     const publicKey = foundKey.publicKey;
 
@@ -26,19 +28,18 @@ export const isAuthenticated = async (req: IReq, res: IRes, next: NextFunction) 
 
     if (uid !== tokenPayload.id) throw new Error();
   } catch (error) {
-    if (error instanceof Error && error.name === 'TokenExpiredError')
+    if (error instanceof Error && error.name === 'TokenExpiredError') {
       throw new RouteError(HttpStatusCodes.UNAUTHORIZED, EXPIRE_SESSION_ERROR);
-    else throw new RouteError(HttpStatusCodes.UNAUTHORIZED, INVALID_TOKEN_ERROR);
+    } else throw new RouteError(HttpStatusCodes.UNAUTHORIZED, INVALID_TOKEN_ERROR);
   }
-
-  next();
+  if (next) next();
 };
 
-export const isAdmin = async (req: IReq, res: IRes, next: NextFunction) => {
+export const isAdmin = async (req: IReq, res: IRes, next?: NextFunction) => {
   const uid = req.signedCookies['uid'];
   const user = await userService.getById(uid);
   if (!user || user.role !== 'admin') {
     throw new RouteError(HttpStatusCodes.FORBIDDEN, 'Not have permission');
   }
-  next();
+  if (next) next();
 };
