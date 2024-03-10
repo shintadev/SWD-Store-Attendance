@@ -64,8 +64,7 @@
       /* Initially hidden */
     }
 
-    #capture-btn,
-    #add-employee-btn {
+    .employee-btn {
       background-color: #28a745;
       color: white;
       padding: 0.5rem;
@@ -74,13 +73,8 @@
       border-radius: 4px;
     }
 
-    #capture-btn:hover,
-    #add-employee-btn:hover {
+    .employee-btn:hover {
       background-color: #218838;
-    }
-
-    #msg {
-      text-align: center;
     }
   </style>
 </head>
@@ -100,21 +94,13 @@
 
   <div class="employee-container">
     <div class="column-header">
-      <h1>Add Employee</h1>
+      <h1>Update Employee</h1>
     </div>
     <form id="employee-form">
       <table>
         <tr>
           <th>Name</th>
           <td><input id="name-input" name="name" placeholder="Nguyen Van A" /></td>
-          <td rowspan="5">
-            <video id="video" autoplay muted></video>
-            <canvas id="canvas"></canvas>
-            <div>
-              <button id="capture-btn">Capture Photo</button>
-              <p id="img-msg"></p>
-            </div>
-          </td>
         </tr>
         <tr>
           <th>Date of Birth</th>
@@ -133,16 +119,13 @@
     </form>
 
     <div style="padding-top: 4px;">
-      <button id="add-employee-btn">Add</button>
-      <p id="msg"></p>
+      <button id="update-employee-btn" class="employee-btn">Update</button>
+      <button id="cancel-employee-btn" class="employee-btn">Cancel</button>
     </div>
   </div>
 
 </body>
 <script src="/scripts/script.js"></script>
-<script>
-
-</script>
-<script src="/scripts/employee.js"></script>
+<script src="/scripts/employeeScripts/employeeUpdate.js"></script>
 
 </html>

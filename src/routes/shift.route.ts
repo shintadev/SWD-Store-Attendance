@@ -7,6 +7,7 @@ import Shift, { IShift } from '@src/models/Shift';
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 import { RouteError } from '@src/other/classes';
 import moment from 'moment';
+import multer from 'multer';
 
 // ** Add Router ** //
 
@@ -48,6 +49,7 @@ const shiftResolvers = {
 
   getByWeek: async (req: IReq<ShiftRequest>, res: IRes) => {
     const { day } = req.body;
+    console.log('🚀 ~ getByWeek: ~ day:', day);
 
     const result = await shiftService.getByWeek(day ?? moment().toDate()); // Default today
 
@@ -139,7 +141,9 @@ shiftRouter
   .put(asyncHandler(shiftResolvers.update))
   .delete(asyncHandler(shiftResolvers.delete));
 
-shiftRouter.route(Paths.Shift.Schedule).get(asyncHandler(shiftResolvers.getByWeek));
+shiftRouter
+  .route(Paths.Shift.Schedule)
+  .post(multer().none(), asyncHandler(shiftResolvers.getByWeek));
 
 shiftRouter
   .route(Paths.Shift.Assign)
