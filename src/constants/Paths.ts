@@ -4,25 +4,36 @@
 
 export default {
   Base: '/api',
-  Employees: {
+  Employee: {
     Base: '/employees',
     CRUD: '/',
+    List: '/list',
   },
   Shift: {
-    Base: '/schedule',
+    Base: '/shift',
     CRUD: '/',
+    Schedule: '/schedule',
+    Assign: '/assign',
   },
   Attendance: {
     Base: '/attendance',
     CRUD: '/',
   },
+  User: {
+    Base: '/users',
+    CRUD: '/',
+    List: '/list',
+  },
+  Auth: {
+    Base: '/auth',
+    Login: '/login',
+    Logout: '/logout',
+    RefreshToken: '/refresh-token',
+  },
+  Admin: {
+    Base: '/admin',
+  },
 } as const;
-
-
-
-
-
-
 
 
 

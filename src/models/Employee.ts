@@ -1,26 +1,86 @@
+import { sequelize } from '@src/repos/sequelize.orm';
 import { generateId } from '@src/util/misc';
-
-// **** Variables **** //
+import { DataTypes, Model } from 'sequelize';
 
 // **** Types **** //
 
 export interface IEmployee {
   id: string;
   name: string;
+  DOB: Date;
+  phone: string;
+  address: string;
   status: string;
   publicId: string;
   rekognitionId: string;
 }
 
+interface EmployeeModel extends Model<IEmployee>, IEmployee {}
+
+// **** Models **** //
+
+export const Employee = sequelize.define<EmployeeModel>(
+  'employee',
+  {
+    id: {
+      type: DataTypes.STRING(10),
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    DOB: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    phone: {
+      type: DataTypes.STRING(12),
+      allowNull: false,
+    },
+    address: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.STRING(10),
+      allowNull: false,
+    },
+    publicId: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    rekognitionId: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+  },
+  {
+    // tableName: 'employee',
+    // freezeTableName: true,
+    // paranoid: true,
+  }
+);
+
 // **** Functions **** //
 
 /**
- * Create new Employee.
+ * Create new IEmployee.
  */
-function new_(name: string, publicId: string, rekognitionId: string): IEmployee {
+function new_(
+  name: string,
+  DOB: Date,
+  phone: string,
+  address: string,
+  publicId: string,
+  rekognitionId: string
+): IEmployee {
   return {
     id: generateId(name),
     name: name,
+    DOB: DOB,
+    phone: phone,
+    address: address,
     publicId: publicId,
     rekognitionId: rekognitionId,
     status: 'Active',

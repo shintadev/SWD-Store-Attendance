@@ -1,0 +1,59 @@
+#video {
+  width: 320px;
+  height: 240px;
+  border: 1px solid #000000;
+}
+
+#canvas {
+  display: none;
+}
+
+th {
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+button{
+  background-color: white; 
+  color: black; 
+  border: 2px solid #04AA6D;
+  padding: 12px 30px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+button:hover{
+  background-color: #04AA6D;
+  color: white;
+}
+
+.home-bar {
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-bar a {
+  color: white;
+  text-decoration: none;
+  padding: 5px 10px;
+}
+
+.home-bar a:hover {
+  background-color: #222;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}

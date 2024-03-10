@@ -1,0 +1,83 @@
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f4f4f4;
+  height: 100vh;
+}
+
+header {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  height: auto;
+}
+
+a {
+  color: #0060B6;
+  text-decoration: none;
+}
+
+.home-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+nav {
+  display: flex;
+}
+
+nav a {
+  margin-right: 1rem;
+  color: white;
+  text-decoration: none;
+}
+
+button {
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #4caf50;
+  /* Green button color */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2a6d2d;
+  /* Darker green on hover */
+}
+
+.header-button {
+  margin: 4px;
+  padding: 10px 22px;
+  font-size: 16px;
+  background-color: #30394e;
+  /* Green button color */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.header-button:hover {
+  background-color: #282841;
+}
+
+.logout-button{
+  background-color: #714040;
+}
+
+.logout-button:hover {
+  background-color: #412828;
+}

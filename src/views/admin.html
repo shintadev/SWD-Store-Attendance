@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+  <title>Store Management Admin</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      overflow: hidden;
+    }
+
+    header {
+      background-color: #333;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .home-container {
+      width: 1000px;
+      margin: 2rem auto;
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .section-header {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .quick-links {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+    }
+
+    .quick-link {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .statistics {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+    }
+
+    .statistic {
+      flex: 1;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-right: 1rem;
+    }
+
+    .section {
+      height: 140px;
+      flex: 1;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+    }
+
+    .recent-activities {}
+
+    .upcoming-shifts {}
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="home-bar">
+      <div class="logo"><a href="/admin">Store Attendance</a></div>
+      <nav>
+        <button class="header-button" onclick="navigateTo('/employees')">Employee</button>
+        <button class="header-button" onclick="navigateTo('/shift')">Schedule</button>
+        <button class="header-button" onclick="navigateTo('/users')">User</button>
+        <button class="header-button logout-button" onclick="logout()">Log out</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="home-container">
+    <h1 class="section-header">Statistics</h1>
+    <div class="statistics">
+      <div class="statistic">Total Employees: <span id="totalEmps"></span></div>
+      <div class="statistic">Total Users: <span id="totalUsers"></span></div>
+      <div class="statistic">Attendance Rate: <span id="attendanceRate"></span>%</div>
+    </div>
+
+    <h1 class="section-header">Recent Activities</h1>
+    <div class="section recent-activities">
+      <!-- Display recent activity log -->
+    </div>
+
+    <h1 class="section-header">Upcoming Shifts</h1>
+    <div class="section upcoming-shifts">
+      <!-- Display upcoming shifts -->
+    </div>
+  </div>
+  <script src="scripts/script.js"></script>
+  <script>
+    async function preStart() {
+      const totalEmps = document.getElementById('totalEmps')
+      const totalUsers = document.getElementById('totalUsers')
+      const attendanceRate = document.getElementById('attendanceRate')
+
+      const response = await fetch('api/admin', {
+        method: 'GET'
+      });
+
+      const result = await response.json();
+
+      totalEmps.innerText = result.totalEmps ?? 0
+      totalUsers.innerText = result.totalUsers ?? 0
+      attendanceRate.innerText = result.attendanceRate ?? 0
+    }
+
+    preStart()
+  </script>
+</body>
+
+</html>

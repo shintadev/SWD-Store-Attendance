@@ -8,6 +8,8 @@ import {
 import { RouteError } from '@src/other/classes';
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 
+// **** Class **** //
+
 class ImageService {
   private client;
   private collectionId;
@@ -18,6 +20,8 @@ class ImageService {
     });
     this.collectionId = EnvVars.Rekognition.COLLECTION_ID;
   }
+
+  // **** Functions **** //
 
   public async indexFace(image: string, collectionId?: string) {
     const params = {

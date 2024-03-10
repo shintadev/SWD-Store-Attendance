@@ -1,0 +1,23 @@
+.home-bar {
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-bar a {
+  color: white;
+  text-decoration: none;
+  padding: 5px 10px;
+}
+
+.home-bar a:hover {
+  background-color: #222;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}

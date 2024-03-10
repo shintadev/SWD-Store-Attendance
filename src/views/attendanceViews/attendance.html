@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance</title>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+  <style>
+    body {
+      overflow: hidden;
+    }
+
+    .column-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      text-align: center;
+    }
+
+    .column-header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    video {
+      width: 100%;
+      max-width: 480px;
+      /* Increase the size of the video */
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 480px;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    #msg {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="home-bar">
+      <div class="logo"><a href="/home">Store Attendance</a></div>
+      <nav>
+        <button class="header-button" onclick="redirectToLogin()">Login</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="column-container">
+    <div class="column-header">
+      <h1>Attendance</h1>
+    </div>
+    <video id="video" width=480 height=360 autoplay muted></video>
+    <canvas id="canvas" width=480 height=360></canvas>
+    <div>
+      <button id="capture-btn">Điểm danh</button>
+      <p id="msg">Ấn nút để check-in/check-out</p>
+    </div>
+  </div>
+
+</body>
+<script src="scripts/attendance.js"></script>
+<script>
+  function redirectToLogin() {
+    // Implement redirection to the login page
+    console.log('Redirecting to Login');
+    window.location.href = '/login';
+  }
+</script>
+
+</html>

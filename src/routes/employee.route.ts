@@ -1,6 +1,6 @@
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 import { IReq, IRes } from './types/express/misc';
-import { Router } from 'express';
+import { Router, json } from 'express';
 import Paths from '../constants/Paths';
 import Employee, { IEmployee } from '@src/models/Employee';
 import imageService from '../services/image.service';
@@ -13,6 +13,9 @@ import { RouteError } from '@src/other/classes';
 // ** Add Router ** //
 
 const employeeRouter = Router();
+
+// **** Variables **** //
+
 const upload = multer();
 
 // **** Types **** //
@@ -24,6 +27,14 @@ export interface FaceRequest {
 export interface EmployeeRequest {
   id?: string;
   name?: string;
+  DOB?: Date;
+  phone?: string;
+  address?: string;
+}
+
+export interface EmployeesRequest {
+  page?: number;
+  pageSize?: number;
 }
 
 // **** Resolvers **** //
@@ -32,16 +43,30 @@ const employeeResolvers = {
   /**
    * Get one employee.
    */
-  getOne: async (req: IReq<EmployeeRequest>, res: IRes) => {
+  getOne: (req: IReq<EmployeeRequest>, res: IRes) => {
     const { id } = req.body;
     if (!id) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
-    const employee = await employeeService.getOne(id);
+    // const employee = await employeeService.getOne(id);
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
-      data: employee,
+      data: id,
+    });
+  },
+
+  /**
+   * Get list employees.
+   */
+  getList: async (req: IReq<EmployeesRequest>, res: IRes) => {
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
+    const result = await employeeService.getList(page, pageSize);
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Request handled',
+      data: result,
     });
   },
 
@@ -49,9 +74,10 @@ const employeeResolvers = {
    * Add one employee.
    */
   add: async (req: IReq<EmployeeRequest>, res: IRes) => {
-    const { name } = req.body;
+    const { name, DOB, phone, address } = req.body;
+
     const img = req.file;
-    if (!name) {
+    if (!name || !DOB || !phone || !address) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
     if (!img) {
@@ -65,7 +91,7 @@ const employeeResolvers = {
 
       const publicId = await fileService.uploadToCloud(imgBuffer);
 
-      const employee: IEmployee = Employee.new(name, publicId, face.FaceId);
+      const employee: IEmployee = Employee.new(name, DOB, phone, address, publicId, face.FaceId);
 
       const result = await employeeService.addOne(employee);
 
@@ -104,12 +130,12 @@ const employeeResolvers = {
   /**
    * Delete one employee.
    */
-  delete_: async (req: IReq<EmployeeRequest>, res: IRes) => {
+  delete: async (req: IReq<EmployeeRequest>, res: IRes) => {
     const { id } = req.body;
     if (!id) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
-    const result = await employeeService._delete(id);
+    const result = await employeeService.deleteOne(id);
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Deleted successfully',
@@ -120,12 +146,18 @@ const employeeResolvers = {
 
 // **** Routes **** //
 
+employeeRouter.use(json({ limit: '10mb' }));
+
 employeeRouter
-  .route(Paths.Employees.CRUD)
-  .get(asyncHandler(employeeResolvers.getOne)) // Get one employee
-  .post(upload.single('file'), employeeResolvers.add) // Add one employee
+  .route(Paths.Employee.CRUD)
+  .get(upload.none(), asyncHandler(employeeResolvers.getOne)) // Get one employee
+  .post(upload.single('file'), asyncHandler(employeeResolvers.add)) // Add one employee
   .put(asyncHandler(employeeResolvers.update)) // Update one employee
-  .delete(asyncHandler(employeeResolvers.delete_)); // Delete one employee
+  .delete(asyncHandler(employeeResolvers.delete)); // Delete one employee
+
+employeeRouter
+  .route(Paths.Employee.List)
+  .get(upload.none(),asyncHandler(employeeResolvers.getList)); //Get list employees
 
 // **** Export default **** //
 

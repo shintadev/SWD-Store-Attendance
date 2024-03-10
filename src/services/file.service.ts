@@ -1,6 +1,8 @@
 import EnvVars from '@src/constants/EnvVars';
 import { v2 as Cloudinary, UploadApiResponse } from 'cloudinary';
 
+// **** Class **** //
+
 class FileService {
   private config;
   private cloudName = EnvVars.Cloudinary.NAME;
@@ -17,6 +19,8 @@ class FileService {
 
     Cloudinary.config(this.config);
   }
+
+  // **** Functions **** //
 
   public async uploadToCloud(image: Buffer): Promise<string> {
     // Use the uploaded file's name as the asset's public ID and

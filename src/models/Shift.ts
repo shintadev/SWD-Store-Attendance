@@ -1,6 +1,6 @@
+import { sequelize } from '@src/repos/sequelize.orm';
 import { generateId } from '@src/util/misc';
-
-// **** Variables **** //
+import { DataTypes, Model } from 'sequelize';
 
 // **** Types **** //
 
@@ -9,6 +9,25 @@ export interface IShift {
   startTime: Date;
   endTime: Date;
 }
+
+interface ShiftModel extends Model<IShift>, IShift {}
+
+// **** Models **** //
+
+export const Shift = sequelize.define<ShiftModel>('shift', {
+  id: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+  },
+  startTime: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  endTime: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+});
 
 // **** Functions **** //
 
