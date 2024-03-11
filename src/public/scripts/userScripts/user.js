@@ -39,7 +39,12 @@ async function renderItems() {
     roleCell.textContent = String(item.role).toUpperCase();
 
     const operationCell = document.createElement('td');
-    operationCell.innerHTML = '<button>Edit🔄️</button><button>Delete❎</button>';
+    operationCell.innerHTML =
+      '<button onclick="callUpdate(\'' +
+      item.id +
+      '\')">Edit🔄️</button><button onclick="callDelete(\'' +
+      item.id +
+      '\')">Delete❎</button>';
 
     // Append cells to the table row
     tr.appendChild(noCell);

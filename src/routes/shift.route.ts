@@ -31,7 +31,7 @@ interface AssignRequest {
 
 const shiftResolvers = {
   getById: async (req: IReq<ShiftRequest>, res: IRes) => {
-    const { id } = req.body;
+    const id = String(req.query.id);
     if (!id) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
@@ -49,7 +49,6 @@ const shiftResolvers = {
 
   getByWeek: async (req: IReq<ShiftRequest>, res: IRes) => {
     const { day } = req.body;
-    console.log('🚀 ~ getByWeek: ~ day:', day);
 
     const result = await shiftService.getByWeek(day ?? moment().toDate()); // Default today
 
