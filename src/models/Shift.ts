@@ -1,13 +1,13 @@
 import { sequelize } from '@src/repos/sequelize.orm';
-import { generateId } from '@src/util/misc';
+import moment from 'moment';
 import { DataTypes, Model } from 'sequelize';
 
 // **** Types **** //
 
 export interface IShift {
   id: string;
-  startTime: Date;
-  endTime: Date;
+  shiftNo: number;
+  day: Date;
 }
 
 interface ShiftModel extends Model<IShift>, IShift {}
@@ -19,11 +19,18 @@ export const Shift = sequelize.define<ShiftModel>('shift', {
     type: DataTypes.STRING,
     primaryKey: true,
   },
-  startTime: {
-    type: DataTypes.DATE,
+  shiftNo: {
+    type: DataTypes.INTEGER,
     allowNull: false,
+    validate: {
+      valid(value: number) {
+        if (value < 0 || value > 4) {
+          throw new Error('Invalid shiftNo');
+        }
+      },
+    },
   },
-  endTime: {
+  day: {
     type: DataTypes.DATE,
     allowNull: false,
   },
@@ -34,11 +41,16 @@ export const Shift = sequelize.define<ShiftModel>('shift', {
 /**
  * Create new Shift.
  */
-function new_(startTime: Date, endTime: Date): IShift {
+function new_(shiftNo: number, day: Date): IShift {
+  const seed = new Date(day).toISOString();
+  const date = moment(seed);
+  let month = (date.month() + 1).toString();
+  if (date.month() + 1 < 10) month = '0' + (date.month() + 1).toString();
+  const id = date.date().toString() + month + date.year() + '_' + shiftNo;
   return {
-    id: generateId(startTime),
-    startTime: startTime,
-    endTime: endTime,
+    id: id,
+    shiftNo: shiftNo,
+    day: day,
   };
 }
 
@@ -46,7 +58,7 @@ function new_(startTime: Date, endTime: Date): IShift {
  * See if the param meets criteria to be a Shift.
  */
 function isShift(arg: unknown): boolean {
-  return !!arg && typeof arg === 'object' && 'id' in arg && 'startTime' in arg && 'endTime' in arg;
+  return !!arg && typeof arg === 'object' && 'id' in arg && 'shiftNo' in arg && 'day' in arg;
 }
 
 // **** Export default **** //

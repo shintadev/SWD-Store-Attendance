@@ -5,7 +5,7 @@ import Paths from '@src/constants/Paths';
 import { isAdmin, isAuthenticated } from '@src/middlewares/auth.middleware';
 
 const AUTHENTICATE_FAILED_HTML =
-  '<div id=\'error\'>Need Login First</div><script src="scripts/script.js"></script>';
+  '<div id=\'error\'>Need Login First</div><script src="/scripts/script.js"></script>';
 
 export const setViews = (app: Express) => {
   // Set views directory (html)
@@ -55,6 +55,8 @@ export const setViews = (app: Express) => {
       await isAdmin(req, res);
       return res.sendFile('admin.html', { root: viewsDir });
     } catch (error) {
+      console.log('🚀 ~ app.get ~ error:', error);
+
       return res.status(401).send(AUTHENTICATE_FAILED_HTML);
     }
   });

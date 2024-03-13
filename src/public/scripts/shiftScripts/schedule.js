@@ -1,6 +1,5 @@
 // DOM elements
 const itemList = document.getElementById('item-list');
-const addShiftBtn = document.getElementById('add-shift-btn');
 const dateChoice = document.getElementById('date-choice');
 
 dateChoice.valueAsDate = new Date();
@@ -19,48 +18,30 @@ async function renderItems() {
 
   // Clear previous items
   itemList.innerHTML = '';
-  for (let n = 0; n < findMaxColumnLength(data); n++) {
+  for (let row = 1; row <= 4; row++) {
     const tr = document.createElement('tr');
-    data.forEach((day) => {
+    const cell = document.createElement('td');
+    cell.innerHTML = 'Shift ' + row;
+    tr.appendChild(cell);
+    for (let col = 0; col <= 6; col++) {
       const cell = document.createElement('td');
-      cell.innerHTML = day[n]
-        ? day[n].startTime.getHours() +
-          ' : ' +
-          day[n].startTime.getMinutes() +
-          ' - ' +
-          day[n].endTime.getHours() +
-          ' : ' +
-          day[n].endTime.getMinutes() +
-          '<br><button>Edit🔄️</button><button>Delete❎</button>'
-        : '';
+      data.forEach((shift) => {
+        const day = new Date(shift.day);
+        if (shift.shiftNo === row && day.getDay() === col) {
+          cell.innerHTML =
+            day.toISOString() +
+            '<button onclick="callUpdate(\'' +
+            shift.id +
+            '\')">Edit🔄️</button><button onclick="callDelete(\'' +
+            shift.id +
+            '\')">Delete❎</button>';
+        } else cell.innerHTML = '‎ ';
+      });
 
       tr.appendChild(cell);
-    });
+    }
     itemList.appendChild(tr);
   }
-}
-
-function findMaxColumnLength(matrix) {
-  if (!matrix || matrix.length === 0 || matrix[0].length === 0) {
-    return -1; // Invalid matrix
-  }
-
-  let maxColumnLength = 0;
-
-  for (let col = 0; col < matrix[0].length; col++) {
-    let columnLength = 0;
-
-    for (let row = 0; row < matrix.length; row++) {
-      if (matrix[row][col] !== undefined) {
-        // Assuming undefined values should not be considered in the length
-        columnLength++;
-      }
-    }
-
-    maxColumnLength = Math.max(maxColumnLength, columnLength);
-  }
-
-  return maxColumnLength;
 }
 
 dateChoice.addEventListener('change', () => {

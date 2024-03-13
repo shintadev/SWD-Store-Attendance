@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shift</title>
+  <title>Schedule</title>
   <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
   <style>
     .schedule-container {
@@ -71,7 +71,7 @@
 
   <div class="schedule-container">
     <div class="title-container">
-      <input type="date" id="date-choice">
+      
       <h1>Schedule</h1>
       <button id="add-shift-btn" onclick="callAdd()">Add➕</button>
     </div>
@@ -79,13 +79,14 @@
       <table id="schedule-table">
         <thead>
           <tr>
+            <th><input type="date" id="date-choice"></th>
+            <th>Sunday</th>
             <th>Monday</th>
             <th>Tuesday</th>
             <th>Wednesday</th>
             <th>Thursday</th>
             <th>Friday</th>
             <th>Saturday</th>
-            <th>Sunday</th>
           </tr>
         </thead>
         <tbody id="item-list"></tbody>

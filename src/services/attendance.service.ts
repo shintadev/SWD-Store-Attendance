@@ -83,11 +83,9 @@ class AttendanceService {
       let attendanceCount = 0;
       let expectAttendanceCount = 0;
 
-      for (const shifts of dayShifts) {
-        for (const shift of shifts) {
-          attendanceCount += await MAttendance.count({ where: { shiftId: shift.id } });
-          expectAttendanceCount += await EmployeeShift.count({ where: { shiftId: shift.id } });
-        }
+      for (const shift of dayShifts) {
+        attendanceCount += await MAttendance.count({ where: { shiftId: shift.id } });
+        expectAttendanceCount += await EmployeeShift.count({ where: { shiftId: shift.id } });
       }
 
       const result = (attendanceCount / expectAttendanceCount) * 100;
