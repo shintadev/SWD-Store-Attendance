@@ -5,7 +5,6 @@ import shiftRepo from '@src/repos/shift.repo';
 import { WhereOptions } from 'sequelize';
 import moment from 'moment';
 import employeeShiftRepo from '@src/repos/employee-shift.repo';
-import employeeService from './employee.service';
 import Shifts from '@src/constants/Shifts';
 
 // **** Variables **** //
@@ -54,8 +53,11 @@ class ShiftService {
       else throw new Error('No shift currently');
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ addOne ~ error:', error);
-
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
+      if (error instanceof Error) {
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      } else {
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_NOT_FOUND_ERROR);
+      }
     }
   }
 
@@ -121,20 +123,6 @@ class ShiftService {
   }
 
   /**
-   * Get shift list.
-   */
-  public async getShiftEmployee(id: string) {
-    const list = await employeeShiftRepo.getEmployeesOfShift(id);
-    const result = [];
-
-    for (const obj of list) {
-      const employee = await employeeService.getOne(obj.employeeId);
-      result.push(employee);
-    }
-    return result;
-  }
-
-  /**
    * Create one shift.
    */
   public async createOne(shift: IShift) {
@@ -194,6 +182,36 @@ class ShiftService {
   }
 
   /**
+   * Get employee shift list.
+   */
+  public async getEmployeesOfShift(employeeId: string, shiftId: string) {
+    try {
+      const result = await employeeShiftRepo.getEmployeesOfShift(employeeId, shiftId);
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ ShiftService ~ getEmployeesOfShift ~ error:', error);
+
+      throw error;
+    }
+  }
+
+  /**
+   * get Employee Shift By ShiftId
+   */
+  public async getEmployeeShiftByShiftId(shiftId: string) {
+    try {
+      const result = await employeeShiftRepo.getEmployeeShiftByShiftId(shiftId);
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ ShiftService ~ getEmployeeShiftByShiftId ~ error:', error);
+
+      throw error;
+    }
+  }
+
+  /**
    * Assign one employee to shift.
    */
   public async assignEmployee(employeeId: string, shiftId: string) {
@@ -204,7 +222,7 @@ class ShiftService {
       };
       const result = await employeeShiftRepo.create(employeeShift);
 
-      return result;
+      return result.dataValues;
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ assignEmployee ~ error:', error);
 

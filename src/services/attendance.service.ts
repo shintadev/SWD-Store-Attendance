@@ -7,6 +7,7 @@ import employeeRepo from '@src/repos/employee.repo';
 import moment from 'moment';
 import shiftService from './shift.service';
 import { EmployeeShift } from '@src/models/EmployeeShift';
+import employeeShiftRepo from '@src/repos/employee-shift.repo';
 
 // **** Variables **** //
 
@@ -21,19 +22,27 @@ class AttendanceService {
    * Take attendance.
    */
   public async takeAttendance(shiftId: string, faceId: string) {
-    const employee = await employeeRepo.getByFaceId(faceId);
-    const attendance = await attendanceRepo.getByEmployeeAndShift(employee.id, shiftId);
-    let result = 'You already take attendance';
+    try {
+      const employee = await employeeRepo.getByFaceId(faceId);
+      const employeeShift = await employeeShiftRepo.getEmployeesOfShift(employee.id, shiftId);
+      if (!employeeShift) throw new Error('Not be assign to this shift.');
+      const attendance = await attendanceRepo.getByEmployeeAndShift(employee.id, shiftId);
+      let result = 'You already take attendance';
 
-    if (!attendance) {
-      await this.createCheckIn(shiftId, employee.id);
-      result = 'Check-in successfully';
-    } else if (!attendance.checkOutTime) {
-      await this.setCheckOut(attendance);
-      result = 'Check-out successfully';
+      if (!attendance) {
+        await this.createCheckIn(shiftId, employee.id);
+        result = 'Check-in successfully';
+      } else if (!attendance.checkOutTime) {
+        await this.setCheckOut(attendance);
+        result = 'Check-out successfully';
+      }
+
+      return result;
+    } catch (error) {
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
     }
-
-    return result;
   }
 
   /**

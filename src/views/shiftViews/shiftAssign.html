@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Form</title>
+  <title>Shift Form</title>
   <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
   <style>
-    .user-container {
+    .shift-container {
       max-width: 800px;
       /* Increased max-width for a wider form */
       margin: 2rem auto;
@@ -39,7 +39,8 @@
       width: 30%;
     }
 
-    input {
+    input,
+    select {
       width: calc(100% - 22px);
       /* Adjusted input width with box-sizing correction */
       padding: 0.5rem;
@@ -48,24 +49,17 @@
       border: 1px solid #ccc;
     }
 
-    video {
-      width: 100%;
-      max-width: 600px;
-      /* Increased max-width for a larger video */
-      height: auto;
+    .selected-item {
+      margin: 6px;
+      padding: .5rem;
+      background-color: #a3a394;
+      color: #fff;
       border-radius: 8px;
-      margin-bottom: 1rem;
+      text-align: left;
+      cursor: pointer;
     }
 
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: none;
-      /* Initially hidden */
-    }
-
-    .user-btn {
+    .shift-btn {
       background-color: #28a745;
       color: white;
       padding: 0.5rem;
@@ -74,10 +68,11 @@
       border-radius: 4px;
     }
 
-    .user-btn:hover {
+    .shift-btn:hover {
       background-color: #218838;
     }
   </style>
+
 </head>
 
 <body>
@@ -93,42 +88,48 @@
       </nav>
     </div>
   </header>
-  <div class="user-container">
+  <div class="shift-container">
     <div class="column-header">
-      <h1>Update User</h1>
+      <h1>Update Shift</h1>
     </div>
-    <form id="user-form">
+    <form id="shift-form">
       <table>
         <tr>
-          <th>ID</th>
-          <td><input id="id-input" disabled></td>
-        </tr>
-        <tr>
-          <th>Password</th>
-          <td><input id="password-input" type="password">
-            <p id="password-msg" style="color: red;"></p>
+          <th>Shift No.</th>
+          <td>
+            <select name="shifts" id="shift-no-select" disabled>
+              <option value="">--Please choose shift--</option>
+              <option value="1">Shift 1</option>
+              <option value="2">Shift 2</option>
+              <option value="3">Shift 3</option>
+              <option value="4">Shift 4</option>
+            </select>
           </td>
         </tr>
         <tr>
-          <th>Confirm Password</th>
-          <td><input id="confirm-input" type="password">
-            <p id="confirm-msg" style="color: red;"></p>
-          </td>
+          <th>Date</th>
+          <td><input type="date" id="date-input" disabled></td>
         </tr>
         <tr>
-          <th>Admin</th>
-          <td><input id="role-input" name="role-input" type="checkbox">
+          <th>Assign to</th>
+          <td>
+            <div>
+              <select name="assign" id="assign-select">
+                <option value="">--Choose employee to assign--</option>
+              </select>
+            </div>
+            <div id="selected-items"></div>
+          </td>
         </tr>
       </table>
     </form>
 
     <div style="padding-top: 8px;">
-      <button id="update-user-btn" class="user-btn">Update</button>
-      <button id="cancel-user-btn" class="user-btn">Cancel</button>
+      <button id="confirm-shift-btn" class="shift-btn">Confirm</button>
     </div>
   </div>
 </body>
 <script src="/scripts/script.js"></script>
-<script src="/scripts/userScripts/userUpdate.js"></script>
+<script src="/scripts/shiftScripts/shiftAssign.js"></script>
 
 </html>

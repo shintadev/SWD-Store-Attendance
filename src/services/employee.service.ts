@@ -29,6 +29,21 @@ class EmployeeService {
   }
 
   /**
+   * Get all employee.
+   */
+  public async getAll() {
+    try {
+      const result = await employeeRepo.getActive();
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ EmployeeService ~ getAll ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, EMPLOYEE_REQUEST_ERROR);
+    }
+  }
+
+  /**
    * Get list employees.
    */
   public async getList(page: number, pageSize: number) {
@@ -64,13 +79,13 @@ class EmployeeService {
   /**
    * Update an employee.
    */
-  public async updateOne(id: string, name: string) {
+  public async updateOne(id: string, name: string, DOB: Date, phone: string, address: string) {
     const persists = await employeeRepo.persists(id);
     if (!persists) {
       throw new RouteError(HttpStatusCodes.NOT_FOUND, EMPLOYEE_NOT_FOUND_ERROR);
     }
     try {
-      const result = await employeeRepo.update(id, name);
+      const result = await employeeRepo.update(id, name, DOB, phone, address);
       return result;
     } catch (error) {
       console.log('🚀 ~ EmployeeService ~ updateOne ~ error:', error);

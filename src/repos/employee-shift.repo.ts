@@ -9,9 +9,31 @@ class EmployeeShiftRepo {
   /**
    * Get employee of a shift.
    */
-  public async getEmployeesOfShift(shiftId: string) {
+  public async getEmployeeShiftByShiftId(shiftId: string) {
     const result = await EmployeeShift.findAll({
       where: {
+        shiftId: shiftId,
+      },
+    }).then(function (records) {
+      if (records) {
+        const result: IEmployeeShift[] = [];
+        records.forEach((record) => {
+          result.push(record.dataValues);
+        });
+        return result;
+      } else throw new Error('Error while getting record');
+    });
+
+    return result;
+  }
+
+  /**
+   * Get specific employee of a shift.
+   */
+  public async getEmployeesOfShift(employeeId: string, shiftId: string) {
+    const result = await EmployeeShift.findOne({
+      where: {
+        employeeId: employeeId,
         shiftId: shiftId,
       },
     });

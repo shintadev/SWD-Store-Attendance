@@ -57,6 +57,18 @@ const employeeResolvers = {
   },
 
   /**
+   * getAll
+   */
+  getAll: async (_: IReq<EmployeeRequest>, res: IRes) => {
+    const employee = await employeeService.getAll();
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Request handled',
+      data: employee,
+    });
+  },
+
+  /**
    * Get list employees.
    */
   getList: async (req: IReq<EmployeesRequest>, res: IRes) => {
@@ -115,11 +127,11 @@ const employeeResolvers = {
    * Update one employee.
    */
   update: async (req: IReq<EmployeeRequest>, res: IRes) => {
-    const { id, name } = req.body;
-    if (!id || !name) {
+    const { id, name, DOB, phone, address } = req.body;
+    if (!id || !name || !DOB || !phone || !address) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
-    const result = await employeeService.updateOne(id, name);
+    const result = await employeeService.updateOne(id, name, DOB, phone, address);
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Update successfully',
@@ -155,6 +167,10 @@ employeeRouter
   .post(upload.single('file'), asyncHandler(employeeResolvers.add)) // Add one employee
   .put(upload.none(),asyncHandler(employeeResolvers.update)) // Update one employee
   .delete(upload.none(),asyncHandler(employeeResolvers.delete)); // Delete one employee
+
+employeeRouter
+  .route(Paths.Employee.All)
+  .get(upload.none(),asyncHandler(employeeResolvers.getAll)); //Get all active employees
 
 employeeRouter
   .route(Paths.Employee.List)

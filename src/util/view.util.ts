@@ -44,8 +44,13 @@ export const setViews = (app: Express) => {
   });
 
   //Auth
-  app.get(Paths.Auth.Login, (_: Request, res: Response) => {
-    return res.sendFile('login.html', { root: authDir });
+  app.get(Paths.Auth.Login, async (req: Request, res: Response) => {
+    try {
+      await isAuthenticated(req, res);
+      return res.redirect('/admin');
+    } catch (error) {
+      return res.sendFile('login.html', { root: authDir });
+    }
   });
 
   //Admin
@@ -90,10 +95,19 @@ export const setViews = (app: Express) => {
   });
 
   //Shift
-  app.get(Paths.Shift.Base, async (req: Request, res: Response) => {
+  app.get(Paths.Shift.Schedule, async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
       return res.sendFile('schedule.html', { root: shiftDir });
+    } catch (error) {
+      return res.status(401).send(AUTHENTICATE_FAILED_HTML);
+    }
+  });
+
+  app.get(Paths.Shift.Base, async (req: Request, res: Response) => {
+    try {
+      await isAuthenticated(req, res);
+      return res.sendFile('shift.html', { root: shiftDir });
     } catch (error) {
       return res.status(401).send(AUTHENTICATE_FAILED_HTML);
     }
@@ -108,10 +122,10 @@ export const setViews = (app: Express) => {
     }
   });
 
-  app.get(Paths.Shift.Base + '/form/update', async (req: Request, res: Response) => {
+  app.get(Paths.Shift.Base + '/form/assign', async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
-      return res.sendFile('shiftUpdate.html', { root: shiftDir });
+      return res.sendFile('shiftAssign.html', { root: shiftDir });
     } catch (error) {
       return res.status(401).send(AUTHENTICATE_FAILED_HTML);
     }

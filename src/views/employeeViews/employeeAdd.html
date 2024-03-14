@@ -82,10 +82,11 @@
 <body>
   <header>
     <div class="home-bar">
-      <div class="logo"><a href="/admin">Store Attendance</a></div>
+      <div class="logo"><a href="/">Store Attendance</a></div>
       <nav>
+        <button class="header-button" onclick="navigateTo('/attendance')">Attendance</button>
         <button class="header-button" onclick="navigateTo('/employees')">Employee</button>
-        <button class="header-button" onclick="navigateTo('/shift')">Schedule</button>
+        <button class="header-button" onclick="navigateTo('/schedule')">Schedule</button>
         <button class="header-button" onclick="navigateTo('/users')">User</button>
         <button class="header-button logout-button" onclick="logout()">Log out</button>
       </nav>

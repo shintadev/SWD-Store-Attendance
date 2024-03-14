@@ -21,7 +21,7 @@ async function renderItems() {
   for (let row = 1; row <= 4; row++) {
     const tr = document.createElement('tr');
     const cell = document.createElement('td');
-    cell.innerHTML = 'Shift ' + row;
+    cell.innerHTML = 'Shift ' + row + '<br>' + (row * 3 + 5) + ':00 - ' + (row * 3 + 8) + ':00';
     tr.appendChild(cell);
     for (let col = 0; col <= 6; col++) {
       const cell = document.createElement('td');
@@ -29,10 +29,14 @@ async function renderItems() {
         const day = new Date(shift.day);
         if (shift.shiftNo === row && day.getDay() === col) {
           cell.innerHTML =
-            day.toISOString() +
-            '<button onclick="callUpdate(\'' +
+            day.getDate() +
+            '/' +
+            day.getMonth() +
+            '/' +
+            day.getFullYear() +
+            '<button onclick="callAssign(\'' +
             shift.id +
-            '\')">Edit🔄️</button><button onclick="callDelete(\'' +
+            '\')">Assign🔄️</button><button onclick="callDelete(\'' +
             shift.id +
             '\')">Delete❎</button>';
         } else cell.innerHTML = '‎ ';
@@ -52,9 +56,9 @@ async function callAdd() {
   window.location.href = '/shift/form/add';
 }
 
-async function callUpdate(id) {
+async function callAssign(id) {
   localStorage.setItem('id', id);
-  window.location.href = '/shift/form/update';
+  window.location.href = '/shift/form/assign';
 }
 
 async function callDelete(id) {

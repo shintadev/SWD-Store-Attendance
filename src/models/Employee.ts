@@ -53,6 +53,7 @@ export const Employee = sequelize.define<EmployeeModel>(
     rekognitionId: {
       type: DataTypes.STRING(50),
       allowNull: false,
+      unique: true,
     },
   },
   {

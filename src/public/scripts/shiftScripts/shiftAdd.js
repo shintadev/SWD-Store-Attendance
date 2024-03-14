@@ -14,11 +14,11 @@ addBtn.addEventListener('click', async function () {
 
   await upload(formData);
 
-  window.location.href = '/shift';
+  window.location.href = '/schedule';
 });
 
 cancelBtn.addEventListener('click', async function () {
-  window.location.href = '/shift';
+  window.location.href = '/schedule';
 });
 
 async function upload(formData) {

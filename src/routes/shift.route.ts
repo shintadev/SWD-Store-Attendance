@@ -36,7 +36,7 @@ const shiftResolvers = {
     }
 
     const shift = await shiftService.getById(id);
-    const employeeOfShift = await shiftService.getShiftEmployee(id);
+    const employeeOfShift = await shiftService.getEmployeeShiftByShiftId(id);
 
     const result = { ...shift.dataValues, employeeOfShift };
 

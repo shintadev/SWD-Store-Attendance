@@ -19,7 +19,6 @@ async function renderItems() {
 
   idField.value = id;
   if (data.role.toUpperCase() === 'ADMIN') roleField.checked = true;
-  console.log('🚀 ~ renderItems ~ role:', data.role);
 }
 
 confirmField.addEventListener('blur', function () {
