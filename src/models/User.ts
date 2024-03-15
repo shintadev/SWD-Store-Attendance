@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 
 // **** Variables **** //
 
-const userRole = ['admin', 'manager'];
+const userRole = ['ADMIN', 'MANAGER'];
 
 // **** Types **** //
 
@@ -77,7 +77,7 @@ function new_(id: string, password?: string, role?: string): IUser {
   return {
     id: id,
     password: password ?? nanoid(8),
-    role: role ?? 'manager',
+    role: role ?? 'MANAGER',
   };
 }
 

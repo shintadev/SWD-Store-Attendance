@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Form</title>
+  <title>User Form</title>
   <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
   <style>
-    .employee-container {
+    .user-container {
       max-width: 800px;
       /* Increased max-width for a wider form */
       margin: 2rem auto;
@@ -36,6 +36,7 @@
 
     th {
       text-align: left;
+      width: 30%;
     }
 
     input {
@@ -64,8 +65,7 @@
       /* Initially hidden */
     }
 
-    #capture-btn,
-    #add-employee-btn {
+    .user-btn {
       background-color: #28a745;
       color: white;
       padding: 0.5rem;
@@ -74,13 +74,8 @@
       border-radius: 4px;
     }
 
-    #capture-btn:hover,
-    #add-employee-btn:hover {
+    .user-btn:hover {
       background-color: #218838;
-    }
-
-    #msg {
-      text-align: center;
     }
   </style>
 </head>
@@ -88,61 +83,52 @@
 <body>
   <header>
     <div class="home-bar">
-      <div class="logo"><a href="/admin">Store Attendance</a></div>
+      <div class="logo"><a href="/">Store Attendance</a></div>
       <nav>
+        <button class="header-button" onclick="navigateTo('/attendance')">Attendance</button>
         <button class="header-button" onclick="navigateTo('/employees')">Employee</button>
-        <button class="header-button" onclick="navigateTo('/shift')">Schedule</button>
+        <button class="header-button" onclick="navigateTo('/schedule')">Schedule</button>
         <button class="header-button" onclick="navigateTo('/users')">User</button>
         <button class="header-button logout-button" onclick="logout()">Log out</button>
       </nav>
     </div>
   </header>
-
-  <div class="employee-container">
+  <div class="user-container">
     <div class="column-header">
-      <h1>Add Employee</h1>
+      <h1>Update User</h1>
     </div>
-    <form id="employee-form">
+    <form id="user-form">
       <table>
         <tr>
-          <th>Name</th>
-          <td><input id="name-input" name="name" placeholder="Nguyen Van A" /></td>
-          <td rowspan="5">
-            <video id="video" autoplay muted></video>
-            <canvas id="canvas"></canvas>
-            <div>
-              <button id="capture-btn">Capture Photo</button>
-              <p id="img-msg"></p>
-            </div>
+          <th>ID</th>
+          <td><input id="id-input" disabled></td>
+        </tr>
+        <tr>
+          <th>Password</th>
+          <td><input id="password-input" type="password">
+            <p id="password-msg" style="color: red;"></p>
           </td>
         </tr>
         <tr>
-          <th>Date of Birth</th>
-          <td><input id="dob-input" name="DOB" type="date" /></td>
+          <th>Confirm Password</th>
+          <td><input id="confirm-input" type="password">
+            <p id="confirm-msg" style="color: red;"></p>
+          </td>
         </tr>
         <tr>
-          <th>Phone number</th>
-          <td><input id="phone-input" name="phone" placeholder="0123456789" /></td>
+          <th>Admin</th>
+          <td><input id="role-input" name="role-input" type="checkbox">
         </tr>
-        <tr>
-          <th>Address</th>
-          <td><input id="address-input" name="address" placeholder="Phường, quận, thành phố" /></td>
-        </tr>
-        <tr style="height: 55px"></tr>
       </table>
     </form>
 
-    <div style="padding-top: 4px;">
-      <button id="add-employee-btn">Add</button>
-      <p id="msg"></p>
+    <div style="padding-top: 8px;">
+      <button id="update-user-btn" class="user-btn">Update</button>
+      <button id="cancel-user-btn" class="user-btn">Cancel</button>
     </div>
   </div>
-
 </body>
 <script src="/scripts/script.js"></script>
-<script>
-
-</script>
-<script src="/scripts/employee.js"></script>
+<script src="/scripts/userScripts/userUpdate.js"></script>
 
 </html>

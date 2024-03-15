@@ -38,7 +38,7 @@ export const isAuthenticated = async (req: IReq, res: IRes, next?: NextFunction)
 export const isAdmin = async (req: IReq, res: IRes, next?: NextFunction) => {
   const uid = req.signedCookies['uid'];
   const user = await userService.getById(uid);
-  if (!user || user.role !== 'admin') {
+  if (!user || user.role !== 'ADMIN') {
     throw new RouteError(HttpStatusCodes.FORBIDDEN, 'Not have permission');
   }
   if (next) next();

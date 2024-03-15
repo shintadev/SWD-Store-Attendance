@@ -5,9 +5,9 @@ const canvas = document.getElementById('canvas');
 let imageData;
 let file;
 const imgMsg = document.getElementById('img-msg');
-const msg = document.getElementById('msg');
 const captureBtn = document.getElementById('capture-btn');
 const addBtn = document.getElementById('add-employee-btn');
+const cancelBtn = document.getElementById('cancel-employee-btn');
 
 let stream;
 
@@ -71,17 +71,19 @@ addBtn.addEventListener('click', async function () {
   window.location.href = '/employees';
 });
 
+cancelBtn.addEventListener('click', async function () {
+  window.location.href = '/employees';
+});
+
 async function upload(formData) {
   try {
-    const response = await fetch('api/employees', {
+    const response = await fetch('/api/employees', {
       method: 'POST',
       body: formData,
     });
     const result = await response.json();
-    msg.innerText = 'Image successfully sent to API!';
     console.log('Success:', result);
   } catch (error) {
-    msg.innerText = 'Error sending image:';
     console.error('Error:', error);
   }
 }
@@ -90,7 +92,6 @@ function getFile(canvas) {
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
       const result = new File([blob], 'img.jpg', { type: 'image/jpeg' });
-      console.log('🚀 ~ file=awaitcanvas.toBlob ~ result:', result);
       resolve(result);
     }, 'image/jpeg');
   });

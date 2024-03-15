@@ -5,8 +5,8 @@ import { sequelize } from './sequelize.orm';
 // **** Types **** //
 
 interface updateParams {
-  startTime?: Date;
-  endTime?: Date;
+  shiftNo?: number;
+  day?: Date;
 }
 
 // **** Class **** //
@@ -74,15 +74,15 @@ class ShiftRepo {
   /**
    * Update a shift.
    */
-  public async update(id: string, start?: Date, end?: Date) {
+  public async update(id: string, shiftNo?: number, day?: Date) {
     const updateValues: updateParams = {};
 
-    if (start) {
-      updateValues.startTime = start;
+    if (shiftNo) {
+      updateValues.shiftNo = shiftNo;
     }
 
-    if (end) {
-      updateValues.endTime = end;
+    if (day) {
+      updateValues.day = day;
     }
 
     const transaction = await sequelize.transaction();
@@ -117,6 +117,7 @@ class ShiftRepo {
         },
         transaction: transaction,
       });
+      transaction.commit();
 
       return result;
     } catch (error) {

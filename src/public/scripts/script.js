@@ -26,5 +26,5 @@ function getParams() {
 document.addEventListener('DOMContentLoaded', () => {
   const error = document.getElementById('error');
   if (error) localStorage.setItem('error', error.innerText);
-  if (error.innerText === 'Authentication failed') window.location.href = '/login';
+  if (error.innerText === 'Need Login First') window.location.href = '/login';
 });

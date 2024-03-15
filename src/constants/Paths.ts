@@ -8,6 +8,7 @@ export default {
     Base: '/employees',
     CRUD: '/',
     List: '/list',
+    All: '/all',
   },
   Shift: {
     Base: '/shift',
@@ -34,6 +35,7 @@ export default {
     Base: '/admin',
   },
 } as const;
+
 
 
 

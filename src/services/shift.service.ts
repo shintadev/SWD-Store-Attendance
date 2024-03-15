@@ -2,10 +2,10 @@ import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 import { IShift } from '@src/models/Shift';
 import { RouteError } from '@src/other/classes';
 import shiftRepo from '@src/repos/shift.repo';
-import { Op, WhereOptions } from 'sequelize';
+import { WhereOptions } from 'sequelize';
 import moment from 'moment';
 import employeeShiftRepo from '@src/repos/employee-shift.repo';
-import employeeService from './employee.service';
+import Shifts from '@src/constants/Shifts';
 
 // **** Variables **** //
 
@@ -31,28 +31,33 @@ class ShiftService {
    */
   public async getCurrentShift() {
     const now = moment();
+    const currentHour = now.hours();
+    const currentMinute = now.minutes();
+    const currentTime = currentHour + ':' + currentMinute;
 
+    const currentShift = Shifts.find((shift) => {
+      return currentTime >= shift.startTime && currentTime < shift.endTime;
+    });
+    if (!currentShift) throw new Error('No shift currently');
     const params = {
-      startTime: {
-        [Op.lte]: now,
-      },
-      endTime: {
-        [Op.gte]: now,
-      },
+      day: now.toDate(),
     };
 
     try {
       const shifts = await shiftRepo.getShifts(params);
       const result = shifts.find((shift) => {
-        return now.isBetween(shift.startTime, shift.endTime);
+        return shift.shiftNo === currentShift.no;
       });
 
-      if (result) return result;
-      else throw new Error();
+      if (result) return result.dataValues;
+      else throw new Error('No shift currently');
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ addOne ~ error:', error);
-
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
+      if (error instanceof Error) {
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      } else {
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_NOT_FOUND_ERROR);
+      }
     }
   }
 
@@ -62,12 +67,7 @@ class ShiftService {
   public async getByDay(date: Date) {
     const result = [];
     const params: WhereOptions = {
-      startTime: {
-        [Op.gte]: moment(date).startOf('d'),
-      },
-      endTime: {
-        [Op.lte]: moment(date).endOf('d'),
-      },
+      day: moment(date).startOf('d').toDate(),
     };
     const shifts = await shiftRepo.getShifts(params);
 
@@ -83,12 +83,7 @@ class ShiftService {
    */
   public async getDayCount(date: Date) {
     const params: WhereOptions = {
-      startTime: {
-        [Op.gte]: moment(date).startOf('d'),
-      },
-      endTime: {
-        [Op.lte]: moment(date).endOf('d'),
-      },
+      day: moment(date).startOf('d').toDate(),
     };
     const result = (await shiftRepo.getShifts(params)).length;
 
@@ -99,13 +94,14 @@ class ShiftService {
    * Get all shift of a week by day
    */
   public async getByWeek(date: Date) {
-    const weekDays = [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday','Sunday'];
-    const result = [];
+    const result: IShift[] = [];
 
-    for (const day of weekDays) {
-      const currentDay = moment(date).startOf('d').day(day).toDate();
+    for (let n = 0; n <= 6; n++) {
+      const currentDay = moment(date).weekday(n).toDate();
       const dayShifts = await this.getByDay(currentDay);
-      result.push(dayShifts);
+      dayShifts.forEach((dayShift) => {
+        result.push(dayShift);
+      });
     }
 
     return result;
@@ -115,11 +111,10 @@ class ShiftService {
    * getWeekCount
    */
   public async getWeekCount(date: Date) {
-    const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     let result = 0;
 
-    for (const day of weekDays) {
-      const currentDay = moment(date).startOf('d').day(day).toDate();
+    for (let n = 0; n <= 6; n++) {
+      const currentDay = moment(date).weekday(n).toDate();
       const dayShifts = await this.getDayCount(currentDay);
       result += dayShifts;
     }
@@ -128,27 +123,19 @@ class ShiftService {
   }
 
   /**
-   * Get shift list.
-   */
-  public async getShiftEmployee(id: string) {
-    const list = await employeeShiftRepo.getEmployeesOfShift(id);
-    const result = [];
-
-    for (const obj of list) {
-      const employee = await employeeService.getOne(obj.employeeId);
-      result.push(employee);
-    }
-    return result;
-  }
-
-  /**
    * Create one shift.
    */
   public async createOne(shift: IShift) {
     try {
+      const params: WhereOptions = {
+        shiftNo: shift.shiftNo,
+        day: moment(shift.day).startOf('d').toDate(),
+      };
+      const shifts = await shiftRepo.getShifts(params);
+      if (shifts.length != 0) throw new Error('Shift already created.');
       const result = await shiftRepo.create(shift);
 
-      return result;
+      return result.dataValues;
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ addOne ~ error:', error);
 
@@ -159,13 +146,13 @@ class ShiftService {
   /**
    * Update one shift
    */
-  public async updateOne(id: string, start?: Date, end?: Date) {
+  public async updateOne(id: string, shiftNo?: number, day?: Date) {
     const persists = await shiftRepo.persists(id);
     if (!persists) {
       throw new RouteError(HttpStatusCodes.NOT_FOUND, SHIFT_NOT_FOUND_ERROR);
     }
     try {
-      const result = await shiftRepo.update(id, start, end);
+      const result = await shiftRepo.update(id, shiftNo, moment(day).startOf('d').toDate());
 
       return result;
     } catch (error) {
@@ -195,6 +182,36 @@ class ShiftService {
   }
 
   /**
+   * Get employee shift list.
+   */
+  public async getEmployeesOfShift(employeeId: string, shiftId: string) {
+    try {
+      const result = await employeeShiftRepo.getEmployeesOfShift(employeeId, shiftId);
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ ShiftService ~ getEmployeesOfShift ~ error:', error);
+
+      throw error;
+    }
+  }
+
+  /**
+   * get Employee Shift By ShiftId
+   */
+  public async getEmployeeShiftByShiftId(shiftId: string) {
+    try {
+      const result = await employeeShiftRepo.getEmployeeShiftByShiftId(shiftId);
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ ShiftService ~ getEmployeeShiftByShiftId ~ error:', error);
+
+      throw error;
+    }
+  }
+
+  /**
    * Assign one employee to shift.
    */
   public async assignEmployee(employeeId: string, shiftId: string) {
@@ -205,7 +222,7 @@ class ShiftService {
       };
       const result = await employeeShiftRepo.create(employeeShift);
 
-      return result;
+      return result.dataValues;
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ assignEmployee ~ error:', error);
 

@@ -7,6 +7,7 @@ import Shift, { IShift } from '@src/models/Shift';
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 import { RouteError } from '@src/other/classes';
 import moment from 'moment';
+import multer from 'multer';
 
 // ** Add Router ** //
 
@@ -16,8 +17,7 @@ const shiftRouter = Router();
 
 interface ShiftRequest {
   id?: string;
-  start?: Date;
-  end?: Date;
+  shiftNo?: number;
   day?: Date;
 }
 
@@ -30,13 +30,13 @@ interface AssignRequest {
 
 const shiftResolvers = {
   getById: async (req: IReq<ShiftRequest>, res: IRes) => {
-    const { id } = req.body;
+    const id = String(req.query.id);
     if (!id) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
 
     const shift = await shiftService.getById(id);
-    const employeeOfShift = await shiftService.getShiftEmployee(id);
+    const employeeOfShift = await shiftService.getEmployeeShiftByShiftId(id);
 
     const result = { ...shift.dataValues, employeeOfShift };
 
@@ -58,12 +58,12 @@ const shiftResolvers = {
   },
 
   create: async (req: IReq<ShiftRequest>, res: IRes) => {
-    const { start, end } = req.body;
-    if (!start || !end) {
+    const { shiftNo, day } = req.body;
+    if (!shiftNo || !day) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
 
-    const shift: IShift = Shift.new(start, end);
+    const shift: IShift = Shift.new(shiftNo, moment(day).startOf('d').toDate());
 
     const result = await shiftService.createOne(shift);
 
@@ -74,12 +74,12 @@ const shiftResolvers = {
   },
 
   update: async (req: IReq<ShiftRequest>, res: IRes) => {
-    const { id, start, end } = req.body;
+    const { id, shiftNo, day } = req.body;
     if (!id) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
 
-    const result = await shiftService.updateOne(id, start, end);
+    const result = await shiftService.updateOne(id, shiftNo, day);
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
@@ -134,17 +134,19 @@ const shiftResolvers = {
 
 shiftRouter
   .route(Paths.Shift.CRUD)
-  .get(asyncHandler(shiftResolvers.getById))
-  .post(asyncHandler(shiftResolvers.create))
-  .put(asyncHandler(shiftResolvers.update))
-  .delete(asyncHandler(shiftResolvers.delete));
+  .get(multer().none(), asyncHandler(shiftResolvers.getById))
+  .post(multer().none(), asyncHandler(shiftResolvers.create))
+  .put(multer().none(), asyncHandler(shiftResolvers.update))
+  .delete(multer().none(), asyncHandler(shiftResolvers.delete));
 
-shiftRouter.route(Paths.Shift.Schedule).get(asyncHandler(shiftResolvers.getByWeek));
+shiftRouter
+  .route(Paths.Shift.Schedule)
+  .post(multer().none(), asyncHandler(shiftResolvers.getByWeek));
 
 shiftRouter
   .route(Paths.Shift.Assign)
-  .post(asyncHandler(shiftResolvers.assign))
-  .put(asyncHandler(shiftResolvers.deallocate));
+  .post(multer().none(), asyncHandler(shiftResolvers.assign))
+  .put(multer().none(), asyncHandler(shiftResolvers.deallocate));
 
 // **** Export default **** //
 

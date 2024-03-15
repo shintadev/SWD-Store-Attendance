@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Form</title>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+  <style>
+    .employee-container {
+      max-width: 800px;
+      /* Increased max-width for a wider form */
+      margin: 2rem auto;
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .column-header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    th,
+    td {
+      padding: 1rem;
+      /* Increased padding for more space */
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      text-align: left;
+    }
+
+    input {
+      width: calc(100% - 22px);
+      /* Adjusted input width with box-sizing correction */
+      padding: 0.5rem;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    video {
+      width: 100%;
+      max-width: 600px;
+      /* Increased max-width for a larger video */
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+      /* Initially hidden */
+    }
+
+    .employee-btn {
+      background-color: #28a745;
+      color: white;
+      padding: 0.5rem;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .employee-btn:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="home-bar">
+      <div class="logo"><a href="/">Store Attendance</a></div>
+      <nav>
+        <button class="header-button" onclick="navigateTo('/attendance')">Attendance</button>
+        <button class="header-button" onclick="navigateTo('/employees')">Employee</button>
+        <button class="header-button" onclick="navigateTo('/schedule')">Schedule</button>
+        <button class="header-button" onclick="navigateTo('/users')">User</button>
+        <button class="header-button logout-button" onclick="logout()">Log out</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="employee-container">
+    <div class="column-header">
+      <h1>Add Employee</h1>
+    </div>
+    <form id="employee-form">
+      <table>
+        <tr>
+          <th>Name</th>
+          <td><input id="name-input" name="name" placeholder="Nguyen Van A" /></td>
+          <td rowspan="5">
+            <video id="video" autoplay muted></video>
+            <canvas id="canvas"></canvas>
+            <div>
+              <button id="capture-btn" class="employee-btn">Capture Photo</button>
+              <p id="img-msg"></p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th>Date of Birth</th>
+          <td><input id="dob-input" name="DOB" type="date" /></td>
+        </tr>
+        <tr>
+          <th>Phone number</th>
+          <td><input id="phone-input" name="phone" placeholder="0123456789" /></td>
+        </tr>
+        <tr>
+          <th>Address</th>
+          <td><input id="address-input" name="address" placeholder="Phường, quận, thành phố" /></td>
+        </tr>
+        <tr style="height: 55px"></tr>
+      </table>
+    </form>
+
+    <div style="padding-top: 4px;">
+      <button id="add-employee-btn" class="employee-btn">Add</button>
+      <button id="cancel-employee-btn" class="employee-btn">Cancel</button>
+    </div>
+  </div>
+
+</body>
+<script src="/scripts/script.js"></script>
+<script src="/scripts/employeeScripts/employeeAdd.js"></script>
+
+</html>

@@ -31,6 +31,27 @@ class EmployeeRepo {
   }
 
   /**
+   * Get all active employee.
+   */
+  public async getActive() {
+    const result = await Employee.findAll({
+      where: {
+        status: 'Active',
+      },
+    }).then(function (employees) {
+      if (employees) {
+        const result: IEmployee[] = [];
+        employees.forEach((employee) => {
+          result.push(employee.dataValues);
+        });
+        return result;
+      } else throw new Error('Error while getting record');
+    });
+
+    return result;
+  }
+
+  /**
    * Get one employee.
    */
   public async getById(id: string): Promise<IEmployee> {
@@ -94,12 +115,15 @@ class EmployeeRepo {
   /**
    * Update an employee.
    */
-  public async update(id: string, name: string) {
+  public async update(id: string, name: string, DOB: Date, phone: string, address: string) {
     const transaction = await sequelize.transaction();
     try {
       const result = await Employee.update(
         {
           name: name,
+          DOB: DOB,
+          phone: phone,
+          address: address,
         },
         {
           where: {

@@ -24,7 +24,7 @@ interface UserRequest {
 
 const userResolvers = {
   getById: async (req: IReq<UserRequest>, res: IRes) => {
-    const { id } = req.body;
+    const id = String(req.query.id);
     if (!id) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
@@ -98,14 +98,12 @@ const userResolvers = {
 
 userRouter
   .route(Paths.User.CRUD)
-  .get(asyncHandler(userResolvers.getById))
+  .get(multer().none(), asyncHandler(userResolvers.getById))
   .post(multer().none(), asyncHandler(userResolvers.create))
-  .put(asyncHandler(userResolvers.update))
-  .delete(asyncHandler(userResolvers.delete));
+  .put(multer().none(), asyncHandler(userResolvers.update))
+  .delete(multer().none(), asyncHandler(userResolvers.delete));
 
-  userRouter
-  .route(Paths.User.List)
-  .get(multer().none(),asyncHandler(userResolvers.getList)); //Get list users
+userRouter.route(Paths.User.List).get(multer().none(), asyncHandler(userResolvers.getList)); 
 
 // **** Export default **** //
 
