@@ -34,7 +34,7 @@ async function renderItems() {
             day.getMonth() +
             '/' +
             day.getFullYear() +
-            '<button onclick="callAssign(\'' +
+            '<br><button onclick="callAssign(\'' +
             shift.id +
             '\')">Assign🔄️</button><button onclick="callDelete(\'' +
             shift.id +
