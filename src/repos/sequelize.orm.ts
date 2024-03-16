@@ -1,5 +1,6 @@
-import EnvVars from '@src/constants/EnvVars';
-import { Sequelize } from 'sequelize';
+import EnvVars from '../constants/EnvVars';
+import { Options, Sequelize } from 'sequelize';
+import pg from 'pg';
 
 // **** Variables **** //
 
@@ -12,7 +13,9 @@ const DB_NAME = EnvVars.DB.PostGre.DATABASE;
 
 const uri = 'postgres://' + DB_USER + ':' + DB_PASSWORD + '@' + DB_HOST + '/' + DB_NAME;
 
-const config = {
+const config: Options = {
+  dialect: 'postgres',
+  dialectModule: pg,
   dialectOptions: {
     ssl: {
       require: true,
@@ -26,7 +29,8 @@ const config = {
 export const sequelize = new Sequelize(uri, config);
 
 // Connect to the database
-sequelize.authenticate()
+sequelize
+  .authenticate()
   .then(() => {
     console.log('Connected to the database');
   })

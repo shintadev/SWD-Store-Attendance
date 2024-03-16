@@ -35,8 +35,8 @@ export default {
   },
   Rekognition: {
     REGION: process.env.AWS_REGION ?? '',
-    ACCESS_KEY: process.env.AWS_ACCESS_KEY ?? '',
-    SECRET_KEY: process.env.AWS_SECRET_KEY ?? '',
+    ACCESS_KEY: process.env.AWS_ACCESS_KEY_ID ?? '',
+    SECRET_KEY: process.env.AWS_SECRET_ACCESS_KEY ?? '',
     COLLECTION_ID: process.env.AWS_COLLECTION_ID ?? '',
   },
   Cloudinary: {
@@ -45,6 +45,7 @@ export default {
     API_SECRET: process.env.CLOUDINARY_API_SECRET ?? '',
   },
 } as const;
+
 
 
 

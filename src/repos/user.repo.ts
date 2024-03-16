@@ -1,4 +1,4 @@
-import { IUser, User } from '@src/models/User';
+import { IUser, User } from '../models/User';
 import { sequelize } from './sequelize.orm';
 
 // **** Types **** //

@@ -1,5 +1,5 @@
-import { sequelize } from '@src/repos/sequelize.orm';
-import { generateId } from '@src/util/misc';
+import { sequelize } from '../repos/sequelize.orm';
+import { generateId } from '../util/misc';
 import { DataTypes, Model } from 'sequelize';
 
 // **** Types **** //

@@ -1,7 +1,7 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import { Employee, IEmployee } from '@src/models/Employee';
-import { RouteError } from '@src/other/classes';
-import employeeRepo from '@src/repos/employee.repo';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import { Employee, IEmployee } from '../models/Employee';
+import { RouteError } from '../other/classes';
+import employeeRepo from '../repos/employee.repo';
 
 // **** Variables **** //
 

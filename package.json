@@ -1,11 +1,11 @@
 {
   "name": "SWD-Store-Attendance",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "scripts": {
     "build": "npx ts-node build.ts",
     "lint": "npx eslint --ext .ts src/",
     "lint:tests": "npx eslint --ext .ts spec/",
-    "start": "node -r module-alias/register ./dist --env=production",
+    "start": "node -r module-alias/register ./dist/src --env=production",
     "dev": "nodemon",
     "test": "nodemon --config ./spec/nodemon.json",
     "test:no-reloading": "npx ts-node --files -r tsconfig-paths/register ./spec"
@@ -24,10 +24,11 @@
     "@src": "dist"
   },
   "engines": {
-    "node": ">=8.10.0"
+    "node": ">=18.x"
   },
   "dependencies": {
     "@aws-sdk/client-rekognition": "^3.501.0",
+    "@types/pg": "^8.11.2",
     "bcrypt": "^5.1.1",
     "cloudinary": "^1.41.3",
     "compression": "^1.7.4",

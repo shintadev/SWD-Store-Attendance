@@ -1,4 +1,4 @@
-import { EmployeeShift, IEmployeeShift } from '@src/models/EmployeeShift';
+import { EmployeeShift, IEmployeeShift } from '../models/EmployeeShift';
 import { sequelize } from './sequelize.orm';
 
 // **** Class **** //

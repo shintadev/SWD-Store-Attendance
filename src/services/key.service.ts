@@ -1,7 +1,7 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import { IKey } from '@src/models/Key';
-import { RouteError } from '@src/other/classes';
-import keyRepo from '@src/repos/key.repo';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import { IKey } from '../models/Key';
+import { RouteError } from '../other/classes';
+import keyRepo from '../repos/key.repo';
 
 // **** Variables **** //
 
@@ -49,7 +49,7 @@ class KeyService {
 
       return result;
     } catch (error) {
-      console.log("🚀 ~ KeyService ~ updateKeyToken ~ error:", error)
+      console.log('🚀 ~ KeyService ~ updateKeyToken ~ error:', error);
 
       throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, KEY_REQUEST_ERROR);
     }

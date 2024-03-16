@@ -1,9 +1,9 @@
-import { createJWTTokenPair, generateAccessToken, generateKeyPair } from '@src/libs/token';
+import { createJWTTokenPair, generateAccessToken, generateKeyPair } from '../libs/token';
 import keyService from './key.service';
-import Key from '@src/models/Key';
-import { verify } from '@src/util/auth.util';
-import { RouteError } from '@src/other/classes';
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
+import Key from '../models/Key';
+import { verify } from '../util/auth.util';
+import { RouteError } from '../other/classes';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
 import userService from './user.service';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 

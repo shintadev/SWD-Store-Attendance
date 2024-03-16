@@ -11,14 +11,14 @@ import compression from 'compression';
 
 import 'express-async-errors';
 
-import BaseRouter from '@src/routes/api';
-import Paths from '@src/constants/Paths';
+import BaseRouter from './routes/api';
+import Paths from './constants/Paths';
 
-import EnvVars from '@src/constants/EnvVars';
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
+import EnvVars from './constants/EnvVars';
+import HttpStatusCodes from './constants/HttpStatusCodes';
 
-import { NodeEnvs } from '@src/constants/misc';
-import { RouteError } from '@src/other/classes';
+import { NodeEnvs } from './constants/misc';
+import { RouteError } from './other/classes';
 import { setViews } from './util/view.util';
 
 // **** Variables **** //

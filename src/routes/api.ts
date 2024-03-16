@@ -6,11 +6,11 @@ import shiftRouter from './shift.route';
 import attendanceRouter from './attendance.route';
 import userRouter from './user.route';
 import authRouter from './auth.route';
-import { isAdmin, isAuthenticated } from '@src/middlewares/auth.middleware';
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import employeeService from '@src/services/employee.service';
-import userService from '@src/services/user.service';
-import attendanceService from '@src/services/attendance.service';
+import { isAdmin, isAuthenticated } from '../middlewares/auth.middleware';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import employeeService from '../services/employee.service';
+import userService from '../services/user.service';
+import attendanceService from '../services/attendance.service';
 
 // **** Router **** //
 
@@ -31,19 +31,17 @@ apiRouter.use(Paths.User.Base, isAuthenticated, isAdmin, userRouter);
 // Add AuthRouter
 apiRouter.use(Paths.Auth.Base, authRouter);
 
-apiRouter
-  .route(Paths.Admin.Base)
-  .get(isAuthenticated, isAdmin, async (_: Request, res: Response) => {
-    const totalEmps = await employeeService.getTotalEmps();
-    const totalUsers = await userService.getTotalUsers();
-    const attendanceRate = await attendanceService.getAttendanceRate();
-    res.status(HttpStatusCodes.OK).json({
-      message: '',
-      totalEmps: totalEmps,
-      totalUsers: totalUsers,
-      attendanceRate: attendanceRate,
-    });
+apiRouter.route(Paths.Dashboard.Base).get(isAuthenticated, async (_: Request, res: Response) => {
+  const totalEmps = await employeeService.getTotalEmps();
+  const totalUsers = await userService.getTotalUsers();
+  const attendanceRate = await attendanceService.getAttendanceRate();
+  res.status(HttpStatusCodes.OK).json({
+    message: '',
+    totalEmps: totalEmps,
+    totalUsers: totalUsers,
+    attendanceRate: attendanceRate,
   });
+});
 
 // **** Export default **** //
 

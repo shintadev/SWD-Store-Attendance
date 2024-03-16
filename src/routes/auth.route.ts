@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { IReq, IRes } from './types/types';
-import { RouteError } from '@src/other/classes';
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import authService from '@src/services/auth.service';
-import EnvVars from '@src/constants/EnvVars';
-import Paths from '@src/constants/Paths';
-import { asyncHandler } from '@src/util/misc';
+import { RouteError } from '../other/classes';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import authService from '../services/auth.service';
+import EnvVars from '../constants/EnvVars';
+import Paths from '../constants/Paths';
+import { asyncHandler } from '../util/misc';
 import { isAuthenticated } from '../middlewares/auth.middleware';
 import multer from 'multer';
 

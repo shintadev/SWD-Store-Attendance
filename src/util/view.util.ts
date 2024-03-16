@@ -1,15 +1,15 @@
 import { Express, Request, Response } from 'express';
 import path from 'path';
 import express from 'express';
-import Paths from '@src/constants/Paths';
-import { isAdmin, isAuthenticated } from '@src/middlewares/auth.middleware';
+import Paths from '../constants/Paths';
+import { isAdmin, isAuthenticated } from '../middlewares/auth.middleware';
 
 const AUTHENTICATE_FAILED_HTML =
   '<div id=\'error\'>Need Login First</div><script src="/scripts/script.js"></script>';
 
 export const setViews = (app: Express) => {
   // Set views directory (html)
-  const viewsDir = path.join('src/', 'views');
+  const viewsDir = path.join('src', 'views');
   app.set('views', viewsDir);
 
   const attendanceDir = path.join(viewsDir, 'attendanceViews');
@@ -19,7 +19,7 @@ export const setViews = (app: Express) => {
   const userDir = path.join(viewsDir, 'userViews');
 
   // Set static directory (js and css).
-  const staticDir = path.join('src/', 'public');
+  const staticDir = path.join('src', 'public');
   app.use(express.static(staticDir));
 
   // Nav to home page by default

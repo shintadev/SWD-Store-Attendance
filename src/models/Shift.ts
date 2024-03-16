@@ -1,4 +1,4 @@
-import { sequelize } from '@src/repos/sequelize.orm';
+import { sequelize } from '../repos/sequelize.orm';
 import moment from 'moment';
 import { DataTypes, Model } from 'sequelize';
 

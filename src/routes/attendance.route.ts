@@ -1,15 +1,15 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
 import { Router, json } from 'express';
 import { IReq, IRes } from './types/types';
-import Paths from '@src/constants/Paths';
-import { asyncHandler } from '@src/util/misc';
-// import attendanceService from '@src/services/attendance.service';
-// import shiftService from '@src/services/shift.service';
-import { RouteError } from '@src/other/classes';
-import imageService from '@src/services/image.service';
+import Paths from '../constants/Paths';
+import { asyncHandler } from '../util/misc';
+// import attendanceService from '../services/attendance.service';
+// import shiftService from '../services/shift.service';
+import { RouteError } from '../other/classes';
+import imageService from '../services/image.service';
 import multer from 'multer';
-import shiftService from '@src/services/shift.service';
-import attendanceService from '@src/services/attendance.service';
+import shiftService from '../services/shift.service';
+import attendanceService from '../services/attendance.service';
 
 // ** Add Router ** //
 

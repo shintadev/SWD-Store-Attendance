@@ -1,4 +1,4 @@
-import EnvVars from '@src/constants/EnvVars';
+import EnvVars from '../constants/EnvVars';
 import { v2 as Cloudinary, UploadApiResponse } from 'cloudinary';
 
 // **** Class **** //

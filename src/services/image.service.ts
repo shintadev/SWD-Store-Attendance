@@ -1,12 +1,12 @@
-import EnvVars from '@src/constants/EnvVars';
+import EnvVars from '../constants/EnvVars';
 import {
   RekognitionClient,
   IndexFacesCommand,
   QualityFilter,
   SearchFacesByImageCommand,
 } from '@aws-sdk/client-rekognition';
-import { RouteError } from '@src/other/classes';
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
+import { RouteError } from '../other/classes';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
 
 // **** Class **** //
 

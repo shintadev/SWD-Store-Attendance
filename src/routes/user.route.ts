@@ -1,11 +1,11 @@
-import Paths from '@src/constants/Paths';
-import { asyncHandler } from '@src/util/misc';
+import Paths from '../constants/Paths';
+import { asyncHandler } from '../util/misc';
 import { Router } from 'express';
 import { IReq, IRes } from './types/types';
-import { RouteError } from '@src/other/classes';
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import userService from '@src/services/user.service';
-import User from '@src/models/User';
+import { RouteError } from '../other/classes';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import userService from '../services/user.service';
+import User from '../models/User';
 import multer from 'multer';
 
 // ** Add Router ** //
@@ -103,7 +103,7 @@ userRouter
   .put(multer().none(), asyncHandler(userResolvers.update))
   .delete(multer().none(), asyncHandler(userResolvers.delete));
 
-userRouter.route(Paths.User.List).get(multer().none(), asyncHandler(userResolvers.getList)); 
+userRouter.route(Paths.User.List).get(multer().none(), asyncHandler(userResolvers.getList));
 
 // **** Export default **** //
 

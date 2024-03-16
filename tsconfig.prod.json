@@ -4,9 +4,6 @@
     "sourceMap": false,
     "removeComments": true
   },
-  "exclude": [
-    "spec",
-    "src/public/",
-    "build.ts"
-  ]
+  "exclude": ["spec", "build.ts"]
 }
+
