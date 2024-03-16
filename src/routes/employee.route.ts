@@ -9,7 +9,7 @@ import fileService from '../services/file.service';
 import employeeService from '../services/employee.service';
 import multer from 'multer';
 import { RouteError } from '../other/classes';
-import attendanceService from '@src/services/attendance.service';
+import attendanceService from '../services/attendance.service';
 
 // ** Add Router ** //
 

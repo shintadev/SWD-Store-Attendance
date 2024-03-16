@@ -11,6 +11,7 @@ import HttpStatusCodes from '../constants/HttpStatusCodes';
 import employeeService from '../services/employee.service';
 import userService from '../services/user.service';
 import attendanceService from '../services/attendance.service';
+import storeRouter from './store.route';
 
 // **** Router **** //
 
@@ -27,6 +28,9 @@ apiRouter.use(Paths.Attendance.Base, attendanceRouter);
 
 // Add UserRouter
 apiRouter.use(Paths.User.Base, isAuthenticated, isAdmin, userRouter);
+
+// Add StoreRouter
+apiRouter.use(Paths.Store.Base, isAuthenticated, isAdmin, storeRouter);
 
 // Add AuthRouter
 apiRouter.use(Paths.Auth.Base, authRouter);

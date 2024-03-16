@@ -24,14 +24,19 @@ const upload = multer();
 interface AttendanceRequest {
   shiftId?: string;
   employeeId?: string;
+  storeId?: string;
 }
 
 // **** Resolvers **** //
 
 const attendanceResolvers = {
   takeAttendance: async (req: IReq<AttendanceRequest>, res: IRes) => {
+    const { storeId } = req.body;
     const img = req.file;
-    console.log('🚀 ~ takeAttendance: ~ img:', img);
+
+    if (!storeId) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
 
     if (!img) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please upload a file');
@@ -43,7 +48,7 @@ const attendanceResolvers = {
     if (!face.FaceId) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
 
     // Get the current shift
-    const shiftId = (await shiftService.getCurrentShift()).id;
+    const shiftId = (await shiftService.getCurrentShift(storeId)).id;
 
     // Create check-in record
     const message = await attendanceService.takeAttendance(shiftId, face.FaceId);

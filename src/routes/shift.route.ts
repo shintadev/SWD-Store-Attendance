@@ -8,7 +8,7 @@ import HttpStatusCodes from '../constants/HttpStatusCodes';
 import { RouteError } from '../other/classes';
 import moment from 'moment';
 import multer from 'multer';
-import attendanceService from '@src/services/attendance.service';
+import attendanceService from '../services/attendance.service';
 
 // ** Add Router ** //
 
@@ -20,6 +20,7 @@ interface ShiftRequest {
   id?: string;
   shiftNo?: number;
   day?: Date;
+  storeId?: string;
 }
 
 interface AssignRequest {
@@ -49,9 +50,12 @@ const shiftResolvers = {
   },
 
   getByWeek: async (req: IReq<ShiftRequest>, res: IRes) => {
-    const { day } = req.body;
+    const { day, storeId } = req.body;
+    if (!storeId) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
 
-    const result = await shiftService.getByWeek(day ?? moment().toDate()); // Default today
+    const result = await shiftService.getByWeek(day ?? moment().toDate(), storeId); // Default today
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
@@ -60,12 +64,12 @@ const shiftResolvers = {
   },
 
   create: async (req: IReq<ShiftRequest>, res: IRes) => {
-    const { shiftNo, day } = req.body;
-    if (!shiftNo || !day) {
+    const { shiftNo, day, storeId } = req.body;
+    if (!shiftNo || !day || !storeId) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
 
-    const shift: IShift = Shift.new(shiftNo, moment(day).startOf('d').toDate());
+    const shift: IShift = Shift.new(shiftNo, moment(day).startOf('d').toDate(), storeId);
 
     const result = await shiftService.createOne(shift);
 

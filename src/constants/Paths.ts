@@ -27,6 +27,11 @@ export default {
     CRUD: '/',
     List: '/list',
   },
+  Store: {
+    Base: '/users',
+    CRUD: '/',
+    List: '/list',
+  },
   Auth: {
     Base: '/auth',
     Login: '/login',
