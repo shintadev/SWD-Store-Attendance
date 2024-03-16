@@ -1,13 +1,14 @@
-import Paths from '@src/constants/Paths';
+import Paths from '../constants/Paths';
 import { IReq, IRes } from './types/types';
-import { asyncHandler } from '@src/util/misc';
+import { asyncHandler } from '../util/misc';
 import { Router } from 'express';
-import shiftService from '@src/services/shift.service';
-import Shift, { IShift } from '@src/models/Shift';
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import { RouteError } from '@src/other/classes';
+import shiftService from '../services/shift.service';
+import Shift, { IShift } from '../models/Shift';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import { RouteError } from '../other/classes';
 import moment from 'moment';
 import multer from 'multer';
+import attendanceService from '@src/services/attendance.service';
 
 // ** Add Router ** //
 
@@ -37,8 +38,9 @@ const shiftResolvers = {
 
     const shift = await shiftService.getById(id);
     const employeeOfShift = await shiftService.getEmployeeShiftByShiftId(id);
+    const attendanceRecords = await attendanceService.getByShiftId(id);
 
-    const result = { ...shift.dataValues, employeeOfShift };
+    const result = { shift, employeeOfShift, attendanceRecords };
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',

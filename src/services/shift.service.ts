@@ -1,11 +1,11 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import { IShift } from '@src/models/Shift';
-import { RouteError } from '@src/other/classes';
-import shiftRepo from '@src/repos/shift.repo';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import { IShift } from '../models/Shift';
+import { RouteError } from '../other/classes';
+import shiftRepo from '../repos/shift.repo';
 import { WhereOptions } from 'sequelize';
 import moment from 'moment';
-import employeeShiftRepo from '@src/repos/employee-shift.repo';
-import Shifts from '@src/constants/Shifts';
+import employeeShiftRepo from '../repos/employee-shift.repo';
+import Shifts from '../constants/Shifts';
 
 // **** Variables **** //
 
@@ -21,9 +21,15 @@ class ShiftService {
    * Get shift by Id
    */
   public async getById(id: string) {
-    const result = await shiftRepo.getById(id);
+    try {
+      const result = await shiftRepo.getById(id);
 
-    return result;
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ ShiftService ~ getById ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_NOT_FOUND_ERROR);
+    }
   }
 
   /**
@@ -49,7 +55,7 @@ class ShiftService {
         return shift.shiftNo === currentShift.no;
       });
 
-      if (result) return result.dataValues;
+      if (result) return result;
       else throw new Error('No shift currently');
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ addOne ~ error:', error);
@@ -65,15 +71,10 @@ class ShiftService {
    * Get all shift of a specific day
    */
   public async getByDay(date: Date) {
-    const result = [];
     const params: WhereOptions = {
       day: moment(date).startOf('d').toDate(),
     };
-    const shifts = await shiftRepo.getShifts(params);
-
-    for (const shift of shifts) {
-      result.push(shift.dataValues);
-    }
+    const result = await shiftRepo.getShifts(params);
 
     return result;
   }

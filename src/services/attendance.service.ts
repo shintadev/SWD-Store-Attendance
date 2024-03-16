@@ -1,13 +1,13 @@
 import { Attendance as MAttendance } from './../models/Attendance';
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import Attendance, { AttendanceModel } from '@src/models/Attendance';
-import { RouteError } from '@src/other/classes';
-import attendanceRepo from '@src/repos/attendance.repo';
-import employeeRepo from '@src/repos/employee.repo';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import Attendance, { AttendanceModel } from '../models/Attendance';
+import { RouteError } from '../other/classes';
+import attendanceRepo from '../repos/attendance.repo';
+import employeeRepo from '../repos/employee.repo';
 import moment from 'moment';
 import shiftService from './shift.service';
-import { EmployeeShift } from '@src/models/EmployeeShift';
-import employeeShiftRepo from '@src/repos/employee-shift.repo';
+import { EmployeeShift } from '../models/EmployeeShift';
+import employeeShiftRepo from '../repos/employee-shift.repo';
 
 // **** Variables **** //
 
@@ -102,6 +102,39 @@ class AttendanceService {
       return result;
     } catch (error) {
       console.log('🚀 ~ AttendanceService ~ getAttendanceRate ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * getByEmployeeId
+   */
+  public async getByEmployeeId(id: string, page: number, pageSize: number) {
+    try {
+      const records = await attendanceRepo.getByEmployeeId(id, page, pageSize);
+      const total = await MAttendance.count({ where: { employeeId: id } });
+      const totalPages = Math.ceil(total / pageSize);
+
+      const result = { records, total, totalPages };
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ AttendanceService ~ getByEmployeeId ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * getByEmployeeId
+   */
+  public async getByShiftId(id: string) {
+    try {
+      const result = await attendanceRepo.getByShiftId(id);
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ AttendanceService ~ getByEmployeeId ~ error:', error);
 
       throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
     }
