@@ -27,6 +27,17 @@ const app = express();
 
 // **** Setup **** //
 
+import YAML from 'yaml';
+import fs from 'fs';
+import path from 'path';
+import swaggerUi from 'swagger-ui-express';
+const file = fs.readFileSync(path.resolve('swagger.yaml'), 'utf8');
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const swaggerDocument = YAML.parse(file);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+
 // Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
