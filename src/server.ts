@@ -21,22 +21,37 @@ import { NodeEnvs } from './constants/misc';
 import { RouteError } from './other/classes';
 import { setViews } from './util/view.util';
 
+import YAML from 'yaml';
+import fs from 'fs';
+import swaggerUi from 'swagger-ui-express';
+import path from 'path';
+
 // **** Variables **** //
 
 const app = express();
 
 // **** Setup **** //
 
-import YAML from 'yaml';
-import fs from 'fs';
-import path from 'path';
-import swaggerUi from 'swagger-ui-express';
-const file = fs.readFileSync(path.resolve('swagger.yaml'), 'utf8');
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+// Api docs
+const file = fs.readFileSync(path.resolve(__dirname, './swagger.yaml'), 'utf8');
+const css = fs.readFileSync(
+  path.resolve(__dirname, '../node_modules/swagger-ui-dist/swagger-ui.css'),
+  'utf8'
+);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 const swaggerDocument = YAML.parse(file);
+const options: swaggerUi.SwaggerUiOptions = {
+  customCss: css,
+  // customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.0.0/swagger-ui.min.css',
+};
 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
+app.use(
+  '/api-docs',
+  express.static('node_modules/swagger-ui-dist'),
+  swaggerUi.serve,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  swaggerUi.setup(swaggerDocument, options)
+);
 
 // Basic middleware
 app.use(express.json());
@@ -58,23 +73,24 @@ if (EnvVars.NodeEnv === NodeEnvs.Production.valueOf()) {
 app.use(Paths.Base, BaseRouter);
 
 // Add error handler
-app.use((
-  err: Error,
-  _: Request,
-  res: Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: NextFunction,
-) => {
-  if (EnvVars.NodeEnv !== NodeEnvs.Test.valueOf()) {
-    logger.err(err, true);
+app.use(
+  (
+    err: Error,
+    _: Request,
+    res: Response,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    next: NextFunction
+  ) => {
+    if (EnvVars.NodeEnv !== NodeEnvs.Test.valueOf()) {
+      logger.err(err, true);
+    }
+    let status = HttpStatusCodes.BAD_REQUEST;
+    if (err instanceof RouteError) {
+      status = err.status;
+    }
+    return res.status(status).json({ error: err.message });
   }
-  let status = HttpStatusCodes.BAD_REQUEST;
-  if (err instanceof RouteError) {
-    status = err.status;
-  }
-  return res.status(status).json({ error: err.message });
-});
-
+);
 
 // ** Front-End Content ** //
 

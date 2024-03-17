@@ -27,15 +27,17 @@ class AttendanceService {
       const employeeShift = await employeeShiftRepo.getEmployeesOfShift(employee.id, shiftId);
       if (!employeeShift) throw new Error('Not be assign to this shift.');
       const attendance = await attendanceRepo.getByEmployeeAndShift(employee.id, shiftId);
-      let result = 'You already take attendance';
+      let message = 'You already take attendance';
 
       if (!attendance) {
         await this.createCheckIn(shiftId, employee.id);
-        result = 'Check-in successfully';
+        message = 'Check-in successfully';
       } else if (!attendance.checkOutTime) {
         await this.setCheckOut(attendance);
-        result = 'Check-out successfully';
+        message = 'Check-out successfully';
       }
+
+      const result = { employee, message };
 
       return result;
     } catch (error) {

@@ -32,9 +32,11 @@ const authResolvers = {
     const result = await authService.login(id, password);
 
     res.clearCookie('uid');
+    res.clearCookie('role');
     res.clearCookie('token');
 
     res.cookie('uid', result.uid, EnvVars.CookieProps.Options);
+    res.cookie('role', result.role, EnvVars.CookieProps.Options);
     res.cookie('token', result.accessToken, EnvVars.CookieProps.Options);
 
     res.status(HttpStatusCodes.OK).json({
@@ -46,6 +48,7 @@ const authResolvers = {
 
   logout: (_: IReq<AuthRequest>, res: IRes) => {
     res.clearCookie('uid');
+    res.clearCookie('role');
     res.clearCookie('token');
     res.status(HttpStatusCodes.OK).json({
       message: 'Logout successful',

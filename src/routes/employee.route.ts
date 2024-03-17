@@ -50,10 +50,13 @@ const employeeResolvers = {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
     const employee = await employeeService.getOne(id); // Get employee info
+    const imgUrl = await fileService.getUrlFromCloud(employee.publicId);
+
+    const result = { ...employee, imgUrl };
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
-      data: employee,
+      data: result,
     });
   },
 
@@ -120,6 +123,7 @@ const employeeResolvers = {
       const face = await imageService.indexFace(imgBuffer.toString('base64'));
       if (!face.FaceId) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
 
+      // Upload to Cloudinary
       const publicId = await fileService.uploadToCloud(imgBuffer);
 
       const employee: IEmployee = Employee.new(name, DOB, phone, address, publicId, face.FaceId);
@@ -195,7 +199,7 @@ employeeRouter
 
 employeeRouter
   .route(Paths.Employee.Attendance)
-  .get(upload.none(), asyncHandler(employeeResolvers.getList)); //Get employees attendance history
+  .get(upload.none(), asyncHandler(employeeResolvers.getAttendanceReport)); //Get employees attendance history
 
 // **** Export default **** //
 

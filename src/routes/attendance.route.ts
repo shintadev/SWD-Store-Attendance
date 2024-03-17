@@ -51,10 +51,11 @@ const attendanceResolvers = {
     const shiftId = (await shiftService.getCurrentShift(storeId)).id;
 
     // Create check-in record
-    const message = await attendanceService.takeAttendance(shiftId, face.FaceId);
+    const result = await attendanceService.takeAttendance(shiftId, face.FaceId);
 
     return res.status(HttpStatusCodes.OK).json({
-      message: message,
+      message: result.message,
+      data: result.employee,
     });
   },
 };

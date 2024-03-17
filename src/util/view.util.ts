@@ -9,7 +9,7 @@ const AUTHENTICATE_FAILED_HTML =
 
 export const setViews = (app: Express) => {
   // Set views directory (html)
-  const viewsDir = path.join('src', 'views');
+  const viewsDir = path.resolve(__dirname, '../views');
   app.set('views', viewsDir);
 
   const attendanceDir = path.join(viewsDir, 'attendanceViews');
@@ -19,7 +19,7 @@ export const setViews = (app: Express) => {
   const userDir = path.join(viewsDir, 'userViews');
 
   // Set static directory (js and css).
-  const staticDir = path.join('src', 'public');
+  const staticDir = path.join(__dirname, '../public');
   app.use(express.static(staticDir));
 
   // Nav to home page by default

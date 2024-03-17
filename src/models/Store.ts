@@ -15,7 +15,7 @@ interface StoreModel extends Model<IStore>, IStore {}
 
 // **** Models **** //
 
-export const Store = sequelize.define<StoreModel>('Store', {
+export const Store = sequelize.define<StoreModel>('store', {
   id: {
     type: DataTypes.STRING,
     primaryKey: true,
