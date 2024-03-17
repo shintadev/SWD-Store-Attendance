@@ -28,7 +28,7 @@ export default {
     List: '/list',
   },
   Store: {
-    Base: '/users',
+    Base: '/store',
     CRUD: '/',
     List: '/list',
   },

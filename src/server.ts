@@ -33,7 +33,7 @@ const app = express();
 // **** Setup **** //
 
 // Api docs
-const file = fs.readFileSync(path.resolve(__dirname, './swagger.yaml'), 'utf8');
+const file = fs.readFileSync(path.resolve(__dirname, '../swagger.yaml'), 'utf8');
 const css = fs.readFileSync(
   path.resolve(__dirname, '../node_modules/swagger-ui-dist/swagger-ui.css'),
   'utf8'
@@ -42,7 +42,6 @@ const css = fs.readFileSync(
 const swaggerDocument = YAML.parse(file);
 const options: swaggerUi.SwaggerUiOptions = {
   customCss: css,
-  // customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.0.0/swagger-ui.min.css',
 };
 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 app.use(
