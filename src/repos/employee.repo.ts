@@ -24,7 +24,7 @@ class EmployeeRepo {
           result.push(employee.dataValues);
         });
         return result;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
 
     return result;
@@ -45,7 +45,7 @@ class EmployeeRepo {
           result.push(employee.dataValues);
         });
         return result;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
 
     return result;
@@ -54,7 +54,7 @@ class EmployeeRepo {
   /**
    * Get one employee.
    */
-  public async getById(id: string): Promise<IEmployee> {
+  public async getById(id: string) {
     const result = await Employee.findOne({
       where: {
         id: id,
@@ -62,8 +62,8 @@ class EmployeeRepo {
       },
     }).then(function (employee) {
       if (employee) {
-        return employee;
-      } else throw new Error('Error while getting record');
+        return employee.dataValues;
+      } else return null;
     });
     return result;
   }
@@ -71,7 +71,7 @@ class EmployeeRepo {
   /**
    * Get one employee by faceId.
    */
-  public async getByFaceId(faceId: string): Promise<IEmployee> {
+  public async getByFaceId(faceId: string) {
     const result = await Employee.findOne({
       where: {
         rekognitionId: faceId,
@@ -79,8 +79,8 @@ class EmployeeRepo {
       },
     }).then(function (employee) {
       if (employee) {
-        return employee;
-      } else throw new Error('Error while getting record');
+        return employee.dataValues;
+      } else return null;
     });
     return result;
   }

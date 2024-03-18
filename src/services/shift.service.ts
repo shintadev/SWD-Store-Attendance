@@ -44,14 +44,16 @@ class ShiftService {
     const currentShift = Shifts.find((shift) => {
       return currentTime >= shift.startTime && currentTime < shift.endTime;
     });
+
     if (!currentShift) throw new Error('No shift currently');
     const params = {
-      day: now.toDate(),
+      day: now.startOf('d').toDate(),
       storeId: storeId,
     };
 
     try {
       const shifts = await shiftRepo.getShifts(params); //Get all shift today of a store
+
       const result = shifts.find((shift) => {
         return shift.shiftNo === currentShift.no; //Get the one happen now
       });
@@ -59,7 +61,8 @@ class ShiftService {
       if (result) return result;
       else throw new Error('No shift currently');
     } catch (error) {
-      console.log('🚀 ~ ShiftService ~ addOne ~ error:', error);
+      console.log('🚀 ~ ShiftService ~ getCurrentShift ~ error:', error);
+
       if (error instanceof Error) {
         throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
       } else {

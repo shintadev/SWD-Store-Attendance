@@ -7,6 +7,7 @@ if (errorMsg) {
   msg.innerText = errorMsg;
   localStorage.clear();
 }
+
 async function login() {
   const formData = new FormData();
 
@@ -16,7 +17,6 @@ async function login() {
 
   await formData.append('id', username);
   await formData.append('password', password);
-  console.log('🚀 ~ login ~ formData:', formData.get('password'));
 
   await upload(formData);
 }
@@ -31,9 +31,12 @@ async function upload(formData) {
     if (result.error) {
       msg.innerText = result.error;
       return;
-    } else msg.innerText = result.message;
+    } else {
+      msg.innerText = result.message;
 
-    window.location.href = '/dashboard';
+      window.localStorage.setItem('role', result.data.role);
+      window.location.href = '/dashboard';
+    }
   } catch (error) {
     msg.innerText = error;
     console.error('Error:', error);

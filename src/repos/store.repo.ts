@@ -28,7 +28,7 @@ class StoreRepo {
           result.push(store.dataValues);
         });
         return result;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
 
     return result;
@@ -41,7 +41,7 @@ class StoreRepo {
     const result = await Store.findByPk(id).then(function (store) {
       if (store) {
         return store;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
     return result;
   }
@@ -57,7 +57,7 @@ class StoreRepo {
           result.push(store.dataValues);
         });
         return result;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
 
     return result;

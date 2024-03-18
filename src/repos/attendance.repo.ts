@@ -60,8 +60,8 @@ class AttendanceRepo {
       },
     }).then(function (attendance) {
       if (attendance) {
-        return attendance;
-      } else throw new Error('Error while getting records');
+        return attendance.dataValues;
+      } else return null;
     });
     return result;
   }

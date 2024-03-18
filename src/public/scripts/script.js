@@ -1,8 +1,6 @@
+const userBtn = document.getElementById('user-btn');
+const storeBtn = document.getElementById('store-btn');
 const logoutBtn = document.getElementById('logout-btn');
-
-logoutBtn.addEventListener('click', () => {
-  logout();
-});
 
 async function logout() {
   if (confirm('Log out now?')) {
@@ -26,6 +24,12 @@ function getParams() {
 
 document.addEventListener('DOMContentLoaded', () => {
   const error = document.getElementById('error');
-  if (error) localStorage.setItem('error', error.innerText);
-  if (error.innerText === 'Need Login First') window.location.href = '/login';
+  if (error) {
+    localStorage.setItem('error', error.innerText);
+    if (error.innerText === 'Need Login First') window.location.href = '/login';
+  }
+});
+
+logoutBtn.addEventListener('click', () => {
+  logout();
 });

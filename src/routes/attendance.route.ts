@@ -35,7 +35,7 @@ const attendanceResolvers = {
     const img = req.file;
 
     if (!storeId) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please choose the store.');
     }
 
     if (!img) {

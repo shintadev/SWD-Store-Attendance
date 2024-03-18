@@ -31,7 +31,7 @@ class UserRepo {
           result.push(User.dataValues);
         });
         return result;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
 
     return result;
@@ -44,7 +44,7 @@ class UserRepo {
     const result = await User.findByPk(id).then(function (user) {
       if (user) {
         return user;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
     return result;
   }

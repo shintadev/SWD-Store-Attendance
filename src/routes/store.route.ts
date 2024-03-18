@@ -7,6 +7,7 @@ import HttpStatusCodes from '../constants/HttpStatusCodes';
 import storeService from '../services/store.service';
 import Store from '../models/Store';
 import multer from 'multer';
+import { isAdmin } from '@src/middlewares/auth.middleware';
 
 // ** Add Router ** //
 
@@ -111,9 +112,9 @@ const storeResolvers = {
 storeRouter
   .route(Paths.Store.CRUD)
   .get(multer().none(), asyncHandler(storeResolvers.getById))
-  .post(multer().none(), asyncHandler(storeResolvers.create))
-  .put(multer().none(), asyncHandler(storeResolvers.update))
-  .delete(multer().none(), asyncHandler(storeResolvers.delete));
+  .post(multer().none(), isAdmin, asyncHandler(storeResolvers.create))
+  .put(multer().none(), isAdmin, asyncHandler(storeResolvers.update))
+  .delete(multer().none(), isAdmin, asyncHandler(storeResolvers.delete));
 
 storeRouter.route(Paths.Store.All).get(multer().none(), asyncHandler(storeResolvers.getAll));
 

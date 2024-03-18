@@ -51,6 +51,7 @@ const employeeResolvers = {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
     const employee = await employeeService.getOne(id); // Get employee info
+    if (!employee) throw new Error('Employee not found.');
     const imgUrl = await fileService.getUrlFromCloud(employee.publicId);
 
     const result = { ...employee, imgUrl };

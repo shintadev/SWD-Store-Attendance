@@ -19,7 +19,7 @@ class UserService {
   public async getById(id: string) {
     try {
       const result = await userRepo.getById(id);
-
+      if (!result) throw new Error('User not found.');
       return result.dataValues;
     } catch (error) {
       console.log('🚀 ~ UserService ~ getById ~ error:', error);

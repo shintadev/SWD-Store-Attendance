@@ -36,7 +36,7 @@ const authResolvers = {
     res.clearCookie('token');
 
     res.cookie('uid', result.uid, EnvVars.CookieProps.Options);
-    res.cookie('role', result.role, EnvVars.CookieProps.Options);
+    res.cookie('role', result.role, { ...EnvVars.CookieProps.Options, signed: false });
     res.cookie('token', result.accessToken, EnvVars.CookieProps.Options);
 
     res.status(HttpStatusCodes.OK).json({

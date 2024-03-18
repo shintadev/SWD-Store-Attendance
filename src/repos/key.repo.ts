@@ -13,7 +13,7 @@ class KeyRepo {
     const result = await Key.findByPk(id).then(function (key) {
       if (key) {
         return key;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
     return result;
   }

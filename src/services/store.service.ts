@@ -18,7 +18,7 @@ class StoreService {
   public async getById(id: string) {
     try {
       const result = await storeRepo.getById(id);
-
+      if (!result) throw new Error('Store not found.');
       return result.dataValues;
     } catch (error) {
       console.log('🚀 ~ StoreService ~ getById ~ error:', error);

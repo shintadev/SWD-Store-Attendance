@@ -1,6 +1,6 @@
-import { Attendance as MAttendance } from './../models/Attendance';
+import { IAttendance, Attendance as MAttendance } from './../models/Attendance';
 import HttpStatusCodes from '../constants/HttpStatusCodes';
-import Attendance, { AttendanceModel } from '../models/Attendance';
+import Attendance from '../models/Attendance';
 import { RouteError } from '../other/classes';
 import attendanceRepo from '../repos/attendance.repo';
 import employeeRepo from '../repos/employee.repo';
@@ -24,11 +24,12 @@ class AttendanceService {
   public async takeAttendance(shiftId: string, faceId: string) {
     try {
       const employee = await employeeRepo.getByFaceId(faceId);
+      if (!employee) throw new Error('Employee info not found.');
       const employeeShift = await employeeShiftRepo.getEmployeesOfShift(employee.id, shiftId);
       if (!employeeShift) throw new Error('Not be assign to this shift.');
       const attendance = await attendanceRepo.getByEmployeeAndShift(employee.id, shiftId);
-      let message = 'You already take attendance';
 
+      let message = 'You already take attendance';
       if (!attendance) {
         await this.createCheckIn(shiftId, employee.id);
         message = 'Check-in successfully';
@@ -41,6 +42,8 @@ class AttendanceService {
 
       return result;
     } catch (error) {
+      console.log('🚀 ~ AttendanceService ~ takeAttendance ~ error:', error);
+
       if (error instanceof Error)
         throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
       else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
@@ -70,11 +73,11 @@ class AttendanceService {
   /**
    * Set check-out.
    */
-  public async setCheckOut(attendance: AttendanceModel) {
+  public async setCheckOut(attendance: IAttendance) {
     try {
       const now = moment().toDate();
 
-      attendance.setDataValue('checkOutTime', now);
+      attendance.checkOutTime = now;
 
       return await attendanceRepo.update(attendance);
     } catch (error) {

@@ -25,7 +25,7 @@ class ShiftRepo {
     }).then(function (shift) {
       if (shift) {
         return shift.dataValues;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
     return result;
   }
@@ -37,13 +37,13 @@ class ShiftRepo {
     const result = await Shift.findAll({
       where: condition,
     }).then(function (shifts) {
+      const output: IShift[] = [];
       if (shifts) {
-        const output: IShift[] = [];
         shifts.forEach((shift) => {
           output.push(shift.dataValues);
         });
-        return output;
-      } else throw new Error('Error while getting record');
+      }
+      return output;
     });
     return result;
   }

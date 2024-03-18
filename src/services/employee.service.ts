@@ -16,7 +16,7 @@ class EmployeeService {
   /**
    * Get one employee.
    */
-  public async getOne(id: string): Promise<IEmployee> {
+  public async getOne(id: string) {
     try {
       const result = await employeeRepo.getById(id);
 

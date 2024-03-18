@@ -9,7 +9,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 // **** Variables **** //
 
-const AUTH_REQUEST_ERROR = 'Request can not be handle';
+const AUTH_REQUEST_ERROR = 'Authenticate failed.';
 export const INVALID_TOKEN_ERROR = 'Invalid token.';
 export const EXPIRE_SESSION_ERROR = 'Expired session. You must re-login.';
 
