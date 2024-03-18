@@ -93,16 +93,22 @@ class AttendanceService {
   public async getAttendanceRate() {
     try {
       const now = moment().toDate();
-      const dayShifts = await shiftService.getByWeek(now);
-      let attendanceCount = 0;
-      let expectAttendanceCount = 0;
+      const result: number[] = [];
 
-      for (const shift of dayShifts) {
-        attendanceCount += await MAttendance.count({ where: { shiftId: shift.id } });
-        expectAttendanceCount += await EmployeeShift.count({ where: { shiftId: shift.id } });
+      for (let n = 0; n <= 6; n++) {
+        let attendanceCount = 0;
+        let expectAttendanceCount = 0;
+        const currentDay = moment(now).weekday(n).toDate();
+        const dayShifts = await shiftService.getByDay(currentDay);
+        console.log('🚀 ~ AttendanceService ~ getAttendanceRate ~ dayShifts:', dayShifts.length);
+
+        for (const shift of dayShifts) {
+          attendanceCount += await MAttendance.count({ where: { shiftId: shift.id } });
+          expectAttendanceCount += await EmployeeShift.count({ where: { shiftId: shift.id } });
+        }
+        const rate = (attendanceCount / expectAttendanceCount) * 100;
+        result.push(rate);
       }
-
-      const result = (attendanceCount / expectAttendanceCount) * 100;
 
       return result;
     } catch (error) {

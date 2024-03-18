@@ -32,11 +32,12 @@ const authResolvers = {
     const result = await authService.login(id, password);
 
     res.clearCookie('uid');
-    res.clearCookie('role');
+    // res.clearCookie('role');
     res.clearCookie('token');
 
+    console.log('🚀 ~ login: ~ EnvVars.CookieProps.Options:', EnvVars.CookieProps.Options);
     res.cookie('uid', result.uid, EnvVars.CookieProps.Options);
-    res.cookie('role', result.role, { ...EnvVars.CookieProps.Options, signed: false });
+    // res.cookie('role', result.role, { ...EnvVars.CookieProps.Options, signed: false });
     res.cookie('token', result.accessToken, EnvVars.CookieProps.Options);
 
     res.status(HttpStatusCodes.OK).json({
@@ -45,6 +46,7 @@ const authResolvers = {
     });
     res.end();
   },
+
 
   logout: (_: IReq<AuthRequest>, res: IRes) => {
     res.clearCookie('uid');

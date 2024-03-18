@@ -33,13 +33,13 @@ async function renderItems() {
   };
   img.src = data.imgUrl;
 
-  nameField.value = data.dataValues.name;
+  nameField.value = data.name;
 
-  dobField.valueAsDate = new Date(data.dataValues.DOB);
+  dobField.valueAsDate = new Date(data.DOB);
 
-  phoneField.value = data.dataValues.phone;
+  phoneField.value = data.phone;
 
-  addressField.value = data.dataValues.address;
+  addressField.value = data.address;
 }
 
 confirmBtn.addEventListener('click', async function () {

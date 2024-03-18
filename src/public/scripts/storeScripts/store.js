@@ -118,7 +118,7 @@ nextBtn.addEventListener('click', () => {
   }
 });
 
-async function callUpdate(id) {
+async function callDetail(id) {
   const response = await fetch('/api/store?id=' + id, {
     method: 'GET',
   });

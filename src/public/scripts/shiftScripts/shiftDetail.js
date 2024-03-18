@@ -40,6 +40,12 @@ async function renderItems() {
     assignId.push(element.employeeId);
   });
 
+  const attendedId = [];
+
+  await shiftData.attendanceRecords.forEach((element) => {
+    attendedId.push(element.employeeId);
+  });
+
   const employeesResponse = await fetch('/api/employees/all', {
     method: 'GET',
   });
@@ -54,11 +60,15 @@ async function renderItems() {
       assignInput.appendChild(option);
     } else {
       const listItem = document.createElement('div');
-      listItem.textContent = element.id + ' : ' + element.name;
+      listItem.innerHTML = `<div>${element.id} : ${element.name}<span style='float:right'>${
+        attendedId.includes(element.id) ? 'Attended' : 'Not yet'
+      }</span></div>`;
       listItem.classList.add('selected-item');
       listItem.addEventListener('click', function () {
-        assignInput.querySelector(`option[value="${optionValue}"]`).selected = false;
-        selectedItems.removeChild(listItem);
+        if (confirm('This will un-assign the selected employee.\nDo you want to continue?')) {
+          assignInput.querySelector(`option[value="${optionValue}"]`).selected = false;
+          selectedItems.removeChild(listItem);
+        }
       });
       selectedItems.appendChild(listItem);
     }

@@ -3,6 +3,11 @@ const itemsPerPage = 10;
 let currentPage = 1;
 let totalPages = 0;
 
+const id = localStorage.getItem('id');
+console.log('🚀 ~ id:', id);
+
+if (!id) window.location.href = '/employees';
+
 // DOM elements
 const itemList = document.getElementById('item-list');
 const prevBtn = document.getElementById('prev-btn');
@@ -12,7 +17,12 @@ const pageInfo = document.getElementById('page-info');
 // Function to render items based on current page
 async function renderItems() {
   const response = await fetch(
-    'api/employees/attendance?page=' + currentPage + '&pageSize=' + itemsPerPage,
+    '/api/employees/attendance-report?id=' +
+      id +
+      '&page=' +
+      currentPage +
+      '&pageSize=' +
+      itemsPerPage,
     {
       method: 'GET',
     }
@@ -22,6 +32,8 @@ async function renderItems() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const data = result.data;
+  console.log('🚀 ~ renderItems ~ data:', data);
+
   const list = data.records;
   totalPages = data.totalPages;
 
@@ -37,11 +49,14 @@ async function renderItems() {
     const noCell = document.createElement('td');
     noCell.textContent = index + 1;
 
-    const checkinCell = document.createElement('td');
-    checkinCell.textContent = item.checkInTime;
+    const checkInTime = new Date(item.checkInTime);
+    const checkInCell = document.createElement('td');
+    checkInCell.textContent = checkInTime.toLocaleString('ja-JP', { timeZoneName: 'short' });
 
-    const checkoutCell = document.createElement('td');
-    checkoutCell.textContent = item.checkOutTime ?? 'Not yet';
+    const checkOutTime = new Date(item.checkOutTime);
+    const checkOutCell = document.createElement('td');
+    checkOutCell.textContent =
+      checkOutTime.toLocaleString('ja-JP', { timeZoneName: 'short' }) ?? 'Not yet';
 
     const shiftCell = document.createElement('td');
     shiftCell.textContent = item.shiftId;
@@ -63,10 +78,10 @@ async function renderItems() {
 
     // Append cells to the table row
     tr.appendChild(noCell);
-    tr.appendChild(checkinCell);
-    tr.appendChild(checkoutCell);
+    tr.appendChild(checkInCell);
+    tr.appendChild(checkOutCell);
     tr.appendChild(shiftCell);
-    tr.appendChild(operationCell);
+    // tr.appendChild(operationCell);
 
     // Append the table row to the table body
     itemList.appendChild(tr);

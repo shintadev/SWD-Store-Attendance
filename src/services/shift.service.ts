@@ -77,8 +77,8 @@ class ShiftService {
   public async getByDay(date: Date, storeId?: string) {
     const params: WhereOptions = {
       day: moment(date).startOf('d').toDate(),
-      storeId: storeId,
     };
+    if (storeId) params.storeId = storeId;
     const result = await shiftRepo.getShifts(params);
 
     return result;

@@ -34,7 +34,7 @@ async function upload(formData) {
     } else {
       msg.innerText = result.message;
 
-      window.localStorage.setItem('role', result.data.role);
+      document.cookie = 'role=' + result.data.role;
       window.location.href = '/dashboard';
     }
   } catch (error) {

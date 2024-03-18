@@ -9,14 +9,14 @@ export default {
     CRUD: '/',
     List: '/list',
     All: '/all',
-    Attendance: '/attendance',
+    Attendance: '/attendance-report',
   },
   Shift: {
     Base: '/shift',
     CRUD: '/',
     Schedule: '/schedule',
     Assign: '/assign',
-    Attendance: '/attendance',
+    Attendance: '/attendance-report',
   },
   Attendance: {
     Base: '/attendance',

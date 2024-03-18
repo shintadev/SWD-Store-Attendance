@@ -4,6 +4,11 @@ const canvas = document.getElementById('canvas');
 let file;
 const msg = document.getElementById('msg');
 const captureBtn = document.getElementById('capture-btn');
+const employeeBtn = document.getElementById('employee-btn');
+const scheduleBtn = document.getElementById('schedule-btn');
+const userBtn = document.getElementById('user-btn');
+const storeBtn = document.getElementById('store-btn');
+const loginBtn = document.getElementById('login-btn');
 
 async function preStart() {
   const storeResponse = await fetch('/api/store/all', {
@@ -19,6 +24,28 @@ async function preStart() {
     option.value = element.id; // Assign a value to each option
     storeInput.appendChild(option);
   });
+
+  const role = getCookie('role');
+  console.log('🚀 ~ document.addEventListener ~ role:', role);
+
+  if (role) {
+    employeeBtn.style.display = 'block';
+    scheduleBtn.style.display = 'block';
+    if (role == 'MANAGER') {
+      userBtn.style.display = 'none';
+      storeBtn.style.display = 'none';
+    } else {
+      userBtn.style.display = 'block';
+      storeBtn.style.display = 'block';
+    }
+    loginBtn.style.display = 'none';
+  } else {
+    employeeBtn.style.display = 'none';
+    scheduleBtn.style.display = 'none';
+    userBtn.style.display = 'none';
+    storeBtn.style.display = 'none';
+    loginBtn.style.display = 'block';
+  }
 }
 
 async function upload(formData) {
@@ -34,6 +61,16 @@ async function upload(formData) {
     msg.innerText = error;
     console.error('Error:', error);
   }
+}
+
+function getCookie(name) {
+  const value = document.cookie;
+  const parts = value.split(';');
+  if (parts.length > 1) {
+    return parts.find((e) => {
+      if (e.split('=')[0] === name) return e;
+    });
+  } else return parts[0].split('=')[1];
 }
 
 function getFile(canvas) {

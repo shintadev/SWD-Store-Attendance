@@ -70,6 +70,7 @@ if (EnvVars.NodeEnv === NodeEnvs.Production.valueOf()) {
       useDefaults: true,
       directives: {
         'img-src': ["'self'", 'https:', 'data:', 'blob:'],
+        'script-src': ["'self'", 'https:'],
       },
     })
   );

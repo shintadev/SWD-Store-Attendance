@@ -7,7 +7,7 @@ import HttpStatusCodes from '../constants/HttpStatusCodes';
 import storeService from '../services/store.service';
 import Store from '../models/Store';
 import multer from 'multer';
-import { isAdmin } from '@src/middlewares/auth.middleware';
+import { isAdmin, isAuthenticated } from '../middlewares/auth.middleware';
 
 // ** Add Router ** //
 
@@ -111,6 +111,7 @@ const storeResolvers = {
 
 storeRouter
   .route(Paths.Store.CRUD)
+  .all(isAuthenticated)
   .get(multer().none(), asyncHandler(storeResolvers.getById))
   .post(multer().none(), isAdmin, asyncHandler(storeResolvers.create))
   .put(multer().none(), isAdmin, asyncHandler(storeResolvers.update))
@@ -118,7 +119,9 @@ storeRouter
 
 storeRouter.route(Paths.Store.All).get(multer().none(), asyncHandler(storeResolvers.getAll));
 
-storeRouter.route(Paths.Store.List).get(multer().none(), asyncHandler(storeResolvers.getList));
+storeRouter
+  .route(Paths.Store.List)
+  .get(multer().none(), isAuthenticated, asyncHandler(storeResolvers.getList));
 
 // **** Export default **** //
 

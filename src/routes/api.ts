@@ -30,7 +30,7 @@ apiRouter.use(Paths.Attendance.Base, attendanceRouter);
 apiRouter.use(Paths.User.Base, isAuthenticated, isAdmin, userRouter);
 
 // Add StoreRouter
-apiRouter.use(Paths.Store.Base, isAuthenticated, storeRouter);
+apiRouter.use(Paths.Store.Base, storeRouter);
 
 // Add AuthRouter
 apiRouter.use(Paths.Auth.Base, authRouter);
