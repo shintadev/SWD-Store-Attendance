@@ -108,34 +108,21 @@
       </nav>
     </div>
   </header>
+  
   <div style="display: flex;height: 100vh;width: 100vw">
     <div class="left-part">
       <div class="button-container">
-        <button class="button" onclick="redirectToLogin()">Go to Login</button>
+        <a class="button" href="/login">Go to Login</a>
         <p class="button-text">Login to use the manage features</p>
       </div>
     </div>
 
     <div class="right-part">
       <div class="button-container">
-        <button class="button" onclick="redirectToAttendance()">Go to Attendance</button>
+        <a class="button" href="/attendance">Go to Attendance</a>
         <p class="button-text">Check-in/Check-out for this shift</p>
       </div>
     </div>
   </div>
-  <script nonce="shinta">
-    function redirectToLogin() {
-      // Implement redirection to the login page
-      console.log('Redirecting to Login');
-      window.location.href = '/login';
-    }
-
-    function redirectToAttendance() {
-      // Implement redirection to the attendance page
-      console.log('Redirecting to Attendance');
-      window.location.href = '/attendance';
-    }
-  </script>
 </body>
-
 </html>

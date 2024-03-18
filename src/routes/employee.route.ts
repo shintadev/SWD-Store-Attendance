@@ -10,7 +10,7 @@ import employeeService from '../services/employee.service';
 import multer from 'multer';
 import { RouteError } from '../other/classes';
 import attendanceService from '../services/attendance.service';
-import { isAdmin } from '@src/middlewares/auth.middleware';
+import { isAdmin } from '../middlewares/auth.middleware';
 
 // ** Add Router ** //
 

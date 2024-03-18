@@ -39,7 +39,7 @@ addBtn.addEventListener('click', async function () {
   const role = document.getElementById('role-input');
   if (role.checked == true) {
     formData.append('role', 'ADMIN');
-  }
+  } else formData.append('role', 'MANAGER');
 
   formData.append('id', id);
   formData.append('password', password);

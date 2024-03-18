@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+  <title>Employee Form</title>
+  <style>
+    body {
+      overflow: hidden;
+    }
+
+    .employee-container {
+      width: 800px;
+      /* Increased max-width for a wider form */
+      margin: 2rem auto;
+      background-color: #fff;
+      padding: 1rem;
+      padding-top: 1px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .title-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 1rem;
+    }
+
+    .title-container h1 {
+      flex: auto;
+      margin: 0;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid;
+      font-family: monospace;
+      font-size: larger;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 5px 10px;
+      margin-right: 5px;
+    }
+
+    #pagination {
+      margin-top: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="home-bar">
+      <div class="logo"><a href="/">Store Attendance</a></div>
+      <nav>
+        <a class="header-button" href="/attendance">Attendance</a>
+        <a class="header-button" href="/employees">Employee</a>
+        <a class="header-button" href="/schedule">Schedule</a>
+        <a class="header-button" href="/users">User</a>
+        <a class="header-button" href="/store">Store</a>
+        <button class="header-button logout-button" id="logout-btn">Log out</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="employee-container">
+    <div class="title-container">
+      <h1>Employee Attendance History</h1>
+    </div>
+    <div id="list-container">
+      <table id="employee-table">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Check-in Time</th>
+            <th>Check-out Time</th>
+            <th>Shift Id</th>
+            <!-- <th>Operation</th> -->
+          </tr>
+        </thead>
+        <tbody id="item-list"></tbody>
+      </table>
+      <div id="pagination">
+        <button id="prev-btn">Previous</button>
+        <span id="page-info"></span>
+        <button id="next-btn">Next</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+<script src="/scripts/script.js"></script>
+<script src="/scripts/employeeScripts/employeeReport.js"></script>
+
+</html>

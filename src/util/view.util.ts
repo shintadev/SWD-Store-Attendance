@@ -48,6 +48,7 @@ export const setViews = (app: Express) => {
   app.get(Paths.Auth.Login, async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
+
       return res.redirect('/dashboard');
     } catch (error) {
       return res.sendFile('login.html', { root: authDir });

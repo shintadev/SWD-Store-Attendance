@@ -1,5 +1,6 @@
 const shiftInput = document.getElementById('shift-no-select');
 const dateInput = document.getElementById('date-input');
+const storeInput = document.getElementById('store-select');
 const assignInput = document.getElementById('assign-select');
 const selectedItems = document.getElementById('selected-items');
 const confirmBtn = document.getElementById('confirm-shift-btn');
@@ -16,9 +17,23 @@ async function renderItems() {
   });
   const shiftJson = await shiftResponse.json();
   const shiftData = shiftJson.data;
+  console.log('🚀 ~ renderItems ~ shiftData:', shiftData);
 
-  shiftInput.value = shiftData.shiftNo;
-  dateInput.valueAsDate = new Date(shiftData.day);
+  shiftInput.value = shiftData.shift.shiftNo;
+  dateInput.valueAsDate = new Date(shiftData.shift.day);
+
+  const storeResponse = await fetch('/api/store?id=' + shiftData.shift.storeId, {
+    method: 'GET',
+  });
+  const storeJson = await storeResponse.json();
+  const storeData = await storeJson.data;
+
+  const option = document.createElement('option');
+  option.textContent = storeData.id + ' : ' + storeData.name;
+  option.value = storeData.id;
+  storeInput.appendChild(option);
+  storeInput.value = storeData.id;
+
   const assignId = [];
 
   await shiftData.employeeOfShift.forEach((element) => {
@@ -31,11 +46,11 @@ async function renderItems() {
   const employeesJson = await employeesResponse.json();
   const employeesData = employeesJson.data;
 
-  employeesData.forEach((element, index) => {
+  employeesData.forEach((element) => {
     if (!assignId.includes(element.id)) {
       const option = document.createElement('option');
       option.textContent = element.id + ' : ' + element.name;
-      option.value = index + 1; // Assign a value to each option
+      option.value = element.id; // Assign a value to each option
       assignInput.appendChild(option);
     } else {
       const listItem = document.createElement('div');

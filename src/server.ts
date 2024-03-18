@@ -32,7 +32,7 @@ const app = express();
 
 // **** Setup **** //
 
-// Api docs
+// Api-docs
 const file = fs.readFileSync(path.resolve(__dirname, '../swagger.yaml'), 'utf8');
 const css = fs.readFileSync(
   path.resolve(__dirname, '../node_modules/swagger-ui-dist/swagger-ui.css'),
@@ -65,7 +65,14 @@ if (EnvVars.NodeEnv === NodeEnvs.Dev.valueOf()) {
 
 // Security
 if (EnvVars.NodeEnv === NodeEnvs.Production.valueOf()) {
-  app.use(helmet());
+  app.use(
+    helmet.contentSecurityPolicy({
+      useDefaults: true,
+      directives: {
+        'img-src': ["'self'", 'https:', 'data:', 'blob:'],
+      },
+    })
+  );
 }
 
 // Add APIs, must be after middleware

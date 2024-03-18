@@ -28,6 +28,21 @@ class StoreService {
   }
 
   /**
+   * Get all store.
+   */
+  public async getAll() {
+    try {
+      const result = await storeRepo.getAll();
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ storeService ~ getAll ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
+    }
+  }
+
+  /**
    * Get list Stores.
    */
   public async getList(page: number, pageSize: number) {

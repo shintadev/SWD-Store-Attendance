@@ -69,11 +69,12 @@
     <div class="home-bar">
       <div class="logo"><a href="/">Store Attendance</a></div>
       <nav>
-        <button class="header-button" onclick="navigateTo('/attendance')">Attendance</button>
-        <button class="header-button" onclick="navigateTo('/employees')">Employee</button>
-        <button class="header-button" onclick="navigateTo('/schedule')">Schedule</button>
-        <button class="header-button" onclick="navigateTo('/users')">User</button>
-        <button class="header-button logout-button" onclick="logout()">Log out</button>
+        <a class="header-button" href="/attendance">Attendance</a>
+        <a class="header-button" href="/employees">Employee</a>
+        <a class="header-button" href="/schedule">Schedule</a>
+        <a class="header-button" href="/users">User</a>
+        <a class="header-button" href="/store">Store</a>
+        <button class="header-button logout-button" id="logout-btn">Log out</button>
       </nav>
     </div>
   </header>
@@ -96,6 +97,12 @@
       <tr>
         <th>Date</th>
         <td><input type="date" id="date-input"></td>
+      </tr>
+      <tr>
+        <th>Store</th>
+        <td><select name="stores" id="store-select">
+            <option value="">--Please choose store--</option>
+          </select></td>
       </tr>
     </table>
   </form>

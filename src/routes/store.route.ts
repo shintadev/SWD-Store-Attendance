@@ -37,6 +37,18 @@ const storeResolvers = {
   },
 
   /**
+   * Get all stores.
+   */
+  getAll: async (_: IReq, res: IRes) => {
+    const store = await storeService.getAll();
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Request handled',
+      data: store,
+    });
+  },
+
+  /**
    * Get list Stores.
    */
   getList: async (req: IReq<StoreRequest>, res: IRes) => {
@@ -102,6 +114,8 @@ storeRouter
   .post(multer().none(), asyncHandler(storeResolvers.create))
   .put(multer().none(), asyncHandler(storeResolvers.update))
   .delete(multer().none(), asyncHandler(storeResolvers.delete));
+
+storeRouter.route(Paths.Store.All).get(multer().none(), asyncHandler(storeResolvers.getAll));
 
 storeRouter.route(Paths.Store.List).get(multer().none(), asyncHandler(storeResolvers.getList));
 
