@@ -46,7 +46,6 @@ const options: swaggerUi.SwaggerUiOptions = {
 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 app.use(
   '/api-docs',
-  express.static('node_modules/swagger-ui-dist'),
   swaggerUi.serve,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   swaggerUi.setup(swaggerDocument, options)

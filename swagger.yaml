@@ -150,6 +150,48 @@ paths:
       responses:
         204:
           description: Employee deleted
+  /employees/active:
+    put:
+      tags:
+        - Employee
+      summary: Change active status
+      description: Change active status
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+      responses:
+        200:
+          description: Employee is actived
+  /employees/inactive:
+    put:
+      tags:
+        - Employee
+      summary: Change inactive status
+      description: Change inactive status
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+      responses:
+        200:
+          description: Employee is inactived
   /employees/list:
     get:
       tags:
@@ -187,6 +229,69 @@ paths:
                   totalPages:
                     type: integer
                     description: Total number of pages
+  /employees/all:
+    get:
+      tags:
+        - Employee
+      summary: Get all employees
+      description: Get all employees
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Employee details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request handled
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Employee"
+  /employees/attendance-report:
+    get:
+      tags:
+        - Employee
+      summary: Get attendance report by employee ID
+      parameters:
+        - name: id
+          in: query
+          description: Employee ID
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request handled
+                  data:
+                    type: object
+                    example: { ...attendanceReportResult }
   /shift:
     # CRUD operations for shifts
     get:
@@ -309,6 +414,50 @@ paths:
                   message:
                     type: string
                     description: Response message
+  /shift/schedule:
+    post:
+      tags:
+        - Shift
+      summary: Get shifts by week
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                day:
+                  type: string
+                  format: date
+                  description: The day to start the week (optional, defaults to today)
+                storeId:
+                  type: string
+                  description: Store ID
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request handled
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Shift"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Please input all necessary fields
   /shift/assign:
     # Assign/de-allocate employees to/from shifts
     post:
@@ -527,6 +676,37 @@ paths:
       responses:
         204:
           description: User deleted
+  /users/list:
+    get:
+      tags:
+        - User
+      summary: Get user's list
+      description: Get a list of user with pagination
+      produces:
+        - application/json
+      parameters:
+        - in: "query"
+          name: "page"
+          type: integer
+          default: 1
+          description: Page number (optional)
+        - in: "query"
+          name: "pageSize"
+          type: integer
+          default: 10
+          description: Page size (optional)
+      responses:
+        200:
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/users"
   /store:
     get:
       tags:
@@ -647,5 +827,85 @@ paths:
         204:
           description: Store deleted
   /auth/login:
+    tags:
+      - Authorization
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: User ID
+                password:
+                  type: string
+                  description: Password
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successfully
+                  data:
+                    type: object
+                    properties:
+                      uid:
+                        type: string
+                      role:
+                        type: string
+                      accessToken:
+                        type: string
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Please input all necessary fields
+
   /auth/logout:
+    tags:
+      - Authorization
+    post:
+      summary: Logout
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logout successful
+
   /auth/refresh-token:
+    tags:
+      - Authorization
+    post:
+      summary: Refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  description: User ID
+                token:
+                  type: string
