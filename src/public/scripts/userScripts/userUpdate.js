@@ -38,10 +38,12 @@ updateBtn.addEventListener('click', async function () {
   const password = passwordField.value;
   console.log('🚀 ~ password:', password);
 
-  const role = roleField.value;
-  if (role.checked == true) {
+  const role = roleField.checked;
+  console.log('🚀 ~ role:', role);
+
+  if (role == true) {
     formData.append('role', 'ADMIN');
-  }
+  } else formData.append('role', 'MANAGER');
 
   formData.append('id', id);
   formData.append('password', password);

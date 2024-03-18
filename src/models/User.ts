@@ -25,6 +25,7 @@ export const User = sequelize.define<UserModel>('user', {
     primaryKey: true,
     validate: {
       async exist(value: string) {
+        if (value === 'admin') return;
         const employee = await Employee.findByPk(value);
         if (!employee) {
           throw new Error('Invalid EmployeeId');
@@ -37,6 +38,7 @@ export const User = sequelize.define<UserModel>('user', {
     allowNull: false,
     validate: {
       valid(value: string) {
+        if (value === 'admin') return;
         if (!value || value.length < 8) {
           throw new Error('Invalid Password');
         }

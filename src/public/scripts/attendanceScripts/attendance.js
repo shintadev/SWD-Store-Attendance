@@ -37,7 +37,7 @@ async function upload(formData) {
     });
     const result = await response.json();
     if (result.error) msg.innerText = result.error.message;
-    else msg.innerText = result.message;
+    else msg.innerText = result.data.name + '\n' + result.message;
   } catch (error) {
     msg.innerText = error;
     console.error('Error:', error);

@@ -47,6 +47,23 @@ class StoreRepo {
   }
 
   /**
+   * Get all store.
+   */
+  public async getAll() {
+    const result = await Store.findAll().then(function (stores) {
+      if (stores) {
+        const result: IStore[] = [];
+        stores.forEach((store) => {
+          result.push(store.dataValues);
+        });
+        return result;
+      } else throw new Error('Error while getting record');
+    });
+
+    return result;
+  }
+
+  /**
    * create
    */
   public async create(store: IStore) {

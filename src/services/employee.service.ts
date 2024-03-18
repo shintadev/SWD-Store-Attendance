@@ -95,6 +95,44 @@ class EmployeeService {
   }
 
   /**
+   * activate an employee by their id.
+   */
+  public async activateOne(id: string) {
+    const persists = await employeeRepo.persists(id);
+    if (!persists) {
+      throw new RouteError(HttpStatusCodes.NOT_FOUND, EMPLOYEE_NOT_FOUND_ERROR);
+    }
+    try {
+      const result = await employeeRepo.activate(id);
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ EmployeeService ~ _delete ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, EMPLOYEE_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * Inactivate an employee by their id.
+   */
+  public async inactivateOne(id: string) {
+    const persists = await employeeRepo.persists(id);
+    if (!persists) {
+      throw new RouteError(HttpStatusCodes.NOT_FOUND, EMPLOYEE_NOT_FOUND_ERROR);
+    }
+    try {
+      const result = await employeeRepo.inactivate(id);
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ EmployeeService ~ _delete ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, EMPLOYEE_REQUEST_ERROR);
+    }
+  }
+
+  /**
    * Delete an employee by their id.
    */
   public async deleteOne(id: string) {

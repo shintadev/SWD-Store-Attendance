@@ -142,9 +142,35 @@ class EmployeeRepo {
   }
 
   /**
-   * Delete one employee.
+   * Activate one employee.
    */
-  public async delete(id: string) {
+  public async activate(id: string) {
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await Employee.update(
+        {
+          status: 'Active',
+        },
+        {
+          where: {
+            id: id,
+          },
+          transaction: transaction,
+        }
+      );
+      transaction.commit();
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
+  }
+
+  /**
+   * Inactivate one employee.
+   */
+  public async inactivate(id: string) {
     const transaction = await sequelize.transaction();
     try {
       const result = await Employee.update(
@@ -158,6 +184,27 @@ class EmployeeRepo {
           transaction: transaction,
         }
       );
+      transaction.commit();
+
+      return result;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
+  }
+
+  /**
+   * Delete one employee.
+   */
+  public async delete(id: string) {
+    const transaction = await sequelize.transaction();
+    try {
+      const result = await Employee.destroy({
+        where: {
+          id: id,
+        },
+        transaction: transaction,
+      });
       transaction.commit();
 
       return result;

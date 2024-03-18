@@ -31,6 +31,7 @@ export default {
     Base: '/store',
     CRUD: '/',
     List: '/list',
+    All: '/all',
   },
   Auth: {
     Base: '/auth',

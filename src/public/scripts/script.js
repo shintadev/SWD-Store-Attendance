@@ -1,7 +1,8 @@
-function navigateTo(page) {
-  // Implement navigation logic based on the selected page
-  window.location.href = page;
-}
+const logoutBtn = document.getElementById('logout-btn');
+
+logoutBtn.addEventListener('click', () => {
+  logout();
+});
 
 async function logout() {
   if (confirm('Log out now?')) {

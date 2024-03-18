@@ -10,6 +10,7 @@ import employeeService from '../services/employee.service';
 import multer from 'multer';
 import { RouteError } from '../other/classes';
 import attendanceService from '../services/attendance.service';
+import { isAdmin } from '../middlewares/auth.middleware';
 
 // ** Add Router ** //
 
@@ -50,10 +51,13 @@ const employeeResolvers = {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
     const employee = await employeeService.getOne(id); // Get employee info
+    const imgUrl = await fileService.getUrlFromCloud(employee.publicId);
+
+    const result = { ...employee, imgUrl };
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
-      data: employee,
+      data: result,
     });
   },
 
@@ -120,6 +124,7 @@ const employeeResolvers = {
       const face = await imageService.indexFace(imgBuffer.toString('base64'));
       if (!face.FaceId) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
 
+      // Upload to Cloudinary
       const publicId = await fileService.uploadToCloud(imgBuffer);
 
       const employee: IEmployee = Employee.new(name, DOB, phone, address, publicId, face.FaceId);
@@ -159,6 +164,40 @@ const employeeResolvers = {
   },
 
   /**
+   * Activate one employee.
+   */
+  activate: async (req: IReq<EmployeeRequest>, res: IRes) => {
+    const { id } = req.body;
+
+    if (!id) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
+    const result = await employeeService.activateOne(id);
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Deleted successfully',
+      data: result,
+    });
+  },
+
+  /**
+   * Inactivate one employee.
+   */
+  inactivate: async (req: IReq<EmployeeRequest>, res: IRes) => {
+    const { id } = req.body;
+
+    if (!id) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
+    const result = await employeeService.inactivateOne(id);
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Deleted successfully',
+      data: result,
+    });
+  },
+
+  /**
    * Delete one employee.
    */
   delete: async (req: IReq<EmployeeRequest>, res: IRes) => {
@@ -185,7 +224,11 @@ employeeRouter
   .get(upload.none(), asyncHandler(employeeResolvers.getOne)) // Get one employee's info
   .post(upload.single('file'), asyncHandler(employeeResolvers.add)) // Add one employee
   .put(upload.none(), asyncHandler(employeeResolvers.update)) // Update one employee
-  .delete(upload.none(), asyncHandler(employeeResolvers.delete)); // Delete one employee
+  .delete(upload.none(), isAdmin, asyncHandler(employeeResolvers.delete)); // Delete one employee
+
+employeeRouter.route('/active').put(upload.none(), asyncHandler(employeeResolvers.activate));
+
+employeeRouter.route('/inactive').put(upload.none(), asyncHandler(employeeResolvers.inactivate));
 
 employeeRouter.route(Paths.Employee.All).get(upload.none(), asyncHandler(employeeResolvers.getAll)); //Get all active employees
 
@@ -195,7 +238,7 @@ employeeRouter
 
 employeeRouter
   .route(Paths.Employee.Attendance)
-  .get(upload.none(), asyncHandler(employeeResolvers.getList)); //Get employees attendance history
+  .get(upload.none(), asyncHandler(employeeResolvers.getAttendanceReport)); //Get employees attendance history
 
 // **** Export default **** //
 

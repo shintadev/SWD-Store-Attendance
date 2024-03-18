@@ -2,6 +2,7 @@ import { sequelize } from '../repos/sequelize.orm';
 import { DataTypes, Model } from 'sequelize';
 import { Employee } from './Employee';
 import { nanoid } from 'nanoid';
+import { User } from './User';
 
 // **** Types **** //
 
@@ -15,7 +16,7 @@ interface StoreModel extends Model<IStore>, IStore {}
 
 // **** Models **** //
 
-export const Store = sequelize.define<StoreModel>('Store', {
+export const Store = sequelize.define<StoreModel>('store', {
   id: {
     type: DataTypes.STRING,
     primaryKey: true,
@@ -27,6 +28,14 @@ export const Store = sequelize.define<StoreModel>('Store', {
   managerId: {
     type: DataTypes.STRING,
     allowNull: false,
+    validate: {
+      async valid(value: string) {
+        const user = await User.findByPk(value);
+        if (!user) {
+          throw new Error('Invalid ManagerId');
+        }
+      },
+    },
     references: {
       model: Employee,
       key: 'id',

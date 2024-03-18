@@ -55,6 +55,7 @@ class AuthService {
 
       return {
         uid: user.id,
+        role: user.role,
         accessToken: keyObject.accessToken,
       };
     } catch (error) {
