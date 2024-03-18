@@ -5,14 +5,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
-  <title>Employee</title>
+  <title>Employee Form</title>
   <style>
     body {
       overflow: hidden;
     }
 
     .employee-container {
-      width: 800px;
+      width: 1200px;
       /* Increased max-width for a wider form */
       margin: 2rem auto;
       background-color: #fff;
@@ -66,6 +66,7 @@
       <div class="logo"><a href="/">Store Attendance</a></div>
       <nav>
         <a class="header-button" href="/attendance">Attendance</a>
+        <a class="header-button" href="/employees">Employee</a>
         <a class="header-button" href="/schedule">Schedule</a>
         <a class="header-button" id="user-btn" href="/users">User</a>
         <a class="header-button" id="store-btn" href="/store">Store</a>
@@ -76,18 +77,16 @@
 
   <div class="employee-container">
     <div class="title-container">
-      <h1>Employee List</h1>
-      <button id="add-employee-btn">Add➕</button>
+      <h1>Employee Attendance History</h1>
     </div>
     <div id="list-container">
       <table id="employee-table">
         <thead>
           <tr>
             <th>No.</th>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Status</th>
+            <th>Check-in Time</th>
+            <th>Check-out Time</th>
+            <th>Shift Id</th>
             <th>Operation</th>
           </tr>
         </thead>
@@ -100,7 +99,9 @@
       </div>
     </div>
   </div>
+
 </body>
-<script src="scripts/script.js"></script>
-<script src="scripts/employeeScripts/employees.js"></script>
+<script src="/scripts/script.js"></script>
+<script src="/scripts/employeeScripts/employeeReport.js"></script>
+
 </html>

@@ -1,11 +1,11 @@
 {
   "name": "SWD-Store-Attendance",
-  "version": "0.2.5",
+  "version": "0.3.1",
   "scripts": {
     "build": "npx ts-node build.ts",
     "lint": "npx eslint --ext .ts src/",
     "lint:tests": "npx eslint --ext .ts spec/",
-    "start": "node -r module-alias/register ./dist --env=production",
+    "start": "node -r module-alias/register ./dist/src --env=production",
     "dev": "nodemon",
     "test": "nodemon --config ./spec/nodemon.json",
     "test:no-reloading": "npx ts-node --files -r tsconfig-paths/register ./spec"
@@ -24,10 +24,11 @@
     "@src": "dist"
   },
   "engines": {
-    "node": ">=8.10.0"
+    "node": ">=18.x"
   },
   "dependencies": {
     "@aws-sdk/client-rekognition": "^3.501.0",
+    "@types/pg": "^8.11.2",
     "bcrypt": "^5.1.1",
     "cloudinary": "^1.41.3",
     "compression": "^1.7.4",
@@ -51,7 +52,10 @@
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.35.2",
-    "ts-command-line-args": "^2.5.1"
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^4.6.3",
+    "ts-command-line-args": "^2.5.1",
+    "yaml": "^2.4.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -67,6 +71,8 @@
     "@types/multer": "^1.4.11",
     "@types/node": "^20.11.5",
     "@types/supertest": "^6.0.2",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.6",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
     "eslint": "^8.56.0",
@@ -80,4 +86,5 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3"
   }
+
 }

@@ -1,4 +1,4 @@
-import { sequelize } from '@src/repos/sequelize.orm';
+import { sequelize } from '../repos/sequelize.orm';
 import { DataTypes, Model } from 'sequelize';
 import { Employee } from './Employee';
 import { Shift } from './Shift';

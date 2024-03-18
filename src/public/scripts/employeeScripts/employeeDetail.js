@@ -1,8 +1,13 @@
+const width = 321;
+const height = 241;
+const canvas = document.getElementById('canvas');
+let imageData;
+let file;
 const nameField = document.getElementById('name-input');
 const dobField = document.getElementById('dob-input');
 const phoneField = document.getElementById('phone-input');
 const addressField = document.getElementById('address-input');
-const updateBtn = document.getElementById('update-employee-btn');
+const confirmBtn = document.getElementById('confirm-employee-btn');
 const cancelBtn = document.getElementById('cancel-employee-btn');
 
 const id = localStorage.getItem('id');
@@ -17,27 +22,37 @@ async function renderItems() {
   const data = result.data;
   console.log('🚀 ~ data:', data);
 
+  const context = canvas.getContext('2d');
+
+  canvas.width = width;
+  canvas.height = height;
+
+  var img = new Image();
+  img.onload = function () {
+    context.drawImage(img, 0, 0, width, height);
+  };
+  img.src = data.imgUrl;
+
   nameField.value = data.name;
+
   dobField.valueAsDate = new Date(data.DOB);
+
   phoneField.value = data.phone;
+
   addressField.value = data.address;
 }
 
-updateBtn.addEventListener('click', async function () {
+confirmBtn.addEventListener('click', async function () {
   const formData = new FormData();
 
   // Access and add form data from the input elements
   const name_ = nameField.value;
-  console.log('🚀 ~ name_:', name_);
 
   const DOB = dobField.value;
-  console.log('🚀 ~ DOB:', DOB);
 
   const phone = phoneField.value;
-  console.log('🚀 ~ phone:', phone);
 
   const address = addressField.value;
-  console.log('🚀 ~ address:', address);
 
   // Add image data to the FormData
   formData.append('id', id);

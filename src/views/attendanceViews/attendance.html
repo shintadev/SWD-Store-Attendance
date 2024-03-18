@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Attendance</title>
   <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+  <title>Attendance</title>
   <style>
     body {
       overflow: hidden;
@@ -49,13 +49,20 @@
     <div class="home-bar">
       <div class="logo"><a href="/">Store Attendance</a></div>
       <nav>
-        <button class="header-button" onclick="redirectToLogin()">Login</button>
+        <a class="header-button" id="employee-btn" href="/employees">Employee</a>
+        <a class="header-button" id="schedule-btn" href="/schedule">Schedule</a>
+        <a class="header-button" id="user-btn" href="/users">User</a>
+        <a class="header-button" id="store-btn" href="/store">Store</a>
+        <a class="header-button" id="login-btn" href="/login">Login</a>
       </nav>
     </div>
   </header>
 
   <div class="column-container">
     <div class="column-header">
+      <select name="stores" id="store-select">
+        <option value="">--Please choose store--</option>
+      </select>
       <h1>Attendance</h1>
     </div>
     <video id="video" width=480 height=360 autoplay muted></video>
@@ -68,12 +75,5 @@
 
 </body>
 <script src="/scripts/attendanceScripts/attendance.js"></script>
-<script>
-  function redirectToLogin() {
-    // Implement redirection to the login page
-    console.log('Redirecting to Login');
-    window.location.href = '/login';
-  }
-</script>
 
 </html>

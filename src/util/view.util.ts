@@ -1,15 +1,15 @@
 import { Express, Request, Response } from 'express';
 import path from 'path';
 import express from 'express';
-import Paths from '@src/constants/Paths';
-import { isAdmin, isAuthenticated } from '@src/middlewares/auth.middleware';
+import Paths from '../constants/Paths';
+import { isAdmin, isAuthenticated } from '../middlewares/auth.middleware';
 
 const AUTHENTICATE_FAILED_HTML =
   '<div id=\'error\'>Need Login First</div><script src="/scripts/script.js"></script>';
 
 export const setViews = (app: Express) => {
   // Set views directory (html)
-  const viewsDir = path.join('src/', 'views');
+  const viewsDir = path.resolve(__dirname, '../views');
   app.set('views', viewsDir);
 
   const attendanceDir = path.join(viewsDir, 'attendanceViews');
@@ -17,16 +17,17 @@ export const setViews = (app: Express) => {
   const employeeDir = path.join(viewsDir, 'employeeViews');
   const shiftDir = path.join(viewsDir, 'shiftViews');
   const userDir = path.join(viewsDir, 'userViews');
+  const storeDir = path.join(viewsDir, 'storeViews');
 
   // Set static directory (js and css).
-  const staticDir = path.join('src/', 'public');
+  const staticDir = path.join(__dirname, '../public');
   app.use(express.static(staticDir));
 
   // Nav to home page by default
   app.get('/', async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
-      return res.redirect('/admin');
+      return res.redirect('/dashboard');
     } catch (error) {
       return res.redirect('/home');
     }
@@ -47,21 +48,19 @@ export const setViews = (app: Express) => {
   app.get(Paths.Auth.Login, async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
-      return res.redirect('/admin');
+
+      return res.redirect('/dashboard');
     } catch (error) {
       return res.sendFile('login.html', { root: authDir });
     }
   });
 
-  //Admin
-  app.get('/admin', async (req: Request, res: Response) => {
+  //Dashboard
+  app.get('/dashboard', async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
-      await isAdmin(req, res);
-      return res.sendFile('admin.html', { root: viewsDir });
+      return res.sendFile('dashboard.html', { root: viewsDir });
     } catch (error) {
-      console.log('🚀 ~ app.get ~ error:', error);
-
       return res.status(401).send(AUTHENTICATE_FAILED_HTML);
     }
   });
@@ -76,7 +75,7 @@ export const setViews = (app: Express) => {
     }
   });
 
-  app.get(Paths.Employee.Base + '/form/add', async (req: Request, res: Response) => {
+  app.get(Paths.Employee.Base + '/add', async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
       return res.sendFile('employeeAdd.html', { root: employeeDir });
@@ -85,10 +84,19 @@ export const setViews = (app: Express) => {
     }
   });
 
-  app.get(Paths.Employee.Base + '/form/update', async (req: Request, res: Response) => {
+  app.get(Paths.Employee.Base + '/detail', async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
-      return res.sendFile('employeeUpdate.html', { root: employeeDir });
+      return res.sendFile('employeeDetail.html', { root: employeeDir });
+    } catch (error) {
+      return res.status(401).send(AUTHENTICATE_FAILED_HTML);
+    }
+  });
+
+  app.get(Paths.Employee.Base + '/attendance-report', async (req: Request, res: Response) => {
+    try {
+      await isAuthenticated(req, res);
+      return res.sendFile('employeeReport.html', { root: employeeDir });
     } catch (error) {
       return res.status(401).send(AUTHENTICATE_FAILED_HTML);
     }
@@ -104,16 +112,7 @@ export const setViews = (app: Express) => {
     }
   });
 
-  app.get(Paths.Shift.Base, async (req: Request, res: Response) => {
-    try {
-      await isAuthenticated(req, res);
-      return res.sendFile('shift.html', { root: shiftDir });
-    } catch (error) {
-      return res.status(401).send(AUTHENTICATE_FAILED_HTML);
-    }
-  });
-
-  app.get(Paths.Shift.Base + '/form/add', async (req: Request, res: Response) => {
+  app.get(Paths.Shift.Base + '/add', async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
       return res.sendFile('shiftAdd.html', { root: shiftDir });
@@ -122,10 +121,10 @@ export const setViews = (app: Express) => {
     }
   });
 
-  app.get(Paths.Shift.Base + '/form/assign', async (req: Request, res: Response) => {
+  app.get(Paths.Shift.Base + '/detail', async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
-      return res.sendFile('shiftAssign.html', { root: shiftDir });
+      return res.sendFile('shiftDetail.html', { root: shiftDir });
     } catch (error) {
       return res.status(401).send(AUTHENTICATE_FAILED_HTML);
     }
@@ -142,7 +141,7 @@ export const setViews = (app: Express) => {
     }
   });
 
-  app.get(Paths.User.Base + '/form/add', async (req: Request, res: Response) => {
+  app.get(Paths.User.Base + '/add', async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
       await isAdmin(req, res);
@@ -152,11 +151,22 @@ export const setViews = (app: Express) => {
     }
   });
 
-  app.get(Paths.User.Base + '/form/update', async (req: Request, res: Response) => {
+  app.get(Paths.User.Base + '/update', async (req: Request, res: Response) => {
     try {
       await isAuthenticated(req, res);
       await isAdmin(req, res);
       return res.sendFile('userUpdate.html', { root: userDir });
+    } catch (error) {
+      return res.status(401).send(AUTHENTICATE_FAILED_HTML);
+    }
+  });
+
+  //Store
+  app.get(Paths.Store.Base, async (req: Request, res: Response) => {
+    try {
+      await isAuthenticated(req, res);
+      await isAdmin(req, res);
+      return res.sendFile('store.html', { root: storeDir });
     } catch (error) {
       return res.status(401).send(AUTHENTICATE_FAILED_HTML);
     }

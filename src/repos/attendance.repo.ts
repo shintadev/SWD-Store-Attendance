@@ -1,4 +1,4 @@
-import { Attendance, IAttendance } from '@src/models/Attendance';
+import { Attendance, IAttendance } from '../models/Attendance';
 import { sequelize } from './sequelize.orm';
 
 // **** Class **** //
@@ -9,14 +9,41 @@ class AttendanceRepo {
   /**
    * Get employee's attendance list.
    */
-  public async getByEmployeeId(employeeId: string) {
+  public async getByEmployeeId(employeeId: string, page: number, pageSize: number) {
+    const offset = (page - 1) * pageSize;
     const result = await Attendance.findAll({
       where: {
         employeeId: employeeId,
       },
-    }).then(function (checkIn) {
-      if (checkIn) {
-        return checkIn;
+      offset: offset,
+      limit: pageSize,
+    }).then(function (attendances) {
+      if (attendances) {
+        const output: IAttendance[] = [];
+        attendances.forEach((attendance) => {
+          output.push(attendance.dataValues);
+        });
+        return output;
+      } else throw new Error('Error while getting records');
+    });
+    return result;
+  }
+
+  /**
+   * Get employee's attendance list.
+   */
+  public async getByShiftId(shiftId: string) {
+    const result = await Attendance.findAll({
+      where: {
+        shiftId: shiftId,
+      },
+    }).then(function (attendances) {
+      if (attendances) {
+        const output: IAttendance[] = [];
+        attendances.forEach((attendance) => {
+          output.push(attendance.dataValues);
+        });
+        return output;
       } else throw new Error('Error while getting records');
     });
     return result;
@@ -33,8 +60,8 @@ class AttendanceRepo {
       },
     }).then(function (attendance) {
       if (attendance) {
-        return attendance;
-      } else throw new Error('Error while getting records');
+        return attendance.dataValues;
+      } else return null;
     });
     return result;
   }

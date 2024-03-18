@@ -1,4 +1,4 @@
-import { IShift, Shift } from '@src/models/Shift';
+import { IShift, Shift } from '../models/Shift';
 import { WhereOptions } from 'sequelize';
 import { sequelize } from './sequelize.orm';
 
@@ -24,8 +24,8 @@ class ShiftRepo {
       },
     }).then(function (shift) {
       if (shift) {
-        return shift;
-      } else throw new Error('Error while getting record');
+        return shift.dataValues;
+      } else return null;
     });
     return result;
   }
@@ -36,10 +36,14 @@ class ShiftRepo {
   public async getShifts(condition: WhereOptions) {
     const result = await Shift.findAll({
       where: condition,
-    }).then(function (shift) {
-      if (shift) {
-        return shift;
-      } else throw new Error('Error while getting record');
+    }).then(function (shifts) {
+      const output: IShift[] = [];
+      if (shifts) {
+        shifts.forEach((shift) => {
+          output.push(shift.dataValues);
+        });
+      }
+      return output;
     });
     return result;
   }

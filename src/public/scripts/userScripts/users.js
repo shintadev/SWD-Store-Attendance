@@ -4,6 +4,7 @@ let currentPage = 1;
 
 // DOM elements
 const itemList = document.getElementById('item-list');
+const addBtn = document.getElementById('add-user-btn');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const pageInfo = document.getElementById('page-info');
@@ -39,12 +40,19 @@ async function renderItems() {
     roleCell.textContent = String(item.role).toUpperCase();
 
     const operationCell = document.createElement('td');
-    operationCell.innerHTML =
-      '<button onclick="callUpdate(\'' +
-      item.id +
-      '\')">Edit🔄️</button><button onclick="callDelete(\'' +
-      item.id +
-      '\')">Delete❎</button>';
+    const updateBtn = document.createElement('button');
+    const deleteBtn = document.createElement('button');
+    updateBtn.innerText = 'Update';
+    deleteBtn.innerText = 'Delete';
+    operationCell.appendChild(updateBtn);
+    operationCell.appendChild(deleteBtn);
+
+    updateBtn.addEventListener('click', () => {
+      callUpdate(item.id);
+    });
+    deleteBtn.addEventListener('click', () => {
+      callDelete(item.id);
+    });
 
     // Append cells to the table row
     tr.appendChild(noCell);
@@ -61,6 +69,10 @@ async function renderItems() {
 }
 
 // Event listeners for pagination buttons
+addBtn.addEventListener('click', () => {
+  callAdd();
+});
+
 prevBtn.addEventListener('click', () => {
   if (currentPage > 1) {
     currentPage--;
@@ -77,22 +89,24 @@ nextBtn.addEventListener('click', () => {
 });
 
 async function callAdd() {
-  window.location.href = '/users/form/add';
+  window.location.href = '/users/add';
 }
 
 async function callUpdate(id) {
   localStorage.setItem('id', id);
-  window.location.href = '/users/form/update';
+  window.location.href = '/users/update';
 }
 
 async function callDelete(id) {
-  const formData = new FormData();
-  formData.append('id', id);
-  await fetch('api/user', {
-    method: 'DELETE',
-    body: formData,
-  });
-  renderItems();
+  if (confirm('This will delete ' + id + ' permanently. Will you continue?')) {
+    const formData = new FormData();
+    formData.append('id', id);
+    await fetch('api/user', {
+      method: 'DELETE',
+      body: formData,
+    });
+    renderItems();
+  }
 }
 
 // Initial render

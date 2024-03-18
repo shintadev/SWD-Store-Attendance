@@ -1,14 +1,16 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
 import { IReq, IRes } from './types/express/misc';
 import { Router, json } from 'express';
 import Paths from '../constants/Paths';
-import Employee, { IEmployee } from '@src/models/Employee';
+import Employee, { IEmployee } from '../models/Employee';
 import imageService from '../services/image.service';
 import { asyncHandler } from '../util/misc';
-import fileService from '@src/services/file.service';
-import employeeService from '@src/services/employee.service';
+import fileService from '../services/file.service';
+import employeeService from '../services/employee.service';
 import multer from 'multer';
-import { RouteError } from '@src/other/classes';
+import { RouteError } from '../other/classes';
+import attendanceService from '../services/attendance.service';
+import { isAdmin } from '../middlewares/auth.middleware';
 
 // ** Add Router ** //
 
@@ -43,23 +45,27 @@ const employeeResolvers = {
   /**
    * Get one employee.
    */
-  getOne: async (req: IReq<EmployeeRequest>, res: IRes) => {
+  getOne: async (req: IReq, res: IRes) => {
     const id = String(req.query.id);
     if (!id) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
     }
-    const employee = await employeeService.getOne(id);
+    const employee = await employeeService.getOne(id); // Get employee info
+    if (!employee) throw new Error('Employee not found.');
+    const imgUrl = await fileService.getUrlFromCloud(employee.publicId);
+
+    const result = { ...employee, imgUrl };
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
-      data: employee,
+      data: result,
     });
   },
 
   /**
-   * getAll
+   * Get all active employees.
    */
-  getAll: async (_: IReq<EmployeeRequest>, res: IRes) => {
+  getAll: async (_: IReq, res: IRes) => {
     const employee = await employeeService.getAll();
 
     return res.status(HttpStatusCodes.OK).json({
@@ -71,10 +77,28 @@ const employeeResolvers = {
   /**
    * Get list employees.
    */
-  getList: async (req: IReq<EmployeesRequest>, res: IRes) => {
+  getList: async (req: IReq, res: IRes) => {
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 10;
     const result = await employeeService.getList(page, pageSize);
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Request handled',
+      data: result,
+    });
+  },
+
+  /**
+   * Get employee's attendance history.
+   */
+  getAttendanceReport: async (req: IReq, res: IRes) => {
+    const id = String(req.query.id);
+    if (!id) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
+    const result = await attendanceService.getByEmployeeId(id, page, pageSize);
 
     return res.status(HttpStatusCodes.OK).json({
       message: 'Request handled',
@@ -101,6 +125,7 @@ const employeeResolvers = {
       const face = await imageService.indexFace(imgBuffer.toString('base64'));
       if (!face.FaceId) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
 
+      // Upload to Cloudinary
       const publicId = await fileService.uploadToCloud(imgBuffer);
 
       const employee: IEmployee = Employee.new(name, DOB, phone, address, publicId, face.FaceId);
@@ -140,6 +165,40 @@ const employeeResolvers = {
   },
 
   /**
+   * Activate one employee.
+   */
+  activate: async (req: IReq<EmployeeRequest>, res: IRes) => {
+    const { id } = req.body;
+
+    if (!id) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
+    const result = await employeeService.activateOne(id);
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Deleted successfully',
+      data: result,
+    });
+  },
+
+  /**
+   * Inactivate one employee.
+   */
+  inactivate: async (req: IReq<EmployeeRequest>, res: IRes) => {
+    const { id } = req.body;
+
+    if (!id) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+    }
+    const result = await employeeService.inactivateOne(id);
+
+    return res.status(HttpStatusCodes.OK).json({
+      message: 'Deleted successfully',
+      data: result,
+    });
+  },
+
+  /**
    * Delete one employee.
    */
   delete: async (req: IReq<EmployeeRequest>, res: IRes) => {
@@ -163,18 +222,24 @@ employeeRouter.use(json({ limit: '10mb' }));
 
 employeeRouter
   .route(Paths.Employee.CRUD)
-  .get(upload.none(), asyncHandler(employeeResolvers.getOne)) // Get one employee
+  .get(upload.none(), asyncHandler(employeeResolvers.getOne)) // Get one employee's info
   .post(upload.single('file'), asyncHandler(employeeResolvers.add)) // Add one employee
-  .put(upload.none(),asyncHandler(employeeResolvers.update)) // Update one employee
-  .delete(upload.none(),asyncHandler(employeeResolvers.delete)); // Delete one employee
+  .put(upload.none(), asyncHandler(employeeResolvers.update)) // Update one employee
+  .delete(upload.none(), isAdmin, asyncHandler(employeeResolvers.delete)); // Delete one employee
 
-employeeRouter
-  .route(Paths.Employee.All)
-  .get(upload.none(),asyncHandler(employeeResolvers.getAll)); //Get all active employees
+employeeRouter.route('/active').put(upload.none(), asyncHandler(employeeResolvers.activate));
+
+employeeRouter.route('/inactive').put(upload.none(), asyncHandler(employeeResolvers.inactivate));
+
+employeeRouter.route(Paths.Employee.All).get(upload.none(), asyncHandler(employeeResolvers.getAll)); //Get all active employees
 
 employeeRouter
   .route(Paths.Employee.List)
-  .get(upload.none(),asyncHandler(employeeResolvers.getList)); //Get list employees
+  .get(upload.none(), asyncHandler(employeeResolvers.getList)); //Get list employees
+
+employeeRouter
+  .route(Paths.Employee.Attendance)
+  .get(upload.none(), asyncHandler(employeeResolvers.getAttendanceReport)); //Get employees attendance history
 
 // **** Export default **** //
 

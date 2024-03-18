@@ -1,6 +1,7 @@
-import { sequelize } from '@src/repos/sequelize.orm';
+import { sequelize } from '../repos/sequelize.orm';
 import moment from 'moment';
 import { DataTypes, Model } from 'sequelize';
+import { Store } from './Store';
 
 // **** Types **** //
 
@@ -8,6 +9,7 @@ export interface IShift {
   id: string;
   shiftNo: number;
   day: Date;
+  storeId: string;
 }
 
 interface ShiftModel extends Model<IShift>, IShift {}
@@ -34,23 +36,41 @@ export const Shift = sequelize.define<ShiftModel>('shift', {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  storeId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    references: {
+      model: Store,
+      key: 'id',
+    },
+  },
 });
+
+// **** Relationship **** //
+
+// Store 1:m Shift
+Store.hasMany(Shift, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+Shift.belongsTo(Store);
 
 // **** Functions **** //
 
 /**
  * Create new Shift.
  */
-function new_(shiftNo: number, day: Date): IShift {
+function new_(shiftNo: number, day: Date, storeId: string): IShift {
   const seed = new Date(day).toISOString();
   const date = moment(seed);
   let month = (date.month() + 1).toString();
   if (date.month() + 1 < 10) month = '0' + (date.month() + 1).toString();
-  const id = date.date().toString() + month + date.year() + '_' + shiftNo;
+  const id = date.date().toString() + month + date.year() + '_' + shiftNo + '_' + storeId;
   return {
     id: id,
     shiftNo: shiftNo,
     day: day,
+    storeId: storeId,
   };
 }
 

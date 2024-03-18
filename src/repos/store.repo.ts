@@ -1,34 +1,31 @@
-import { IUser, User } from '../models/User';
+import { IStore, Store } from '../models/Store';
 import { sequelize } from './sequelize.orm';
 
 // **** Types **** //
 
 interface updateParams {
-  password?: string;
-  role?: string;
+  name?: string;
+  managerId?: string;
 }
 
 // **** Class **** //
 
-class UserRepo {
+class StoreRepo {
   // **** Functions **** //
 
   /**
-   * Get list users.
+   * Get list stores.
    */
   public async getList(page: number, pageSize: number) {
     const offset = (page - 1) * pageSize;
-    const result = await User.findAll({
-      where: {
-        // status: 'Active',
-      },
+    const result = await Store.findAll({
       offset: offset,
       limit: pageSize,
-    }).then(function (Users) {
-      if (Users) {
-        const result: IUser[] = [];
-        Users.forEach((User) => {
-          result.push(User.dataValues);
+    }).then(function (stores) {
+      if (stores) {
+        const result: IStore[] = [];
+        stores.forEach((store) => {
+          result.push(store.dataValues);
         });
         return result;
       } else return null;
@@ -41,21 +38,38 @@ class UserRepo {
    * getById
    */
   public async getById(id: string) {
-    const result = await User.findByPk(id).then(function (user) {
-      if (user) {
-        return user;
+    const result = await Store.findByPk(id).then(function (store) {
+      if (store) {
+        return store;
       } else return null;
     });
     return result;
   }
 
   /**
+   * Get all store.
+   */
+  public async getAll() {
+    const result = await Store.findAll().then(function (stores) {
+      if (stores) {
+        const result: IStore[] = [];
+        stores.forEach((store) => {
+          result.push(store.dataValues);
+        });
+        return result;
+      } else return null;
+    });
+
+    return result;
+  }
+
+  /**
    * create
    */
-  public async create(user: IUser) {
+  public async create(store: IStore) {
     const transaction = await sequelize.transaction();
     try {
-      const result = await User.create(user, { transaction: transaction });
+      const result = await Store.create(store, { transaction: transaction });
       transaction.commit();
 
       return result;
@@ -68,21 +82,21 @@ class UserRepo {
   /**
    * Update.
    */
-  public async update(id: string, password?: string, role?: string) {
+  public async update(id: string, name?: string, managerId?: string) {
     const updateValues: updateParams = {};
 
-    if (password) {
-      updateValues.password = password;
+    if (name) {
+      updateValues.name = name;
     }
 
-    if (role) {
-      updateValues.role = role;
+    if (managerId) {
+      updateValues.managerId = managerId;
     }
 
     const transaction = await sequelize.transaction();
     try {
       if (Object.keys(updateValues).length > 0) {
-        const result = await User.update(updateValues, {
+        const result = await Store.update(updateValues, {
           where: {
             id: id,
           },
@@ -104,7 +118,7 @@ class UserRepo {
   public async delete(id: string) {
     const transaction = await sequelize.transaction();
     try {
-      const result = await User.destroy({
+      const result = await Store.destroy({
         where: {
           id: id,
         },
@@ -122,4 +136,4 @@ class UserRepo {
 
 // **** Export default **** //
 
-export default new UserRepo();
+export default new StoreRepo();

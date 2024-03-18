@@ -61,11 +61,11 @@
     <div class="home-bar">
       <div class="logo"><a href="/">Store Attendance</a></div>
       <nav>
-        <button class="header-button" onclick="navigateTo('/attendance')">Attendance</button>
-        <button class="header-button" onclick="navigateTo('/employees')">Employee</button>
-        <button class="header-button" onclick="navigateTo('/schedule')">Schedule</button>
-        <button class="header-button" onclick="navigateTo('/users')">User</button>
-        <button class="header-button logout-button" onclick="logout()">Log out</button>
+        <a class="header-button" href="/attendance">Attendance</a>
+        <a class="header-button" href="/employees">Employee</a>
+        <a class="header-button" href="/schedule">Schedule</a>
+        <a class="header-button" href="/store">Store</a>
+        <button class="header-button logout-button" id="logout-btn">Log out</button>
       </nav>
     </div>
   </header>
@@ -73,7 +73,7 @@
   <div class="user-container">
     <div class="title-container">
       <h1>User Account List</h1>
-      <button id="add-user-btn" onclick="callAdd()">Add➕</button>
+      <button id="add-user-btn">Add➕</button>
     </div>
     <div id="list-container">
       <table id="user-table">
@@ -96,5 +96,5 @@
   </div>
 </body>
   <script src="scripts/script.js"></script>
-  <script src="scripts/userScripts/user.js"></script>
+  <script src="scripts/userScripts/users.js"></script>
 </html>

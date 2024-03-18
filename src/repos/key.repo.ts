@@ -1,4 +1,4 @@
-import { IKey, Key } from '@src/models/Key';
+import { IKey, Key } from '../models/Key';
 import { sequelize } from './sequelize.orm';
 
 // **** Class **** //
@@ -13,7 +13,7 @@ class KeyRepo {
     const result = await Key.findByPk(id).then(function (key) {
       if (key) {
         return key;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
     return result;
   }
@@ -40,15 +40,12 @@ class KeyRepo {
   public async update(key: IKey) {
     const transaction = await sequelize.transaction();
     try {
-      const result = await Key.update(
-        key, 
-        {
-          where:{
-            id:key.id,
-          }, 
-          transaction: transaction,
+      const result = await Key.update(key, {
+        where: {
+          id: key.id,
         },
-      );
+        transaction: transaction,
+      });
       transaction.commit();
 
       return result;

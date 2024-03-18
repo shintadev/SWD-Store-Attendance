@@ -19,9 +19,11 @@ import childProcess from 'child_process';
     await copy('./src/views', './dist/views');
     // Copy back-end files
     await exec('tsc --build tsconfig.prod.json', './');
-  } catch (err) {
-    logger.err(err);
-    process.exit(1);
+    await copy('./swagger.yaml', './dist/swagger.yaml');
+  } catch (err ) {
+    logger.err(err as Error);
+    // process.exit(1);
+    throw err;
   }
 })();
 

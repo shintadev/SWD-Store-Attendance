@@ -1,11 +1,11 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import { IShift } from '@src/models/Shift';
-import { RouteError } from '@src/other/classes';
-import shiftRepo from '@src/repos/shift.repo';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import { IShift } from '../models/Shift';
+import { RouteError } from '../other/classes';
+import shiftRepo from '../repos/shift.repo';
 import { WhereOptions } from 'sequelize';
 import moment from 'moment';
-import employeeShiftRepo from '@src/repos/employee-shift.repo';
-import Shifts from '@src/constants/Shifts';
+import employeeShiftRepo from '../repos/employee-shift.repo';
+import Shifts from '../constants/Shifts';
 
 // **** Variables **** //
 
@@ -21,15 +21,21 @@ class ShiftService {
    * Get shift by Id
    */
   public async getById(id: string) {
-    const result = await shiftRepo.getById(id);
+    try {
+      const result = await shiftRepo.getById(id);
 
-    return result;
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ ShiftService ~ getById ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_NOT_FOUND_ERROR);
+    }
   }
 
   /**
    * Get current shift.
    */
-  public async getCurrentShift() {
+  public async getCurrentShift(storeId: string) {
     const now = moment();
     const currentHour = now.hours();
     const currentMinute = now.minutes();
@@ -38,21 +44,25 @@ class ShiftService {
     const currentShift = Shifts.find((shift) => {
       return currentTime >= shift.startTime && currentTime < shift.endTime;
     });
+
     if (!currentShift) throw new Error('No shift currently');
     const params = {
-      day: now.toDate(),
+      day: now.startOf('d').toDate(),
+      storeId: storeId,
     };
 
     try {
-      const shifts = await shiftRepo.getShifts(params);
+      const shifts = await shiftRepo.getShifts(params); //Get all shift today of a store
+
       const result = shifts.find((shift) => {
-        return shift.shiftNo === currentShift.no;
+        return shift.shiftNo === currentShift.no; //Get the one happen now
       });
 
-      if (result) return result.dataValues;
+      if (result) return result;
       else throw new Error('No shift currently');
     } catch (error) {
-      console.log('🚀 ~ ShiftService ~ addOne ~ error:', error);
+      console.log('🚀 ~ ShiftService ~ getCurrentShift ~ error:', error);
+
       if (error instanceof Error) {
         throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
       } else {
@@ -64,16 +74,12 @@ class ShiftService {
   /**
    * Get all shift of a specific day
    */
-  public async getByDay(date: Date) {
-    const result = [];
+  public async getByDay(date: Date, storeId?: string) {
     const params: WhereOptions = {
       day: moment(date).startOf('d').toDate(),
     };
-    const shifts = await shiftRepo.getShifts(params);
-
-    for (const shift of shifts) {
-      result.push(shift.dataValues);
-    }
+    if (storeId) params.storeId = storeId;
+    const result = await shiftRepo.getShifts(params);
 
     return result;
   }
@@ -81,9 +87,10 @@ class ShiftService {
   /**
    * getDayCount
    */
-  public async getDayCount(date: Date) {
+  public async getDayCount(date: Date, storeId?: string) {
     const params: WhereOptions = {
       day: moment(date).startOf('d').toDate(),
+      storeId: storeId,
     };
     const result = (await shiftRepo.getShifts(params)).length;
 
@@ -93,12 +100,12 @@ class ShiftService {
   /**
    * Get all shift of a week by day
    */
-  public async getByWeek(date: Date) {
+  public async getByWeek(date: Date, storeId?: string) {
     const result: IShift[] = [];
 
     for (let n = 0; n <= 6; n++) {
       const currentDay = moment(date).weekday(n).toDate();
-      const dayShifts = await this.getByDay(currentDay);
+      const dayShifts = await this.getByDay(currentDay, storeId);
       dayShifts.forEach((dayShift) => {
         result.push(dayShift);
       });
@@ -130,6 +137,7 @@ class ShiftService {
       const params: WhereOptions = {
         shiftNo: shift.shiftNo,
         day: moment(shift.day).startOf('d').toDate(),
+        storeId: shift.storeId,
       };
       const shifts = await shiftRepo.getShifts(params);
       if (shifts.length != 0) throw new Error('Shift already created.');

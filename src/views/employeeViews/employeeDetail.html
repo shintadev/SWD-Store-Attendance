@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Form</title>
   <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+  <title>Employee Form</title>
   <style>
     .employee-container {
       max-width: 800px;
@@ -47,24 +47,21 @@
       border: 1px solid #ccc;
     }
 
-    video {
+    canvas {
       width: 100%;
       max-width: 600px;
       /* Increased max-width for a larger video */
       height: auto;
       border-radius: 8px;
       margin-bottom: 1rem;
-    }
-
-    canvas {
-      position: absolute;
+      /* position: absolute;
       top: 0;
       left: 0;
-      display: none;
+      display: none; */
       /* Initially hidden */
     }
 
-    .employee-btn {
+    .employee-btn .view-btn{
       background-color: #28a745;
       color: white;
       padding: 0.5rem;
@@ -73,7 +70,7 @@
       border-radius: 4px;
     }
 
-    .employee-btn:hover {
+    .employee-btn:hover .view-btn:hover{
       background-color: #218838;
     }
   </style>
@@ -84,24 +81,28 @@
     <div class="home-bar">
       <div class="logo"><a href="/">Store Attendance</a></div>
       <nav>
-        <button class="header-button" onclick="navigateTo('/attendance')">Attendance</button>
-        <button class="header-button" onclick="navigateTo('/employees')">Employee</button>
-        <button class="header-button" onclick="navigateTo('/schedule')">Schedule</button>
-        <button class="header-button" onclick="navigateTo('/users')">User</button>
-        <button class="header-button logout-button" onclick="logout()">Log out</button>
+        <a class="header-button" href="/attendance">Attendance</a>
+        <a class="header-button" href="/employees">Employee</a>
+        <a class="header-button" href="/schedule">Schedule</a>
+        <a class="header-button" id="user-btn" href="/users">User</a>
+        <a class="header-button" id="store-btn" href="/store">Store</a>
+        <button class="header-button logout-button" id="logout-btn">Log out</button>
       </nav>
     </div>
   </header>
 
   <div class="employee-container">
     <div class="column-header">
-      <h1>Update Employee</h1>
+      <h1>Employee Detail</h1>
     </div>
     <form id="employee-form">
       <table>
         <tr>
           <th>Name</th>
           <td><input id="name-input" name="name" placeholder="Nguyen Van A" /></td>
+          <td rowspan="5">
+            <canvas id="canvas"></canvas>
+          </td>
         </tr>
         <tr>
           <th>Date of Birth</th>
@@ -115,18 +116,20 @@
           <th>Address</th>
           <td><input id="address-input" name="address" placeholder="Phường, quận, thành phố" /></td>
         </tr>
-        <tr style="height: 55px"></tr>
+        <tr>
+          <a class="view-btn" href="/employees/attendance-report">View attendance</a>
+        </tr>
       </table>
     </form>
 
     <div style="padding-top: 4px;">
-      <button id="update-employee-btn" class="employee-btn">Update</button>
+      <button id="confirm-employee-btn" class="employee-btn">Confirm</button>
       <button id="cancel-employee-btn" class="employee-btn">Cancel</button>
     </div>
   </div>
 
 </body>
 <script src="/scripts/script.js"></script>
-<script src="/scripts/employeeScripts/employeeUpdate.js"></script>
+<script src="/scripts/employeeScripts/employeeDetail.js"></script>
 
 </html>

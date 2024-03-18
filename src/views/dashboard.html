@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
-  <title>Admin Page</title>
+  <title>Dashboard</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -74,7 +74,9 @@
       margin-bottom: 1rem;
     }
 
-    .recent-activities {}
+    .section {
+      height: 50vh;
+    }
 
     .upcoming-shifts {}
   </style>
@@ -85,11 +87,12 @@
     <div class="home-bar">
       <div class="logo"><a href="/">Store Attendance</a></div>
       <nav>
-        <button class="header-button" onclick="navigateTo('/attendance')">Attendance</button>
-        <button class="header-button" onclick="navigateTo('/employees')">Employee</button>
-        <button class="header-button" onclick="navigateTo('/schedule')">Schedule</button>
-        <button class="header-button" onclick="navigateTo('/users')">User</button>
-        <button class="header-button logout-button" onclick="logout()">Log out</button>
+        <a class="header-button" href="/attendance">Attendance</a>
+        <a class="header-button" href="/employees">Employee</a>
+        <a class="header-button" href="/schedule">Schedule</a>
+        <a class="header-button" id="user-btn" href="/users">User</a>
+        <a class="header-button" id="store-btn" href="/store">Store</a>
+        <button class="header-button logout-button" id="logout-btn">Log out</button>
       </nav>
     </div>
   </header>
@@ -99,39 +102,16 @@
     <div class="statistics">
       <div class="statistic">Total Employees: <span id="totalEmps"></span></div>
       <div class="statistic">Total Users: <span id="totalUsers"></span></div>
-      <div class="statistic">Attendance Rate: <span id="attendanceRate"></span>%</div>
     </div>
 
-    <h1 class="section-header">Recent Activities</h1>
-    <div class="section recent-activities">
-      <!-- Display recent activity log -->
-    </div>
-
-    <h1 class="section-header">Upcoming Shifts</h1>
-    <div class="section upcoming-shifts">
-      <!-- Display upcoming shifts -->
+    <h1 class="section-header">Attendance Rate Of Week:</h1>
+    <div class="section">
+      <canvas id="myChart"></canvas>
     </div>
   </div>
-  <script src="scripts/script.js"></script>
-  <script>
-    async function preStart() {
-      const totalEmps = document.getElementById('totalEmps')
-      const totalUsers = document.getElementById('totalUsers')
-      const attendanceRate = document.getElementById('attendanceRate')
-
-      const response = await fetch('api/admin', {
-        method: 'GET'
-      });
-
-      const result = await response.json();
-
-      totalEmps.innerText = result.totalEmps ?? 0
-      totalUsers.innerText = result.totalUsers ?? 0
-      attendanceRate.innerText = result.attendanceRate ?? 0
-    }
-
-    preStart()
-  </script>
 </body>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="scripts/script.js"></script>
+  <script src="scripts/dashboard.js"></script>
 
 </html>

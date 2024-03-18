@@ -1,8 +1,8 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import { IUser, User } from '@src/models/User';
-import { RouteError } from '@src/other/classes';
-import userRepo from '@src/repos/user.repo';
-import { getHash } from '@src/util/auth.util';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import { IUser, User } from '../models/User';
+import { RouteError } from '../other/classes';
+import userRepo from '../repos/user.repo';
+import { getHash } from '../util/auth.util';
 
 // **** Variables **** //
 
@@ -19,7 +19,7 @@ class UserService {
   public async getById(id: string) {
     try {
       const result = await userRepo.getById(id);
-
+      if (!result) throw new Error('User not found.');
       return result.dataValues;
     } catch (error) {
       console.log('🚀 ~ UserService ~ getById ~ error:', error);

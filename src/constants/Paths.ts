@@ -9,12 +9,14 @@ export default {
     CRUD: '/',
     List: '/list',
     All: '/all',
+    Attendance: '/attendance-report',
   },
   Shift: {
     Base: '/shift',
     CRUD: '/',
     Schedule: '/schedule',
     Assign: '/assign',
+    Attendance: '/attendance-report',
   },
   Attendance: {
     Base: '/attendance',
@@ -25,14 +27,20 @@ export default {
     CRUD: '/',
     List: '/list',
   },
+  Store: {
+    Base: '/store',
+    CRUD: '/',
+    List: '/list',
+    All: '/all',
+  },
   Auth: {
     Base: '/auth',
     Login: '/login',
     Logout: '/logout',
     RefreshToken: '/refresh-token',
   },
-  Admin: {
-    Base: '/admin',
+  Dashboard: {
+    Base: '/dashboard',
   },
 } as const;
 

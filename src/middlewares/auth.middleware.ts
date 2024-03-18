@@ -1,15 +1,15 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import { RouteError } from '@src/other/classes';
-import { IReq, IRes } from '@src/routes/types/types';
-import { EXPIRE_SESSION_ERROR, INVALID_TOKEN_ERROR } from '@src/services/auth.service';
-import keyService from '@src/services/key.service';
-import userService from '@src/services/user.service';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import { RouteError } from '../other/classes';
+import { IReq, IRes } from '../routes/types/types';
+import { EXPIRE_SESSION_ERROR, INVALID_TOKEN_ERROR } from '../services/auth.service';
+import keyService from '../services/key.service';
+import userService from '../services/user.service';
 import { NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 // **** Functions **** //
 
-export const isAuthenticated = async (req: IReq, res: IRes, next?: NextFunction) => {
+export const isAuthenticated = async (req: IReq, _: IRes, next?: NextFunction) => {
   const uid = req.signedCookies['uid'];
   const accessToken = req.signedCookies['token'];
 

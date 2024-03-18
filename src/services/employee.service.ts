@@ -1,7 +1,7 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import { Employee, IEmployee } from '@src/models/Employee';
-import { RouteError } from '@src/other/classes';
-import employeeRepo from '@src/repos/employee.repo';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import { Employee, IEmployee } from '../models/Employee';
+import { RouteError } from '../other/classes';
+import employeeRepo from '../repos/employee.repo';
 
 // **** Variables **** //
 
@@ -16,7 +16,7 @@ class EmployeeService {
   /**
    * Get one employee.
    */
-  public async getOne(id: string): Promise<IEmployee> {
+  public async getOne(id: string) {
     try {
       const result = await employeeRepo.getById(id);
 
@@ -89,6 +89,44 @@ class EmployeeService {
       return result;
     } catch (error) {
       console.log('🚀 ~ EmployeeService ~ updateOne ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, EMPLOYEE_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * activate an employee by their id.
+   */
+  public async activateOne(id: string) {
+    const persists = await employeeRepo.persists(id);
+    if (!persists) {
+      throw new RouteError(HttpStatusCodes.NOT_FOUND, EMPLOYEE_NOT_FOUND_ERROR);
+    }
+    try {
+      const result = await employeeRepo.activate(id);
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ EmployeeService ~ _delete ~ error:', error);
+
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, EMPLOYEE_REQUEST_ERROR);
+    }
+  }
+
+  /**
+   * Inactivate an employee by their id.
+   */
+  public async inactivateOne(id: string) {
+    const persists = await employeeRepo.persists(id);
+    if (!persists) {
+      throw new RouteError(HttpStatusCodes.NOT_FOUND, EMPLOYEE_NOT_FOUND_ERROR);
+    }
+    try {
+      const result = await employeeRepo.inactivate(id);
+
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ EmployeeService ~ _delete ~ error:', error);
 
       throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, EMPLOYEE_REQUEST_ERROR);
     }

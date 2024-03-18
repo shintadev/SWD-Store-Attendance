@@ -3,7 +3,6 @@
  */
 
 import { NextFunction, Request, Response } from 'express';
-import moment from 'moment';
 import { nanoid } from 'nanoid';
 
 /**
@@ -28,21 +27,12 @@ export function tick(milliseconds: number): Promise<void> {
  * Generate new random Id
  */
 export function generateId(seed: string) {
-  let result;
-
-  if (moment(seed).isValid()) {
-    const date = moment(seed);
-    let month = (date.month() + 1).toString();
-    if (date.month() + 1 < 10) month = '0' + (date.month() + 1).toString();
-    result = date.date().toString() + month + date.year() + nanoid(4);
-  } else {
-    const name = seed.split(' ');
-    let id = name[name.length - 1];
-    for (let i = 0; i < name.length - 1; i++) {
-      id = id + name[i].charAt(0);
-    }
-    result = id + nanoid(10 - id.length);
+  const name = seed.split(' ');
+  let id = name[name.length - 1];
+  for (let i = 0; i < name.length - 1; i++) {
+    id = id + name[i].charAt(0);
   }
+  const result = id + nanoid(10 - id.length);
 
   return result;
 }

@@ -1,15 +1,15 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
 import { Router, json } from 'express';
 import { IReq, IRes } from './types/types';
-import Paths from '@src/constants/Paths';
-import { asyncHandler } from '@src/util/misc';
-// import attendanceService from '@src/services/attendance.service';
-// import shiftService from '@src/services/shift.service';
-import { RouteError } from '@src/other/classes';
-import imageService from '@src/services/image.service';
+import Paths from '../constants/Paths';
+import { asyncHandler } from '../util/misc';
+// import attendanceService from '../services/attendance.service';
+// import shiftService from '../services/shift.service';
+import { RouteError } from '../other/classes';
+import imageService from '../services/image.service';
 import multer from 'multer';
-import shiftService from '@src/services/shift.service';
-import attendanceService from '@src/services/attendance.service';
+import shiftService from '../services/shift.service';
+import attendanceService from '../services/attendance.service';
 
 // ** Add Router ** //
 
@@ -24,14 +24,19 @@ const upload = multer();
 interface AttendanceRequest {
   shiftId?: string;
   employeeId?: string;
+  storeId?: string;
 }
 
 // **** Resolvers **** //
 
 const attendanceResolvers = {
   takeAttendance: async (req: IReq<AttendanceRequest>, res: IRes) => {
+    const { storeId } = req.body;
     const img = req.file;
-    console.log('🚀 ~ takeAttendance: ~ img:', img);
+
+    if (!storeId) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please choose the store.');
+    }
 
     if (!img) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please upload a file');
@@ -43,13 +48,14 @@ const attendanceResolvers = {
     if (!face.FaceId) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
 
     // Get the current shift
-    const shiftId = (await shiftService.getCurrentShift()).id;
+    const shiftId = (await shiftService.getCurrentShift(storeId)).id;
 
     // Create check-in record
-    const message = await attendanceService.takeAttendance(shiftId, face.FaceId);
+    const result = await attendanceService.takeAttendance(shiftId, face.FaceId);
 
     return res.status(HttpStatusCodes.OK).json({
-      message: message,
+      message: result.message,
+      data: result.employee,
     });
   },
 };

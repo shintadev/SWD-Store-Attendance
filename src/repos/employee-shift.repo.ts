@@ -1,4 +1,4 @@
-import { EmployeeShift, IEmployeeShift } from '@src/models/EmployeeShift';
+import { EmployeeShift, IEmployeeShift } from '../models/EmployeeShift';
 import { sequelize } from './sequelize.orm';
 
 // **** Class **** //
@@ -21,7 +21,7 @@ class EmployeeShiftRepo {
           result.push(record.dataValues);
         });
         return result;
-      } else throw new Error('Error while getting record');
+      } else return null;
     });
 
     return result;
@@ -36,6 +36,11 @@ class EmployeeShiftRepo {
         employeeId: employeeId,
         shiftId: shiftId,
       },
+    }).then(function (record) {
+      if (record) {
+        return record.dataValues;
+      }
+      return null;
     });
 
     return result;

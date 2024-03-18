@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { IReq, IRes } from './types/types';
-import { RouteError } from '@src/other/classes';
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import authService from '@src/services/auth.service';
-import EnvVars from '@src/constants/EnvVars';
-import Paths from '@src/constants/Paths';
-import { asyncHandler } from '@src/util/misc';
+import { RouteError } from '../other/classes';
+import HttpStatusCodes from '../constants/HttpStatusCodes';
+import authService from '../services/auth.service';
+import EnvVars from '../constants/EnvVars';
+import Paths from '../constants/Paths';
+import { asyncHandler } from '../util/misc';
 import { isAuthenticated } from '../middlewares/auth.middleware';
 import multer from 'multer';
 
@@ -32,9 +32,12 @@ const authResolvers = {
     const result = await authService.login(id, password);
 
     res.clearCookie('uid');
+    // res.clearCookie('role');
     res.clearCookie('token');
 
+    console.log('🚀 ~ login: ~ EnvVars.CookieProps.Options:', EnvVars.CookieProps.Options);
     res.cookie('uid', result.uid, EnvVars.CookieProps.Options);
+    // res.cookie('role', result.role, { ...EnvVars.CookieProps.Options, signed: false });
     res.cookie('token', result.accessToken, EnvVars.CookieProps.Options);
 
     res.status(HttpStatusCodes.OK).json({
@@ -44,8 +47,10 @@ const authResolvers = {
     res.end();
   },
 
+
   logout: (_: IReq<AuthRequest>, res: IRes) => {
     res.clearCookie('uid');
+    res.clearCookie('role');
     res.clearCookie('token');
     res.status(HttpStatusCodes.OK).json({
       message: 'Logout successful',

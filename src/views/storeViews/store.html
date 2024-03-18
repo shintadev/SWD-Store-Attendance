@@ -5,13 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
-  <title>Employee</title>
+  <title>Store</title>
   <style>
-    body {
-      overflow: hidden;
-    }
-
-    .employee-container {
+    .user-container {
       width: 800px;
       /* Increased max-width for a wider form */
       margin: 2rem auto;
@@ -66,29 +62,27 @@
       <div class="logo"><a href="/">Store Attendance</a></div>
       <nav>
         <a class="header-button" href="/attendance">Attendance</a>
+        <a class="header-button" href="/employees">Employee</a>
         <a class="header-button" href="/schedule">Schedule</a>
-        <a class="header-button" id="user-btn" href="/users">User</a>
-        <a class="header-button" id="store-btn" href="/store">Store</a>
+        <a class="header-button" href="/users">User</a>
         <button class="header-button logout-button" id="logout-btn">Log out</button>
       </nav>
     </div>
   </header>
 
-  <div class="employee-container">
+  <div class="user-container">
     <div class="title-container">
-      <h1>Employee List</h1>
-      <button id="add-employee-btn">Add➕</button>
+      <h1>Store List</h1>
+      <button id="add-store-btn">Add➕</button>
     </div>
     <div id="list-container">
-      <table id="employee-table">
+      <table id="store-table">
         <thead>
           <tr>
             <th>No.</th>
             <th>ID</th>
             <th>Name</th>
-            <th>Phone</th>
-            <th>Status</th>
-            <th>Operation</th>
+            <th>Manager</th>
           </tr>
         </thead>
         <tbody id="item-list"></tbody>
@@ -102,5 +96,6 @@
   </div>
 </body>
 <script src="scripts/script.js"></script>
-<script src="scripts/employeeScripts/employees.js"></script>
+<script src="scripts/storeScripts/store.js"></script>
+
 </html>
