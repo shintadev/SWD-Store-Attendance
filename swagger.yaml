@@ -1,11 +1,15 @@
 openapi: 3.1.0
 basePath: "/api"
+info:
+  title: Store Attendance
+  description: Đây là thông tin API của dự án Store Attendance bằng face recognition.
 paths:
   /employees:
     get:
-      tags:
-        - Get employee
+      summary: Get an employee by id
       description: Get an employee
+      tags:
+        - Employee
       produces:
         - application/json
       requestBody:
@@ -38,7 +42,10 @@ paths:
                   address:
                     type: string
     post:
+      summary: Create new employee
       description: Create new employee
+      tags:
+        - Employee
       produces:
         - application/json
       requestBody:
@@ -81,7 +88,10 @@ paths:
                   address:
                     type: string
     put:
+      summary: Update an existing employee
       description: Update an employee
+      tags:
+        - Employee
       produces:
         - application/json
       requestBody:
@@ -123,6 +133,9 @@ paths:
                   address:
                     type: string
     delete:
+      tags:
+        - Employee
+      summary: Delete an existing employee
       description: Delete an employee
       requestBody:
         required: true
@@ -137,10 +150,53 @@ paths:
       responses:
         204:
           description: Employee deleted
+  /employees/active:
+    put:
+      tags:
+        - Employee
+      summary: Change active status
+      description: Change active status
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+      responses:
+        200:
+          description: Employee is actived
+  /employees/inactive:
+    put:
+      tags:
+        - Employee
+      summary: Change inactive status
+      description: Change inactive status
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+      responses:
+        200:
+          description: Employee is inactived
   /employees/list:
     get:
       tags:
-        - Get employees list
+        - Employee
+      summary: Get employee's list
       description: Get a list of employees with pagination
       produces:
         - application/json
@@ -173,13 +229,76 @@ paths:
                   totalPages:
                     type: integer
                     description: Total number of pages
+  /employees/all:
+    get:
+      tags:
+        - Employee
+      summary: Get all employees
+      description: Get all employees
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Employee details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request handled
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Employee"
+  /employees/attendance-report:
+    get:
+      tags:
+        - Employee
+      summary: Get attendance report by employee ID
+      parameters:
+        - name: id
+          in: query
+          description: Employee ID
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request handled
+                  data:
+                    type: object
+                    example: { ...attendanceReportResult }
   /shift:
     # CRUD operations for shifts
     get:
-      summary: Get shifts by week
-      description: Retrieves shifts for a given week (defaults to current week)
+      summary: Get shifts by id
+      description: Retrieves shifts for a given id
       tags:
-        - Shifts
+        - Shift
       requestBody:
         required: false
         content:
@@ -187,10 +306,9 @@ paths:
             schema:
               type: object
               properties:
-                day:
+                id:
                   type: string
-                  format: date
-                  description: (Optional) Specific date to retrieve shifts for. Defaults to today.
+                  description: Specific id to retrieve shifts for.
       responses:
         200:
           description: List of shifts for the specified week
@@ -204,13 +322,11 @@ paths:
                     description: Response message
                   data:
                     type: array
-                    items:
-                      $ref: "#/components/schemas/Shift"
     post:
       summary: Create a new shift
       description: Creates a new shift with specified start and end times
       tags:
-        - Shifts
+        - Shift
       requestBody:
         required: true
         content:
@@ -237,13 +353,11 @@ paths:
                   message:
                     type: string
                     description: Response message
-                  data:
-                    $ref: "#/components/schemas/Shift"
     put:
       summary: Update an existing shift
       description: Updates an existing shift with new start and/or end times
       tags:
-        - Shifts
+        - Shift
       requestBody:
         required: true
         content:
@@ -273,13 +387,11 @@ paths:
                   message:
                     type: string
                     description: Response message
-                  data:
-                    $ref: "#/components/schemas/Shift"
     delete:
       summary: Delete an existing shift
       description: Deletes a shift by its ID
       tags:
-        - Shifts
+        - Shift
       requestBody:
         required: true
         content:
@@ -301,15 +413,57 @@ paths:
                   message:
                     type: string
                     description: Response message
+  /shift/schedule:
+    post:
+      tags:
+        - Shift
+      summary: Get shifts by week
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                day:
+                  type: string
+                  format: date
+                  description: The day to start the week (optional, defaults to today)
+                storeId:
+                  type: string
+                  description: Store ID
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request handled
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Shift"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Please input all necessary fields
   /shift/assign:
     # Assign/de-allocate employees to/from shifts
-    get:
-      # ... (existing documentation for GET)
     post:
       summary: Assign employee to a shift
       description: Assigns an employee to a specific shift
       tags:
-        - Shifts
+        - Shift
       requestBody:
         required: true
         content:
@@ -338,37 +492,35 @@ paths:
                     type: object
                     properties:
                       # ... (Shift properties)
-                      employeeOfShift:
-                        $ref: "#/components/schemas/Employee"
-  put:
-    summary: De-allocate employee from a shift
-    description: Removes an employee from an assigned shift
-    tags:
-      - Shifts
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              employeeId:
-                type: string
-                description: ID of the employee to de-assign
-              shiftId:
-                type: string
-                description: ID of the shift to de-assign the employee from
-      responses:
-        200:
-          description: Confirmation message of successful de-allocation
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: Response message
+    put:
+      summary: De-allocate employee from a shift
+      description: Removes an employee from an assigned shift
+      tags:
+        - Shift
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employeeId:
+                  type: string
+                  description: ID of the employee to de-assign
+                shiftId:
+                  type: string
+                  description: ID of the shift to de-assign the employee from
+        responses:
+          200:
+            description: Confirmation message of successful de-allocation
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      description: Response message
   /attendance:
     post:
       summary: Take attendance using facial recognition
@@ -398,14 +550,13 @@ paths:
                     description: Response message
                   data:
                     oneOf:
-                      - $ref: "#/components/schemas/Attendance"
                       - type: object
                         properties:
                           error:
                             type: string
                             description: Error message (e.g., face not found)
-  /user:
-    post:
+  /users:
+    get:
       summary: Get user by id
       tags:
         - User
@@ -432,12 +583,310 @@ paths:
                     description: Response message
                   data:
                     oneOf:
-                      - $ref: "#/components/schemas/Attendance"
                       - type: object
                         properties:
                           error:
                             type: string
                             description: Error message (e.g., face not found)
+    post:
+      tags:
+        - User
+      summary: Create new user
+      description: Create new user
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  required: true
+                role:
+                  type: string
+                  required: true
+      responses:
+        201:
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  password:
+                    type: string
+                  role:
+                    type: string
+    put:
+      tags:
+        - User
+      summary: Update an existing user
+      description: Update a user
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+                password:
+                  type: string
+                role:
+                  type: string
+      responses:
+        200:
+          description: User updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  password:
+                    type: string
+                  role:
+                    type: string
+    delete:
+      tags:
+        - User
+      summary: Delete an existing user
+      description: Delete a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+      responses:
+        204:
+          description: User deleted
+  /users/list:
+    get:
+      tags:
+        - User
+      summary: Get user's list
+      description: Get a list of user with pagination
+      produces:
+        - application/json
+      parameters:
+        - in: "query"
+          name: "page"
+          type: integer
+          default: 1
+          description: Page number (optional)
+        - in: "query"
+          name: "pageSize"
+          type: integer
+          default: 10
+          description: Page size (optional)
+      responses:
+        200:
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  employees:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/users"
+  /store:
+    get:
+      tags:
+        - Store
+      summary: Get a store by id
+      description: Get a store by id
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+      responses:
+        200:
+          description: store details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  managerId:
+                    type: string
+    post:
+      tags:
+        - Store
+      summary: Create new store
+      description: Create new store
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  required: true
+                managerId:
+                  type: string
+                  required: true
+      responses:
+        201:
+          description: Store created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  managerId:
+                    type: string
+    put:
+      tags:
+        - Store
+      summary: Update an existing store
+      description: Update a store
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+                name:
+                  type: string
+                managerId:
+                  type: string
+      responses:
+        200:
+          description: Store updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  managerId:
+                    type: string
+    delete:
+      tags:
+        - Store
+      summary: Delete an existing store
+      description: Delete a store
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  required: true
+      responses:
+        204:
+          description: Store deleted
   /auth/login:
+    tags:
+      - Authorization
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: User ID
+                password:
+                  type: string
+                  description: Password
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successfully
+                  data:
+                    type: object
+                    properties:
+                      uid:
+                        type: string
+                      role:
+                        type: string
+                      accessToken:
+                        type: string
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Please input all necessary fields
+
   /auth/logout:
-  /auth/refresh-token:
+    tags:
+      - Authorization
+    post:
+      summary: Logout
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logout successful
