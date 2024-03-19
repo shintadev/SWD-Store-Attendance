@@ -61,11 +61,10 @@ export const User = sequelize.define<UserModel>('user', {
 // **** Relationship **** //
 
 // Employee 1:1 User
-Employee.hasOne(User, {
+Employee.hasOne(User, {});
+User.belongsTo(Employee, {
   onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
-});
-User.belongsTo(Employee, {
   foreignKey: 'id',
   targetKey: 'id',
 });

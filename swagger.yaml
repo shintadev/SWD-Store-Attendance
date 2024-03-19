@@ -295,8 +295,8 @@ paths:
   /shift:
     # CRUD operations for shifts
     get:
-      summary: Get shifts by week
-      description: Retrieves shifts for a given week (defaults to current week)
+      summary: Get shifts by id
+      description: Retrieves shifts for a given id
       tags:
         - Shift
       requestBody:
@@ -306,10 +306,9 @@ paths:
             schema:
               type: object
               properties:
-                day:
+                id:
                   type: string
-                  format: date
-                  description: (Optional) Specific date to retrieve shifts for. Defaults to today.
+                  description: Specific id to retrieve shifts for.
       responses:
         200:
           description: List of shifts for the specified week
@@ -891,21 +890,3 @@ paths:
                   message:
                     type: string
                     example: Logout successful
-
-  /auth/refresh-token:
-    tags:
-      - Authorization
-    post:
-      summary: Refresh token
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                uid:
-                  type: string
-                  description: User ID
-                token:
-                  type: string

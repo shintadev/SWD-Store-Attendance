@@ -32,7 +32,7 @@ const authResolvers = {
     const result = await authService.login(id, password);
 
     res.clearCookie('uid');
-    // res.clearCookie('role');
+    res.clearCookie('role');
     res.clearCookie('token');
 
     console.log('🚀 ~ login: ~ EnvVars.CookieProps.Options:', EnvVars.CookieProps.Options);
