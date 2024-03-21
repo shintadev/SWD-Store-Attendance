@@ -20,11 +20,15 @@ class UserService {
     try {
       const result = await userRepo.getById(id);
       if (!result) throw new Error('User not found.');
-      return result.dataValues;
-    } catch (error) {
-      console.log('🚀 ~ UserService ~ getById ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
+      return result;
+    } catch (error) {
+    console.log("🚀 ~ UserService ~ getById ~ error:", error)
+
+
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
     }
   }
 
@@ -40,9 +44,11 @@ class UserService {
       const result = { users, total, totalPages };
       return result;
     } catch (error) {
-      console.log('🚀 ~ userService ~ getOne ~ error:', error);
+    console.log('🚀 ~ UserService ~ getList ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
+    if (error instanceof Error)
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+    else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
     }
   }
 
@@ -55,11 +61,13 @@ class UserService {
 
       const result = await userRepo.create(user);
 
-      return result.dataValues;
+      return result;
     } catch (error) {
-      console.log('🚀 ~ UserService ~ createOne ~ error:', error);
+    console.log('🚀 ~ UserService ~ createOne ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
+    if (error instanceof Error)
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+    else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
     }
   }
 
@@ -72,9 +80,11 @@ class UserService {
 
       return result;
     } catch (error) {
-      console.log('🚀 ~ UserService ~ updateOne ~ error:', error);
+    console.log('🚀 ~ UserService ~ updateOne ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
+    if (error instanceof Error)
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+    else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
     }
   }
 
@@ -87,24 +97,28 @@ class UserService {
 
       return result;
     } catch (error) {
-      console.log('🚀 ~ UserService ~ deleteOne ~ error:', error);
+    console.log('🚀 ~ UserService ~ deleteOne ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
+    if (error instanceof Error)
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+    else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
     }
   }
 
   /**
    * getTotalUsers
    */
-  public getTotalUsers() {
+  public async getTotalUsers() {
     try {
-      const result = User.count();
+      const result = await User.count();
 
       return result;
     } catch (error) {
-      console.log('🚀 ~ UserService ~ getTotalUsers ~ error:', error);
+    console.log('🚀 ~ UserService ~ getTotalUsers ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
+    if (error instanceof Error)
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+    else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, USER_REQUEST_ERROR);
     }
   }
 }

@@ -6,8 +6,8 @@ import { Shift } from './Shift';
 // **** Types **** //
 
 export interface IAttendance {
-  checkInTime: Date;
-  checkOutTime?: Date;
+  checkInTime: string;
+  checkOutTime?: string;
   shiftId: string;
   employeeId: string;
 }
@@ -18,11 +18,11 @@ export interface AttendanceModel extends Model<IAttendance>, IAttendance {}
 
 export const Attendance = sequelize.define<AttendanceModel>('attendance', {
   checkInTime: {
-    type: DataTypes.DATE,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   checkOutTime: {
-    type: DataTypes.DATE,
+    type: DataTypes.STRING,
     allowNull: true,
   },
   shiftId: {
@@ -80,7 +80,7 @@ Attendance.belongsTo(Shift);
 /**
  * Create new Attendance.
  */
-function new_(checkInTime: Date, shiftId: string, employeeId: string): IAttendance {
+function new_(checkInTime: string, shiftId: string, employeeId: string): IAttendance {
   return {
     checkInTime: checkInTime,
     shiftId: shiftId,

@@ -19,11 +19,15 @@ class StoreService {
     try {
       const result = await storeRepo.getById(id);
       if (!result) throw new Error('Store not found.');
-      return result.dataValues;
-    } catch (error) {
-      console.log('🚀 ~ StoreService ~ getById ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
+      return result;
+    } catch (error) {
+    console.log('🚀 ~ StoreService ~ getById ~ error:', error);
+
+
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
     }
   }
 
@@ -36,9 +40,12 @@ class StoreService {
 
       return result;
     } catch (error) {
-      console.log('🚀 ~ storeService ~ getAll ~ error:', error);
+    console.log('🚀 ~ StoreService ~ getAll ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
+
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
     }
   }
 
@@ -54,9 +61,11 @@ class StoreService {
       const result = { stores, total, totalPages };
       return result;
     } catch (error) {
-      console.log('🚀 ~ StoreService ~ getOne ~ error:', error);
+      console.log('🚀 ~ StoreService ~ getList ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
     }
   }
 
@@ -67,11 +76,13 @@ class StoreService {
     try {
       const result = await storeRepo.create(store);
 
-      return result.dataValues;
+      return result;
     } catch (error) {
       console.log('🚀 ~ StoreService ~ createOne ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
     }
   }
 
@@ -86,7 +97,9 @@ class StoreService {
     } catch (error) {
       console.log('🚀 ~ StoreService ~ updateOne ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
     }
   }
 
@@ -101,7 +114,9 @@ class StoreService {
     } catch (error) {
       console.log('🚀 ~ StoreService ~ deleteOne ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, STORE_REQUEST_ERROR);
     }
   }
 }

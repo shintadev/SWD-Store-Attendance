@@ -25,7 +25,7 @@ addBtn.addEventListener('click', async function () {
   const formData = new FormData();
 
   const shiftNo = shiftInput.value;
-  const date = dateInput.value;
+  const date = dateInput.value.toISOString();
   const storeId = storeInput.value;
 
   formData.append('shiftNo', shiftNo);

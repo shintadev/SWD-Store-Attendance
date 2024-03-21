@@ -24,86 +24,167 @@ interface StoreRequest {
 // **** Resolvers **** //
 
 const storeResolvers = {
-  getById: async (req: IReq<StoreRequest>, res: IRes) => {
+  getById: async (req: IReq, res: IRes) => {
     const id = String(req.query.id);
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
-    const store = await storeService.getById(id);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: store,
-    });
+    try {
+      const result = await storeService.getById(id);
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ getById: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   /**
    * Get all stores.
    */
   getAll: async (_: IReq, res: IRes) => {
-    const store = await storeService.getAll();
+    try {
+      const result = await storeService.getAll();
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: store,
-    });
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ getAll: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   /**
    * Get list Stores.
    */
-  getList: async (req: IReq<StoreRequest>, res: IRes) => {
+  getList: async (req: IReq, res: IRes) => {
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 10;
-    const result = await storeService.getList(page, pageSize);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: result,
-    });
+    try {
+      const result = await storeService.getList(page, pageSize);
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ getList: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   create: async (req: IReq<StoreRequest>, res: IRes) => {
     const { name, managerId } = req.body;
     if (!name || !managerId) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
-    const store = Store.new(name, managerId);
 
-    const result = await storeService.createOne(store);
+    try {
+      const store = Store.new(name, managerId);
 
-    return res.status(HttpStatusCodes.CREATED).json({
-      message: 'Store created',
-      data: result,
-    });
+      const result = await storeService.createOne(store);
+
+      return res.status(HttpStatusCodes.CREATED).json({
+        message: 'Create successfully',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ create: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   update: async (req: IReq<StoreRequest>, res: IRes) => {
     const { id, name, managerId } = req.body;
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
 
-    const result = await storeService.updateOne(id, name, managerId);
+    try {
+      const result = await storeService.updateOne(id, name, managerId);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: result ?? 'Nothing to update.',
-    });
+      return res.status(HttpStatusCodes.OK).json({
+        message: result ? 'Update successfully' : 'Nothing to update.',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ update: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
-  delete: async (req: IReq<StoreRequest>, res: IRes) => {
-    const { id } = req.body;
+  delete: async (req: IReq, res: IRes) => {
+    const id = String(req.query.id);
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
 
-    const result = await storeService.deleteOne(id);
+    try {
+      const result = await storeService.deleteOne(id);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: result,
-    });
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Delete successfully',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ delete: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 };
 
@@ -112,16 +193,14 @@ const storeResolvers = {
 storeRouter
   .route(Paths.Store.CRUD)
   .all(isAuthenticated)
-  .get(multer().none(), asyncHandler(storeResolvers.getById))
+  .get(asyncHandler(storeResolvers.getById))
   .post(multer().none(), isAdmin, asyncHandler(storeResolvers.create))
   .put(multer().none(), isAdmin, asyncHandler(storeResolvers.update))
-  .delete(multer().none(), isAdmin, asyncHandler(storeResolvers.delete));
+  .delete(isAdmin, asyncHandler(storeResolvers.delete));
 
-storeRouter.route(Paths.Store.All).get(multer().none(), asyncHandler(storeResolvers.getAll));
+storeRouter.route(Paths.Store.All).get(asyncHandler(storeResolvers.getAll));
 
-storeRouter
-  .route(Paths.Store.List)
-  .get(multer().none(), isAuthenticated, asyncHandler(storeResolvers.getList));
+storeRouter.route(Paths.Store.List).get(isAuthenticated, asyncHandler(storeResolvers.getList));
 
 // **** Export default **** //
 

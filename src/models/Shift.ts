@@ -1,5 +1,4 @@
 import { sequelize } from '../repos/sequelize.orm';
-import moment from 'moment';
 import { DataTypes, Model } from 'sequelize';
 import { Store } from './Store';
 
@@ -8,8 +7,8 @@ import { Store } from './Store';
 export interface IShift {
   id: string;
   shiftNo: number;
-  day: Date;
-  storeId: string;
+  day: string;
+  storeId?: string;
 }
 
 interface ShiftModel extends Model<IShift>, IShift {}
@@ -33,7 +32,7 @@ export const Shift = sequelize.define<ShiftModel>('shift', {
     },
   },
   day: {
-    type: DataTypes.DATE,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   storeId: {
@@ -60,12 +59,12 @@ Shift.belongsTo(Store);
 /**
  * Create new Shift.
  */
-function new_(shiftNo: number, day: Date, storeId: string): IShift {
-  const seed = new Date(day).toISOString();
-  const date = moment(seed);
-  let month = (date.month() + 1).toString();
-  if (date.month() + 1 < 10) month = '0' + (date.month() + 1).toString();
-  const id = date.date().toString() + month + date.year() + '_' + shiftNo + '_' + storeId;
+function new_(shiftNo: number, day: string, storeId: string): IShift {
+  const date = new Date(day);
+  let month = (date.getUTCMonth() + 1).toString();
+  if (date.getUTCMonth() + 1 < 10) month = '0' + (date.getUTCMonth() + 1).toString();
+  const id =
+    date.getUTCDate().toString() + month + date.getUTCFullYear() + '_' + shiftNo + '_' + storeId;
   return {
     id: id,
     shiftNo: shiftNo,
@@ -78,7 +77,14 @@ function new_(shiftNo: number, day: Date, storeId: string): IShift {
  * See if the param meets criteria to be a Shift.
  */
 function isShift(arg: unknown): boolean {
-  return !!arg && typeof arg === 'object' && 'id' in arg && 'shiftNo' in arg && 'day' in arg;
+  return (
+    !!arg &&
+    typeof arg === 'object' &&
+    'id' in arg &&
+    'shiftNo' in arg &&
+    'day' in arg &&
+    'storeId' in arg
+  );
 }
 
 // **** Export default **** //

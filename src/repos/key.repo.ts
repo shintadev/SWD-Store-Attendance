@@ -12,7 +12,7 @@ class KeyRepo {
   public async getById(id: string) {
     const result = await Key.findByPk(id).then(function (key) {
       if (key) {
-        return key;
+        return key.dataValues;
       } else return null;
     });
     return result;

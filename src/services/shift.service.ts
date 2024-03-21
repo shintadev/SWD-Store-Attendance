@@ -9,7 +9,6 @@ import Shifts from '../constants/Shifts';
 
 // **** Variables **** //
 
-const SHIFT_NOT_FOUND_ERROR = 'Shift not found';
 const SHIFT_REQUEST_ERROR = 'Request can not be handle';
 
 // **** Class **** //
@@ -28,7 +27,9 @@ class ShiftService {
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ getById ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_NOT_FOUND_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
     }
   }
 
@@ -36,22 +37,23 @@ class ShiftService {
    * Get current shift.
    */
   public async getCurrentShift(storeId: string) {
-    const now = moment();
-    const currentHour = now.hours();
-    const currentMinute = now.minutes();
+    const now = new Date();
+    let currentHour = now.getUTCHours() + 7;
+    if (currentHour >= 24) currentHour -= 24;
+    const currentMinute = now.getUTCMinutes();
     const currentTime = currentHour + ':' + currentMinute;
 
     const currentShift = Shifts.find((shift) => {
       return currentTime >= shift.startTime && currentTime < shift.endTime;
     });
-
     if (!currentShift) throw new Error('No shift currently');
-    const params = {
-      day: now.startOf('d').toDate(),
-      storeId: storeId,
-    };
 
     try {
+      const params = {
+        day: now.toISOString(),
+        storeId: storeId,
+      };
+
       const shifts = await shiftRepo.getShifts(params); //Get all shift today of a store
 
       const result = shifts.find((shift) => {
@@ -63,11 +65,9 @@ class ShiftService {
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ getCurrentShift ~ error:', error);
 
-      if (error instanceof Error) {
+      if (error instanceof Error)
         throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
-      } else {
-        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_NOT_FOUND_ERROR);
-      }
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
     }
   }
 
@@ -75,58 +75,45 @@ class ShiftService {
    * Get all shift of a specific day
    */
   public async getByDay(date: Date, storeId?: string) {
-    const params: WhereOptions = {
-      day: moment(date).startOf('d').toDate(),
-    };
-    if (storeId) params.storeId = storeId;
-    const result = await shiftRepo.getShifts(params);
+    try {
+      const params: WhereOptions = {
+        day: date.toISOString(),
+      };
+      if (storeId) params.storeId = storeId;
+      const result = await shiftRepo.getShifts(params);
 
-    return result;
-  }
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ ShiftService ~ getByDay ~ error:', error);
 
-  /**
-   * getDayCount
-   */
-  public async getDayCount(date: Date, storeId?: string) {
-    const params: WhereOptions = {
-      day: moment(date).startOf('d').toDate(),
-      storeId: storeId,
-    };
-    const result = (await shiftRepo.getShifts(params)).length;
-
-    return result;
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
+    }
   }
 
   /**
    * Get all shift of a week by day
    */
-  public async getByWeek(date: Date, storeId?: string) {
+  public async getByWeek(date: string, storeId?: string) {
     const result: IShift[] = [];
+    try {
+      for (let n = 0; n <= 6; n++) {
+        const currentDay = moment(date).weekday(n).toDate();
+        const dayShifts = await this.getByDay(currentDay, storeId);
+        dayShifts.forEach((dayShift) => {
+          result.push(dayShift);
+        });
+      }
 
-    for (let n = 0; n <= 6; n++) {
-      const currentDay = moment(date).weekday(n).toDate();
-      const dayShifts = await this.getByDay(currentDay, storeId);
-      dayShifts.forEach((dayShift) => {
-        result.push(dayShift);
-      });
+      return result;
+    } catch (error) {
+      console.log('🚀 ~ ShiftService ~ getByWeek ~ error:', error);
+
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
     }
-
-    return result;
-  }
-
-  /**
-   * getWeekCount
-   */
-  public async getWeekCount(date: Date) {
-    let result = 0;
-
-    for (let n = 0; n <= 6; n++) {
-      const currentDay = moment(date).weekday(n).toDate();
-      const dayShifts = await this.getDayCount(currentDay);
-      result += dayShifts;
-    }
-
-    return result;
   }
 
   /**
@@ -136,37 +123,38 @@ class ShiftService {
     try {
       const params: WhereOptions = {
         shiftNo: shift.shiftNo,
-        day: moment(shift.day).startOf('d').toDate(),
+        day: new Date(shift.day).toISOString(),
         storeId: shift.storeId,
       };
       const shifts = await shiftRepo.getShifts(params);
       if (shifts.length != 0) throw new Error('Shift already created.');
+
       const result = await shiftRepo.create(shift);
 
-      return result.dataValues;
+      return result;
     } catch (error) {
-      console.log('🚀 ~ ShiftService ~ addOne ~ error:', error);
+      console.log('🚀 ~ ShiftService ~ createOne ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
     }
   }
 
   /**
    * Update one shift
    */
-  public async updateOne(id: string, shiftNo?: number, day?: Date) {
-    const persists = await shiftRepo.persists(id);
-    if (!persists) {
-      throw new RouteError(HttpStatusCodes.NOT_FOUND, SHIFT_NOT_FOUND_ERROR);
-    }
+  public async updateOne(shift: IShift) {
     try {
-      const result = await shiftRepo.update(id, shiftNo, moment(day).startOf('d').toDate());
+      const result = await shiftRepo.update(shift);
 
       return result;
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ updateOne ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
     }
   }
 
@@ -174,18 +162,16 @@ class ShiftService {
    * Delete one shift
    */
   public async deleteOne(id: string) {
-    const persists = await shiftRepo.persists(id);
-    if (!persists) {
-      throw new RouteError(HttpStatusCodes.NOT_FOUND, SHIFT_NOT_FOUND_ERROR);
-    }
     try {
       const result = await shiftRepo.delete(id);
 
       return result;
     } catch (error) {
-      console.log('🚀 ~ ShiftService ~ updateOne ~ error:', error);
+      console.log('🚀 ~ ShiftService ~ deleteOne ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
     }
   }
 
@@ -200,12 +186,14 @@ class ShiftService {
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ getEmployeesOfShift ~ error:', error);
 
-      throw error;
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
     }
   }
 
   /**
-   * get Employee Shift By ShiftId
+   * Get employee shift by shiftId
    */
   public async getEmployeeShiftByShiftId(shiftId: string) {
     try {
@@ -215,7 +203,9 @@ class ShiftService {
     } catch (error) {
       console.log('🚀 ~ ShiftService ~ getEmployeeShiftByShiftId ~ error:', error);
 
-      throw error;
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
     }
   }
 
@@ -230,11 +220,11 @@ class ShiftService {
       };
       const result = await employeeShiftRepo.create(employeeShift);
 
-      return result.dataValues;
+      return result;
     } catch (error) {
-      console.log('🚀 ~ ShiftService ~ assignEmployee ~ error:', error);
-
-      throw error;
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
     }
   }
 
@@ -251,9 +241,9 @@ class ShiftService {
 
       return result;
     } catch (error) {
-      console.log('🚀 ~ ShiftService ~ deAllocateEmployee ~ error:', error);
-
-      throw error;
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, SHIFT_REQUEST_ERROR);
     }
   }
 }

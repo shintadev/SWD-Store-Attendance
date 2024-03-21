@@ -28,7 +28,7 @@ async function preStart() {
 
 async function renderItems() {
   const formData = new FormData();
-  formData.append('day', dateChoice.value);
+  formData.append('day', dateChoice.value.toISOString());
   formData.append('storeId', storeInput.value ?? '');
 
   const response = await fetch('api/shift/schedule', {
@@ -52,7 +52,8 @@ async function renderItems() {
       data.every((shift) => {
         const day = new Date(shift.day);
         if (shift.shiftNo === row && day.getDay() === col) {
-          cell.innerHTML = day.getDate() + '/' + day.getMonth() + '/' + day.getFullYear() + '<br>';
+          cell.innerHTML =
+            day.getDate() + '/' + (day.getMonth() + 1) + '/' + day.getFullYear() + '<br>';
           const detailBtn = document.createElement('button');
           const deleteBtn = document.createElement('button');
           detailBtn.innerText = 'Detail';

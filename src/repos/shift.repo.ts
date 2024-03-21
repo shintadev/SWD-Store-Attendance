@@ -6,7 +6,7 @@ import { sequelize } from './sequelize.orm';
 
 interface updateParams {
   shiftNo?: number;
-  day?: Date;
+  day?: string;
 }
 
 // **** Class **** //
@@ -18,15 +18,12 @@ class ShiftRepo {
    * Get one shift.
    */
   public async getById(id: string) {
-    const result = await Shift.findOne({
-      where: {
-        id: id,
-      },
-    }).then(function (shift) {
+    const result = await Shift.findByPk(id).then(function (shift) {
       if (shift) {
         return shift.dataValues;
       } else return null;
     });
+
     return result;
   }
 
@@ -45,18 +42,8 @@ class ShiftRepo {
       }
       return output;
     });
-    return result;
-  }
 
-  /**
-   * See if a shift with the given id exists.
-   */
-  public async persists(id: string): Promise<boolean> {
-    const shift = await Shift.findOne({
-      where: { id: id },
-    });
-    if (shift) return true;
-    else return false;
+    return result;
   }
 
   /**
@@ -68,7 +55,7 @@ class ShiftRepo {
       const result = await Shift.create(shift, { transaction: transaction });
       transaction.commit();
 
-      return result;
+      return result.dataValues;
     } catch (error) {
       transaction.rollback();
       throw error;
@@ -78,31 +65,36 @@ class ShiftRepo {
   /**
    * Update a shift.
    */
-  public async update(id: string, shiftNo?: number, day?: Date) {
-    const updateValues: updateParams = {};
-
-    if (shiftNo) {
-      updateValues.shiftNo = shiftNo;
-    }
-
-    if (day) {
-      updateValues.day = day;
-    }
-
+  public async update(shift: IShift) {
     const transaction = await sequelize.transaction();
     try {
-      // Only execute the update if there are values to update
-      if (Object.keys(updateValues).length > 0) {
-        const result = await Shift.update(updateValues, {
-          where: {
-            id: id,
-          }, // Use shorthand for where clause
-          transaction: transaction,
-        });
-        transaction.commit();
+      const oldRecord = await Shift.findOne({
+        where: {
+          id: shift.id,
+        },
+      }).then(function (shift) {
+        if (shift) {
+          return shift.dataValues;
+        } else throw Error('Shift not found');
+      });
 
-        return result;
-      }
+      const updateValues: updateParams = {};
+
+      if (shift.shiftNo !== oldRecord.shiftNo) {
+        updateValues.shiftNo = shift.shiftNo;
+      } else if (shift.day !== oldRecord.day) {
+        updateValues.day = shift.day;
+      } else return null;
+
+      const result = await Shift.update(updateValues, {
+        where: {
+          id: shift.id,
+        },
+        transaction: transaction,
+      });
+      transaction.commit();
+
+      return result;
     } catch (error) {
       transaction.rollback();
       throw error;

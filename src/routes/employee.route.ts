@@ -10,7 +10,7 @@ import employeeService from '../services/employee.service';
 import multer from 'multer';
 import { RouteError } from '../other/classes';
 import attendanceService from '../services/attendance.service';
-import { isAdmin } from '../middlewares/auth.middleware';
+import { isAdmin, isAuthenticated } from '../middlewares/auth.middleware';
 
 // ** Add Router ** //
 
@@ -22,21 +22,12 @@ const upload = multer();
 
 // **** Types **** //
 
-export interface FaceRequest {
-  img?: File;
-}
-
 export interface EmployeeRequest {
   id?: string;
   name?: string;
-  DOB?: Date;
+  DOB?: string;
   phone?: string;
   address?: string;
-}
-
-export interface EmployeesRequest {
-  page?: number;
-  pageSize?: number;
 }
 
 // **** Resolvers **** //
@@ -48,30 +39,57 @@ const employeeResolvers = {
   getOne: async (req: IReq, res: IRes) => {
     const id = String(req.query.id);
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
-    const employee = await employeeService.getOne(id); // Get employee info
-    if (!employee) throw new Error('Employee not found.');
-    const imgUrl = await fileService.getUrlFromCloud(employee.publicId);
 
-    const result = { ...employee, imgUrl };
+    try {
+      const employee = await employeeService.getOne(id); // Get employee info
+      if (!employee) throw new Error('Employee not found.');
+      const imgUrl = await fileService.getUrlFromCloud(employee.publicId);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: result,
-    });
+      const result = { ...employee, imgUrl };
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ getOne: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   /**
    * Get all active employees.
    */
   getAll: async (_: IReq, res: IRes) => {
-    const employee = await employeeService.getAll();
+    try {
+      const employee = await employeeService.getAll();
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: employee,
-    });
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: employee,
+      });
+    } catch (error) {
+      console.log('🚀 ~ getAll: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   /**
@@ -80,12 +98,26 @@ const employeeResolvers = {
   getList: async (req: IReq, res: IRes) => {
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 10;
-    const result = await employeeService.getList(page, pageSize);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: result,
-    });
+    try {
+      const result = await employeeService.getList(page, pageSize);
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ getList: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   /**
@@ -94,16 +126,30 @@ const employeeResolvers = {
   getAttendanceReport: async (req: IReq, res: IRes) => {
     const id = String(req.query.id);
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 10;
-    const result = await attendanceService.getByEmployeeId(id, page, pageSize);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: result,
-    });
+    try {
+      const result = await attendanceService.getByEmployeeId(id, page, pageSize);
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ getAttendanceReport: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   /**
@@ -111,14 +157,14 @@ const employeeResolvers = {
    */
   add: async (req: IReq<EmployeeRequest>, res: IRes) => {
     const { name, DOB, phone, address } = req.body;
-
     const img = req.file;
     if (!name || !DOB || !phone || !address) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
     if (!img) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please upload a file');
     }
+
     const imgBuffer = img.buffer;
     try {
       // Index faces using Rekognition
@@ -137,6 +183,8 @@ const employeeResolvers = {
         data: { id: result.id },
       });
     } catch (error) {
+      console.log('🚀 ~ add: ~ error:', error);
+
       if (error instanceof Error) {
         let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
         if (error instanceof RouteError) {
@@ -153,66 +201,142 @@ const employeeResolvers = {
    */
   update: async (req: IReq<EmployeeRequest>, res: IRes) => {
     const { id, name, DOB, phone, address } = req.body;
+    const img = req.file;
     if (!id || !name || !DOB || !phone || !address) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
-    const result = await employeeService.updateOne(id, name, DOB, phone, address);
+    if (!img) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please upload a file');
+    }
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Update successfully',
-      data: result,
-    });
+    const imgBuffer = img.buffer;
+    try {
+      // Index faces using Rekognition
+      const face = await imageService.indexFace(imgBuffer.toString('base64'));
+      if (!face.FaceId) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
+
+      // Upload to Cloudinary
+      const publicId = await fileService.uploadToCloud(imgBuffer);
+
+      const employee: IEmployee = {
+        id: id,
+        name: name,
+        DOB: DOB,
+        phone: phone,
+        address: address,
+        status: '',
+        publicId: publicId,
+        rekognitionId: face.FaceId,
+      };
+
+      const result = await employeeService.updateOne(employee);
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Update successfully',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ update: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   /**
    * Activate one employee.
    */
-  activate: async (req: IReq<EmployeeRequest>, res: IRes) => {
-    const { id } = req.body;
-
+  activate: async (req: IReq, res: IRes) => {
+    const id = String(req.query.id);
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
-    const result = await employeeService.activateOne(id);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Deleted successfully',
-      data: result,
-    });
+    try {
+      const result = await employeeService.activateOne(id);
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ activate: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   /**
    * Inactivate one employee.
    */
-  inactivate: async (req: IReq<EmployeeRequest>, res: IRes) => {
-    const { id } = req.body;
-
+  inactivate: async (req: IReq, res: IRes) => {
+    const id = String(req.query.id);
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
-    const result = await employeeService.inactivateOne(id);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Deleted successfully',
-      data: result,
-    });
+    try {
+      const result = await employeeService.inactivateOne(id);
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ inactivate: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   /**
    * Delete one employee.
    */
-  delete: async (req: IReq<EmployeeRequest>, res: IRes) => {
-    const { id } = req.body;
-
+  delete: async (req: IReq, res: IRes) => {
+    const id = String(req.query.id);
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
-    const result = await employeeService.deleteOne(id);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Deleted successfully',
-      data: result,
-    });
+    try {
+      const result = await employeeService.deleteOne(id);
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Deleted successfully',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ delete: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 };
 
@@ -222,24 +346,36 @@ employeeRouter.use(json({ limit: '10mb' }));
 
 employeeRouter
   .route(Paths.Employee.CRUD)
-  .get(upload.none(), asyncHandler(employeeResolvers.getOne)) // Get one employee's info
+  .all(isAuthenticated)
+  .get(asyncHandler(employeeResolvers.getOne)) // Get one employee's info
   .post(upload.single('file'), asyncHandler(employeeResolvers.add)) // Add one employee
   .put(upload.none(), asyncHandler(employeeResolvers.update)) // Update one employee
-  .delete(upload.none(), isAdmin, asyncHandler(employeeResolvers.delete)); // Delete one employee
+  .delete(isAdmin, asyncHandler(employeeResolvers.delete)); // Delete one employee
 
-employeeRouter.route('/active').put(upload.none(), asyncHandler(employeeResolvers.activate));
+employeeRouter
+  .route('/active')
+  .all(isAuthenticated)
+  .put(asyncHandler(employeeResolvers.activate)); // Activate employees
 
-employeeRouter.route('/inactive').put(upload.none(), asyncHandler(employeeResolvers.inactivate));
+employeeRouter
+  .route('/inactive')
+  .all(isAuthenticated)
+  .put(asyncHandler(employeeResolvers.inactivate)); // Inactivate employees
 
-employeeRouter.route(Paths.Employee.All).get(upload.none(), asyncHandler(employeeResolvers.getAll)); //Get all active employees
+employeeRouter
+  .route(Paths.Employee.All)
+  .all(isAuthenticated)
+  .get(upload.none(), asyncHandler(employeeResolvers.getAll)); // Get all active employees
 
 employeeRouter
   .route(Paths.Employee.List)
-  .get(upload.none(), asyncHandler(employeeResolvers.getList)); //Get list employees
+  .all(isAuthenticated)
+  .get( asyncHandler(employeeResolvers.getList)); //Get list employees
 
 employeeRouter
   .route(Paths.Employee.Attendance)
-  .get(upload.none(), asyncHandler(employeeResolvers.getAttendanceReport)); //Get employees attendance history
+  .all(isAuthenticated)
+  .get(asyncHandler(employeeResolvers.getAttendanceReport)); //Get employees attendance history
 
 // **** Export default **** //
 

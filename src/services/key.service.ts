@@ -22,6 +22,10 @@ class KeyService {
       return result;
     } catch (error) {
       console.log('🚀 ~ KeyService ~ getByUserId ~ error:', error);
+
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, KEY_REQUEST_ERROR);
     }
   }
 
@@ -36,7 +40,9 @@ class KeyService {
     } catch (error) {
       console.log('🚀 ~ KeyService ~ createKeyToken ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, KEY_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, KEY_REQUEST_ERROR);
     }
   }
 
@@ -51,7 +57,9 @@ class KeyService {
     } catch (error) {
       console.log('🚀 ~ KeyService ~ updateKeyToken ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, KEY_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, KEY_REQUEST_ERROR);
     }
   }
 }

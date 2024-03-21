@@ -55,7 +55,7 @@ class AttendanceService {
    */
   public async createCheckIn(shiftId: string, employeeId: string) {
     try {
-      const now = moment().toDate();
+      const now = new Date().toISOString();
 
       const attendance = Attendance.new(now, shiftId, employeeId);
 
@@ -65,7 +65,8 @@ class AttendanceService {
     } catch (error) {
       console.log('🚀 ~ AttendanceService ~ createCheckIn ~ error:', error);
 
-      if (error instanceof RouteError) throw error;
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
       else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
     }
   }
@@ -75,7 +76,7 @@ class AttendanceService {
    */
   public async setCheckOut(attendance: IAttendance) {
     try {
-      const now = moment().toDate();
+      const now = new Date().toISOString();
 
       attendance.checkOutTime = now;
 
@@ -83,7 +84,9 @@ class AttendanceService {
     } catch (error) {
       console.log('🚀 ~ AttendanceService ~ setCheckOut ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
     }
   }
 
@@ -92,7 +95,7 @@ class AttendanceService {
    */
   public async getAttendanceRate() {
     try {
-      const now = moment().toDate();
+      const now = new Date().toISOString();
       const result: number[] = [];
 
       for (let n = 0; n <= 6; n++) {
@@ -114,7 +117,9 @@ class AttendanceService {
     } catch (error) {
       console.log('🚀 ~ AttendanceService ~ getAttendanceRate ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
     }
   }
 
@@ -132,12 +137,14 @@ class AttendanceService {
     } catch (error) {
       console.log('🚀 ~ AttendanceService ~ getByEmployeeId ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
     }
   }
 
   /**
-   * getByEmployeeId
+   * getByShiftId
    */
   public async getByShiftId(id: string) {
     try {
@@ -147,7 +154,9 @@ class AttendanceService {
     } catch (error) {
       console.log('🚀 ~ AttendanceService ~ getByEmployeeId ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, ATTENDANCE_REQUEST_ERROR);
     }
   }
 }

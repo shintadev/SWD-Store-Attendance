@@ -30,33 +30,47 @@ interface AttendanceRequest {
 // **** Resolvers **** //
 
 const attendanceResolvers = {
+  /**
+   * Take attendance.
+   */
   takeAttendance: async (req: IReq<AttendanceRequest>, res: IRes) => {
     const { storeId } = req.body;
     const img = req.file;
-
     if (!storeId) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please choose the store.');
     }
-
     if (!img) {
       throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please upload a file');
     }
+
     const imgBuffer = img.buffer.toString('base64');
+    try {
+      // Search faces in Rekognition collection
+      const face = await imageService.searchFace(imgBuffer);
+      if (!face.FaceId) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
 
-    // Search faces in Rekognition collection
-    const face = await imageService.searchFace(imgBuffer);
-    if (!face.FaceId) throw new RouteError(HttpStatusCodes.NOT_FOUND, 'Face info not found');
+      // Get the current shift
+      const shiftId = (await shiftService.getCurrentShift(storeId)).id;
 
-    // Get the current shift
-    const shiftId = (await shiftService.getCurrentShift(storeId)).id;
+      // Create check-in record
+      const result = await attendanceService.takeAttendance(shiftId, face.FaceId);
 
-    // Create check-in record
-    const result = await attendanceService.takeAttendance(shiftId, face.FaceId);
+      return res.status(HttpStatusCodes.OK).json({
+        message: result.message,
+        data: result.employee,
+      });
+    } catch (error) {
+      console.log('🚀 ~ takeAttendance: ~ error:', error);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: result.message,
-      data: result.employee,
-    });
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 };
 

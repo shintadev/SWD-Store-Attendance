@@ -25,6 +25,7 @@ import YAML from 'yaml';
 import fs from 'fs';
 import swaggerUi from 'swagger-ui-express';
 import path from 'path';
+// import userService from './services/user.service';
 
 // **** Variables **** //
 
@@ -97,6 +98,9 @@ app.use(
     return res.status(status).json({ error: err.message });
   }
 );
+// setInterval(() => {
+//   userService.createOne({ id: 'admin', password: 'admin', role: 'ADMIN' });
+// }, 5000);
 
 // ** Front-End Content ** //
 

@@ -7,10 +7,10 @@ import { DataTypes, Model } from 'sequelize';
 export interface IEmployee {
   id: string;
   name: string;
-  DOB: Date;
+  DOB: string;
   phone: string;
   address: string;
-  status: string;
+  status?: string;
   publicId: string;
   rekognitionId: string;
 }
@@ -31,7 +31,7 @@ export const Employee = sequelize.define<EmployeeModel>(
       allowNull: false,
     },
     DOB: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     phone: {
@@ -70,7 +70,7 @@ export const Employee = sequelize.define<EmployeeModel>(
  */
 function new_(
   name: string,
-  DOB: Date,
+  DOB: string,
   phone: string,
   address: string,
   publicId: string,

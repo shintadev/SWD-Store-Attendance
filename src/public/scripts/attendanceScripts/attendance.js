@@ -77,7 +77,6 @@ function getFile(canvas) {
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
       const result = new File([blob], 'img.jpg', { type: 'image/jpeg' });
-      console.log('🚀 ~ file=awaitcanvas.toBlob ~ result:', result);
       resolve(result);
     }, 'image/jpeg');
   });

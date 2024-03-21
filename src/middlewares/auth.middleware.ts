@@ -35,7 +35,7 @@ export const isAuthenticated = async (req: IReq, _: IRes, next?: NextFunction) =
   if (next) next();
 };
 
-export const isAdmin = async (req: IReq, res: IRes, next?: NextFunction) => {
+export const isAdmin = async (req: IReq, _: IRes, next?: NextFunction) => {
   const uid = req.signedCookies['uid'];
   const user = await userService.getById(uid);
   if (!user || user.role !== 'ADMIN') {

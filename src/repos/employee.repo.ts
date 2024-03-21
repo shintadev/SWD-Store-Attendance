@@ -1,20 +1,28 @@
 import { Employee, IEmployee } from '../models/Employee';
 import { sequelize } from './sequelize.orm';
 
+// **** Type **** //
+
+interface updateParams {
+  name?:string,
+  DOB?: string,
+  phone?: string,
+  address?: string,
+  publicId?:string,
+  rekognitionId?:string,
+}
+
 // **** Class **** //
 
 class EmployeeRepo {
   // **** Functions **** //
 
   /**
-   * Get list employee.
+   * Get list employees.
    */
   public async getList(page: number, pageSize: number) {
     const offset = (page - 1) * pageSize;
     const result = await Employee.findAll({
-      where: {
-        // status: 'Active',
-      },
       offset: offset,
       limit: pageSize,
     }).then(function (employees) {
@@ -31,7 +39,7 @@ class EmployeeRepo {
   }
 
   /**
-   * Get all active employee.
+   * Get all active employees.
    */
   public async getActive() {
     const result = await Employee.findAll({
@@ -65,6 +73,7 @@ class EmployeeRepo {
         return employee.dataValues;
       } else return null;
     });
+
     return result;
   }
 
@@ -82,30 +91,20 @@ class EmployeeRepo {
         return employee.dataValues;
       } else return null;
     });
-    return result;
-  }
 
-  /**
-   * See if an employee with the given id exists.
-   */
-  public async persists(id: string): Promise<boolean> {
-    const employee = await Employee.findOne({
-      where: { id: id },
-    });
-    if (employee) return true;
-    else return false;
+    return result;
   }
 
   /**
    * Add one employee.
    */
-  public async add(employee: IEmployee): Promise<IEmployee> {
+  public async add(employee: IEmployee) {
     const transaction = await sequelize.transaction();
     try {
       const result = await Employee.create(employee, { transaction: transaction });
       transaction.commit();
 
-      return result;
+      return result.dataValues;
     } catch (error) {
       transaction.rollback();
       throw error;
@@ -115,23 +114,39 @@ class EmployeeRepo {
   /**
    * Update an employee.
    */
-  public async update(id: string, name: string, DOB: Date, phone: string, address: string) {
+  public async update(employee: IEmployee) {
     const transaction = await sequelize.transaction();
     try {
-      const result = await Employee.update(
-        {
-          name: name,
-          DOB: DOB,
-          phone: phone,
-          address: address,
+      const oldRecord = await Employee.findOne({
+        where: { id: employee.id },
+      }).then(function (employee) {
+        if (employee) {
+          return employee.dataValues;
+        } else throw Error('Employee not found.');
+      });
+
+      const updateValues: updateParams = {};
+
+      if (employee.name !== oldRecord.name) {
+        updateValues.name = employee.name;
+      } else if (employee.DOB !== oldRecord.DOB) {
+        updateValues.DOB = employee.DOB;
+      } else if (employee.phone !== oldRecord.phone) {
+        updateValues.phone = employee.phone;
+      } else if (employee.address !== oldRecord.address) {
+        updateValues.address = employee.address;
+      } else if (employee.publicId !== oldRecord.publicId) {
+        updateValues.publicId = employee.publicId;
+      } else if (employee.rekognitionId !== oldRecord.rekognitionId) {
+        updateValues.rekognitionId = employee.rekognitionId;
+      } else return null;
+
+      const result = await Employee.update(updateValues, {
+        where: {
+          id: employee.id,
         },
-        {
-          where: {
-            id: id,
-          },
-          transaction: transaction,
-        }
-      );
+        transaction: transaction,
+      });
       transaction.commit();
 
       return result;

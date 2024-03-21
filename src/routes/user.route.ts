@@ -7,6 +7,7 @@ import HttpStatusCodes from '../constants/HttpStatusCodes';
 import userService from '../services/user.service';
 import User from '../models/User';
 import multer from 'multer';
+import { isAdmin, isAuthenticated } from '@src/middlewares/auth.middleware';
 
 // ** Add Router ** //
 
@@ -23,74 +24,135 @@ interface UserRequest {
 // **** Resolvers **** //
 
 const userResolvers = {
-  getById: async (req: IReq<UserRequest>, res: IRes) => {
+  getById: async (req: IReq, res: IRes) => {
     const id = String(req.query.id);
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
-    const user = await userService.getById(id);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: user,
-    });
+    try {
+      const user = await userService.getById(id);
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: user,
+      });
+    } catch (error) {
+      console.log('🚀 ~ getById: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   /**
    * Get list users.
    */
-  getList: async (req: IReq<UserRequest>, res: IRes) => {
+  getList: async (req: IReq, res: IRes) => {
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 10;
-    const result = await userService.getList(page, pageSize);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: result,
-    });
+    try {
+      const result = await userService.getList(page, pageSize);
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Request handled',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ getList: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   create: async (req: IReq<UserRequest>, res: IRes) => {
     const { id, password, role } = req.body;
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
-    const user = User.new(id, password, role);
 
-    const result = await userService.createOne(user);
+    try {
+      const user = User.new(id, password, role);
 
-    return res.status(HttpStatusCodes.CREATED).json({
-      message: 'User created',
-      data: result,
-    });
+      const result = await userService.createOne(user);
+
+      return res.status(HttpStatusCodes.CREATED).json({
+        message: 'Create successfully',
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
   update: async (req: IReq<UserRequest>, res: IRes) => {
     const { id, password, role } = req.body;
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
+    try {
+      const result = await userService.updateOne(id, password, role);
 
-    const result = await userService.updateOne(id, password, role);
-
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: result ?? 'Nothing to update.',
-    });
+      return res.status(HttpStatusCodes.OK).json({
+        message: result ? 'Update successfully' : 'Nothing to update.',
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
-  delete: async (req: IReq<UserRequest>, res: IRes) => {
-    const { id } = req.body;
+  delete: async (req: IReq, res: IRes) => {
+    const id = String(req.query.id);
     if (!id) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
 
-    const result = await userService.deleteOne(id);
+    try {
+      const result = await userService.deleteOne(id);
 
-    return res.status(HttpStatusCodes.OK).json({
-      message: 'Request handled',
-      data: result,
-    });
+      return res.status(HttpStatusCodes.OK).json({
+        message: 'Delete successfully',
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 };
 
@@ -98,12 +160,16 @@ const userResolvers = {
 
 userRouter
   .route(Paths.User.CRUD)
-  .get(multer().none(), asyncHandler(userResolvers.getById))
+  .all(isAuthenticated, isAdmin)
+  .get(asyncHandler(userResolvers.getById))
   .post(multer().none(), asyncHandler(userResolvers.create))
   .put(multer().none(), asyncHandler(userResolvers.update))
-  .delete(multer().none(), asyncHandler(userResolvers.delete));
+  .delete(asyncHandler(userResolvers.delete));
 
-userRouter.route(Paths.User.List).get(multer().none(), asyncHandler(userResolvers.getList));
+userRouter
+  .route(Paths.User.List)
+  .all(isAuthenticated, isAdmin)
+  .get(asyncHandler(userResolvers.getList));
 
 // **** Export default **** //
 

@@ -24,7 +24,7 @@ class AuthService {
   public async login(id: string, password: string) {
     try {
       const user = await verify(id, password);
-      let keyObject = (await keyService.getByUserId(user.id))?.dataValues;
+      let keyObject = await keyService.getByUserId(user.id);
       if (!keyObject) {
         const { publicKey, privateKey } = generateKeyPair();
         const { accessToken, refreshToken } = createJWTTokenPair(
@@ -61,7 +61,9 @@ class AuthService {
     } catch (error) {
       console.log('🚀 ~ AuthService ~ login ~ error:', error);
 
-      throw new RouteError(HttpStatusCodes.UNAUTHORIZED, AUTH_REQUEST_ERROR);
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
+      else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, AUTH_REQUEST_ERROR);
     }
   }
 
@@ -110,7 +112,8 @@ class AuthService {
     } catch (error) {
       console.log('🚀 ~ AuthService ~ refreshToken ~ error:', error);
 
-      if (error instanceof RouteError) throw error;
+      if (error instanceof Error)
+        throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message);
       else throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, AUTH_REQUEST_ERROR);
     }
   }

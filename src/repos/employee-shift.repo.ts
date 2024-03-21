@@ -55,7 +55,7 @@ class EmployeeShiftRepo {
       const result = await EmployeeShift.create(employeeShift, { transaction: transaction });
       transaction.commit();
 
-      return result;
+      return result.dataValues;
     } catch (error) {
       transaction.rollback();
       throw error;

@@ -25,50 +25,87 @@ export interface AuthRequest {
 const authResolvers = {
   login: async (req: IReq<AuthRequest>, res: IRes) => {
     const { id, password } = req.body;
-
     if (!id || !password) {
-      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Please input all necessary fields');
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
     }
-    const result = await authService.login(id, password);
 
-    res.clearCookie('uid');
-    res.clearCookie('role');
-    res.clearCookie('token');
+    try {
+      const result = await authService.login(id, password);
 
-    console.log('🚀 ~ login: ~ EnvVars.CookieProps.Options:', EnvVars.CookieProps.Options);
-    res.cookie('uid', result.uid, EnvVars.CookieProps.Options);
-    // res.cookie('role', result.role, { ...EnvVars.CookieProps.Options, signed: false });
-    res.cookie('token', result.accessToken, EnvVars.CookieProps.Options);
+      res.clearCookie('uid');
+      res.clearCookie('role');
+      res.clearCookie('token');
 
-    res.status(HttpStatusCodes.OK).json({
-      message: 'Login successfully',
-      data: result,
-    });
-    res.end();
+      res.cookie('uid', result.uid, EnvVars.CookieProps.Options);
+      // res.cookie('role', result.role, { ...EnvVars.CookieProps.Options, signed: false });
+      res.cookie('token', result.accessToken, EnvVars.CookieProps.Options);
+
+      res.status(HttpStatusCodes.OK).json({
+        message: 'Login successfully.',
+        data: result,
+      });
+    } catch (error) {
+      console.log('🚀 ~ login: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
-
 
   logout: (_: IReq<AuthRequest>, res: IRes) => {
-    res.clearCookie('uid');
-    res.clearCookie('role');
-    res.clearCookie('token');
-    res.status(HttpStatusCodes.OK).json({
-      message: 'Logout successful',
-    });
-    // res.end();
+    try {
+      res.clearCookie('uid');
+      res.clearCookie('role');
+      res.clearCookie('token');
+      res.status(HttpStatusCodes.OK).json({
+        message: 'Logout successfully.',
+      });
+    } catch (error) {
+      console.log('🚀 ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 
-  refreshToken: async (req: IReq<AuthRequest>, res: IRes) => {
+  refreshToken: async (req: IReq, res: IRes) => {
     const uid = req.signedCookies['uid'];
     const oldToken = req.signedCookies['token'];
-    const newToken = await authService.refreshToken(uid, oldToken);
+    if (!uid || !oldToken) {
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, 'Missing params');
+    }
+    try {
+      const newToken = await authService.refreshToken(uid, oldToken);
 
-    res.clearCookie('token');
-    res.cookie('token', newToken, EnvVars.CookieProps.Options);
-    res.status(HttpStatusCodes.OK).json({
-      message: 'Refresh token successfully',
-    });
-    res.end();
+      res.clearCookie('token');
+      res.cookie('token', newToken, EnvVars.CookieProps.Options);
+      res.status(HttpStatusCodes.OK).json({
+        message: 'Refresh token successfully',
+      });
+    } catch (error) {
+      console.log('🚀 ~ refreshToken: ~ error:', error);
+
+      if (error instanceof Error) {
+        let status = HttpStatusCodes.INTERNAL_SERVER_ERROR;
+        if (error instanceof RouteError) {
+          status = error.status;
+        }
+        throw new RouteError(status, error.message);
+      }
+      throw new RouteError(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'UNDEFINED_ERROR');
+    }
   },
 };
 

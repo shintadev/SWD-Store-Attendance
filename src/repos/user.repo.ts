@@ -19,16 +19,13 @@ class UserRepo {
   public async getList(page: number, pageSize: number) {
     const offset = (page - 1) * pageSize;
     const result = await User.findAll({
-      where: {
-        // status: 'Active',
-      },
       offset: offset,
       limit: pageSize,
-    }).then(function (Users) {
-      if (Users) {
+    }).then(function (users) {
+      if (users) {
         const result: IUser[] = [];
-        Users.forEach((User) => {
-          result.push(User.dataValues);
+        users.forEach((user) => {
+          result.push(user.dataValues);
         });
         return result;
       } else return null;
@@ -43,14 +40,15 @@ class UserRepo {
   public async getById(id: string) {
     const result = await User.findByPk(id).then(function (user) {
       if (user) {
-        return user;
+        return user.dataValues;
       } else return null;
     });
+
     return result;
   }
 
   /**
-   * create
+   * Create new user.
    */
   public async create(user: IUser) {
     const transaction = await sequelize.transaction();
@@ -58,7 +56,7 @@ class UserRepo {
       const result = await User.create(user, { transaction: transaction });
       transaction.commit();
 
-      return result;
+      return result.dataValues;
     } catch (error) {
       transaction.rollback();
       throw error;
@@ -66,7 +64,7 @@ class UserRepo {
   }
 
   /**
-   * Update.
+   * Update a user.
    */
   public async update(id: string, password?: string, role?: string) {
     const updateValues: updateParams = {};
@@ -99,7 +97,7 @@ class UserRepo {
   }
 
   /**
-   * delete
+   * Delete a user.
    */
   public async delete(id: string) {
     const transaction = await sequelize.transaction();

@@ -24,7 +24,7 @@ class AttendanceRepo {
           output.push(attendance.dataValues);
         });
         return output;
-      } else throw new Error('Error while getting records');
+      } else return null;
     });
     return result;
   }
@@ -44,7 +44,7 @@ class AttendanceRepo {
           output.push(attendance.dataValues);
         });
         return output;
-      } else throw new Error('Error while getting records');
+      } else return null;
     });
     return result;
   }
@@ -72,14 +72,10 @@ class AttendanceRepo {
   public async create(attendance: IAttendance) {
     const transaction = await sequelize.transaction();
     try {
-      const result = await Attendance.create(attendance, { transaction: transaction }).then(
-        function (shift) {
-          return shift;
-        }
-      );
+      const result = await Attendance.create(attendance, { transaction: transaction });
       transaction.commit();
 
-      return result;
+      return result.dataValues;
     } catch (error) {
       transaction.rollback();
       throw error;
@@ -103,9 +99,7 @@ class AttendanceRepo {
           },
           transaction: transaction,
         }
-      ).then(function (shift) {
-        return shift;
-      });
+      );
       transaction.commit();
 
       return result;

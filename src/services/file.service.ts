@@ -22,15 +22,7 @@ class FileService {
 
   // **** Functions **** //
 
-  public async uploadToCloud(image: Buffer): Promise<string> {
-    // Use the uploaded file's name as the asset's public ID and
-    // allow overwriting the asset with new versions
-    // const options = {
-    //   use_filename: true,
-    //   unique_filename: true,
-    //   overwrite: true,
-    // };
-
+  public async uploadToCloud(image: Buffer) {
     try {
       const result = await new Promise<UploadApiResponse>((resolve, reject) => {
         Cloudinary.uploader
@@ -49,7 +41,7 @@ class FileService {
     }
   }
 
-  public async getUrlFromCloud(publicId: string): Promise<string> {
+  public async getUrlFromCloud(publicId: string) {
     try {
       // Retrieve image URL using stored public ID
       const imageUrl = await new Promise<string>((resolve) =>
@@ -57,7 +49,8 @@ class FileService {
       );
       return imageUrl;
     } catch (error) {
-      console.error(error);
+      console.log('🚀 ~ FileService ~ getUrlFromCloud ~ error:', error);
+
       throw error;
     }
   }

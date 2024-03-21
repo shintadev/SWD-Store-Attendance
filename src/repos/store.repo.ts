@@ -40,7 +40,7 @@ class StoreRepo {
   public async getById(id: string) {
     const result = await Store.findByPk(id).then(function (store) {
       if (store) {
-        return store;
+        return store.dataValues;
       } else return null;
     });
     return result;
@@ -64,7 +64,7 @@ class StoreRepo {
   }
 
   /**
-   * create
+   * Create new store.
    */
   public async create(store: IStore) {
     const transaction = await sequelize.transaction();
@@ -72,7 +72,7 @@ class StoreRepo {
       const result = await Store.create(store, { transaction: transaction });
       transaction.commit();
 
-      return result;
+      return result.dataValues;
     } catch (error) {
       transaction.rollback();
       throw error;
@@ -80,7 +80,7 @@ class StoreRepo {
   }
 
   /**
-   * Update.
+   * Update a store.
    */
   public async update(id: string, name?: string, managerId?: string) {
     const updateValues: updateParams = {};
@@ -113,7 +113,7 @@ class StoreRepo {
   }
 
   /**
-   * delete
+   * Delete a store.
    */
   public async delete(id: string) {
     const transaction = await sequelize.transaction();
