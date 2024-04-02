@@ -13,6 +13,7 @@ async function preStart() {
   const storeJson = await storeResponse.json();
 
   const storeData = storeJson.data;
+  console.log('🚀 ~ preStart ~ storeData:', storeData);
 
   storeData.forEach((element) => {
     const option = document.createElement('option');
@@ -28,7 +29,7 @@ async function preStart() {
 
 async function renderItems() {
   const formData = new FormData();
-  formData.append('day', dateChoice.value.toISOString());
+  formData.append('day', new Date(dateChoice.value).toISOString());
   formData.append('storeId', storeInput.value ?? '');
 
   const response = await fetch('api/shift/schedule', {

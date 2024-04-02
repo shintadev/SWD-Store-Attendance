@@ -68,7 +68,7 @@ function new_(shiftNo: number, day: string, storeId: string): IShift {
   return {
     id: id,
     shiftNo: shiftNo,
-    day: day,
+    day: date.toLocaleDateString(),
     storeId: storeId,
   };
 }

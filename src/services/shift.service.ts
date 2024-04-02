@@ -41,20 +41,40 @@ class ShiftService {
     let currentHour = now.getUTCHours() + 7;
     if (currentHour >= 24) currentHour -= 24;
     const currentMinute = now.getUTCMinutes();
-    const currentTime = currentHour + ':' + currentMinute;
 
     const currentShift = Shifts.find((shift) => {
-      return currentTime >= shift.startTime && currentTime < shift.endTime;
+      const startTime = shift.startTime.split(':');
+      const startHour = startTime[0];
+      const startMinute = startTime[1];
+      const endTime = shift.endTime.split(':');
+      const endHour = endTime[0];
+      const endMinute = endTime[1];
+      if (currentHour > Number(startHour)) {
+        if (currentHour < Number(endHour)) return true;
+        else if (currentHour == Number(endHour)) {
+          if (currentMinute <= Number(endMinute)) return true;
+          else return false;
+        } else return false;
+      } else if (currentHour == Number(startHour)) {
+        if (currentMinute >= Number(startMinute)) {
+          if (currentHour < Number(endHour)) return true;
+          else if (currentHour == Number(endHour)) {
+            if (currentMinute <= Number(endMinute)) return true;
+            else return false;
+          } else return false;
+        } else return false;
+      } else return false;
     });
     if (!currentShift) throw new Error('No shift currently');
 
     try {
       const params = {
-        day: now.toISOString(),
+        day: now.toLocaleDateString(),
         storeId: storeId,
       };
 
       const shifts = await shiftRepo.getShifts(params); //Get all shift today of a store
+      console.log('🚀 ~ ShiftService ~ getCurrentShift ~ shifts:', shifts);
 
       const result = shifts.find((shift) => {
         return shift.shiftNo === currentShift.no; //Get the one happen now
@@ -77,7 +97,7 @@ class ShiftService {
   public async getByDay(date: Date, storeId?: string) {
     try {
       const params: WhereOptions = {
-        day: date.toISOString(),
+        day: date.toLocaleDateString(),
       };
       if (storeId) params.storeId = storeId;
       const result = await shiftRepo.getShifts(params);
@@ -122,14 +142,15 @@ class ShiftService {
   public async createOne(shift: IShift) {
     try {
       const params: WhereOptions = {
-        shiftNo: shift.shiftNo,
-        day: new Date(shift.day).toISOString(),
+        id: shift.id,
         storeId: shift.storeId,
       };
       const shifts = await shiftRepo.getShifts(params);
       if (shifts.length != 0) throw new Error('Shift already created.');
 
       const result = await shiftRepo.create(shift);
+      console.log('🚀 ~ ShiftService ~ createOne ~ shift:', shift);
+
 
       return result;
     } catch (error) {

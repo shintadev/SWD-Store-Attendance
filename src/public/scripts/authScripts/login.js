@@ -8,6 +8,26 @@ if (errorMsg) {
   localStorage.clear();
 }
 
+function getCookie(name) {
+  const value = document.cookie;
+  const parts = value.split(';');
+  if (parts.length > 1) {
+    return parts.find((e) => {
+      if (e.split('=')[0] === name) return e;
+    });
+  } else return parts[0].split('=')[1];
+}
+
+function setCookie(name, value, expDays) {
+  let date = new Date();
+  date.setTime(date.getTime() + expDays * 24 * 60 * 60 * 1000);
+  const expires = 'expires=' + date.toUTCString();
+  document.cookie = name + '=' + value + '; ' + expires + '; path=/';
+}
+
+const role = getCookie('role');
+if (role) window.location.href = '/dashboard';
+
 async function login() {
   const formData = new FormData();
 
@@ -34,7 +54,7 @@ async function upload(formData) {
     } else {
       msg.innerText = result.message;
 
-      document.cookie = 'role=' + result.data.role;
+      setCookie('role', result.data.role, 3);
       window.location.href = '/dashboard';
     }
   } catch (error) {

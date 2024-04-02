@@ -40,11 +40,7 @@ export const setViews = (app: Express) => {
 
   //Auth
   app.get(Paths.Auth.Login, (req: Request, res: Response) => {
-    try {
-      return res.redirect('/dashboard');
-    } catch (error) {
-      return res.sendFile('login.html', { root: authDir });
-    }
+    return res.sendFile('login.html', { root: authDir });
   });
 
   //Dashboard
